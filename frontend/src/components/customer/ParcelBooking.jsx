@@ -1,0 +1,292 @@
+import React, { useState } from 'react';
+import {
+  ArrowLeft, Check, Package, ChevronDown, CheckCircle2,
+  ShieldCheck, Phone, MapPin, ArrowRight
+} from 'lucide-react';
+import { useApp } from '../../context/AppContext';
+
+export const ParcelBooking = ({ onNavigate, onBack }) => {
+  const { setActiveParcel } = useApp();
+
+  const [pickup, setPickup] = useState('Miyapur, Hyderabad');
+  const [delivery, setDelivery] = useState('Gachibowli, Hyderabad');
+  const [parcelSize, setParcelSize] = useState('small'); // 'small' | 'medium' | 'large'
+  const [itemType, setItemType] = useState('Documents');
+  const [senderPhone, setSenderPhone] = useState('+91 98765 43210');
+  const [receiverPhone, setReceiverPhone] = useState('+91 99887 65432');
+  const [receiverName, setReceiverName] = useState('Anil Kumar');
+  const [instructions, setInstructions] = useState('Hand over directly to reception, 3rd floor');
+  const [isBooked, setIsBooked] = useState(false);
+  const [pickupOtp] = useState('6192');
+  const [deliveryOtp] = useState('4018');
+
+  const fareMap = {
+    small: 85,
+    medium: 120,
+    large: 175
+  };
+
+  const handleContinue = () => {
+    const parcelOrder = {
+      id: 'pcl_' + Date.now(),
+      pickup,
+      delivery,
+      parcelSize,
+      itemType,
+      fare: fareMap[parcelSize],
+      senderPhone,
+      receiverName,
+      receiverPhone,
+      instructions,
+      pickupOtp,
+      deliveryOtp,
+      partnerName: 'Suresh Reddy',
+      partnerPhone: '+91 97000 54321',
+      status: 'assigned'
+    };
+    setActiveParcel(parcelOrder);
+    setIsBooked(true);
+  };
+
+  return (
+    <div className="flex flex-col min-h-full bg-white pb-8 select-none">
+      {/* Header matching image.png */}
+      <div className="flex items-center px-4 py-3.5 border-b border-gray-100 bg-white sticky top-0 z-20">
+        <button
+          onClick={onBack}
+          className="p-1 rounded-full hover:bg-gray-100 text-gray-800 transition mr-3 active:scale-95"
+          aria-label="Go back"
+        >
+          <ArrowLeft className="w-5 h-5 stroke-[2.2]" />
+        </button>
+        <h1 className="text-base font-bold text-gray-900">Send Parcels</h1>
+      </div>
+
+      {!isBooked ? (
+        <div className="px-5 pt-4 space-y-4">
+          {/* Banner matching reference screenshot */}
+          <div className="relative overflow-hidden rounded-2xl bg-[#FFF9E6] border border-yellow-200 p-4">
+            <div className="max-w-[62%] relative z-10">
+              <h2 className="text-sm font-extrabold text-gray-900 leading-snug">
+                Send Anything<br />Anywhere
+              </h2>
+              <div className="mt-2 space-y-1">
+                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-gray-700">
+                  <span className="w-3.5 h-3.5 rounded-full bg-yellow-400 text-black flex items-center justify-center text-[9px] font-black">✓</span>
+                  <span>Quick Pickup</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-gray-700">
+                  <span className="w-3.5 h-3.5 rounded-full bg-yellow-400 text-black flex items-center justify-center text-[9px] font-black">✓</span>
+                  <span>Real-time Tracking</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-gray-700">
+                  <span className="w-3.5 h-3.5 rounded-full bg-yellow-400 text-black flex items-center justify-center text-[9px] font-black">✓</span>
+                  <span>Safe & Reliable</span>
+                </div>
+              </div>
+            </div>
+
+            {/* 3D Parcel Box illustration on right */}
+            <div className="absolute right-2 top-1/2 -translate-y-1/2 w-28 h-24 flex items-center justify-center pointer-events-none">
+              <div className="relative">
+                <div className="w-16 h-16 bg-[#e69500] rounded-lg transform rotate-6 shadow-md flex items-center justify-center font-bold text-white text-xs border-2 border-yellow-600">
+                  📦 V RIDE
+                </div>
+                <div className="w-12 h-12 bg-[#cca022] rounded-md absolute -bottom-2 -left-3 transform -rotate-12 shadow flex items-center justify-center text-xs">
+                  📦
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Locations Card matching reference screenshot */}
+          <div className="bg-[#f9fafb] p-3.5 rounded-2xl border border-gray-200 space-y-3">
+            {/* Pickup */}
+            <div className="flex items-center gap-2.5 pb-2.5 border-b border-gray-200">
+              <span className="w-2.5 h-2.5 rounded-full bg-green-500 ring-2 ring-green-200"></span>
+              <div className="flex-1">
+                <label className="text-[10px] text-gray-400 block font-semibold uppercase">Pickup Location</label>
+                <input
+                  type="text"
+                  value={pickup}
+                  onChange={(e) => setPickup(e.target.value)}
+                  className="w-full text-xs font-bold text-gray-900 bg-transparent focus:outline-none"
+                />
+              </div>
+            </div>
+
+            {/* Delivery Location */}
+            <div className="flex items-center gap-2.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-red-500 ring-2 ring-red-200"></span>
+              <div className="flex-1">
+                <label className="text-[10px] text-gray-400 block font-semibold uppercase">Delivery Location</label>
+                <input
+                  type="text"
+                  value={delivery}
+                  onChange={(e) => setDelivery(e.target.value)}
+                  className="w-full text-xs font-bold text-gray-900 bg-transparent focus:outline-none"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Parcel Details Section matching reference screenshot */}
+          <div className="space-y-3">
+            <h3 className="text-xs font-extrabold text-gray-900 uppercase tracking-wide">Parcel Details</h3>
+
+            {/* Size options cards: Small / Medium / Large */}
+            <div className="grid grid-cols-3 gap-2.5">
+              {/* Small */}
+              <button
+                onClick={() => setParcelSize('small')}
+                className={`flex flex-col items-center justify-center p-3 rounded-2xl border transition-all ${
+                  parcelSize === 'small'
+                    ? 'border-black bg-yellow-50 text-black font-extrabold shadow-sm'
+                    : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                <Package className="w-5 h-5 mb-1" />
+                <span className="text-xs font-bold">Small</span>
+                <span className="text-[10px] text-gray-400">(≤ 1 kg)</span>
+              </button>
+
+              {/* Medium */}
+              <button
+                onClick={() => setParcelSize('medium')}
+                className={`flex flex-col items-center justify-center p-3 rounded-2xl border transition-all ${
+                  parcelSize === 'medium'
+                    ? 'border-black bg-yellow-50 text-black font-extrabold shadow-sm'
+                    : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                <Package className="w-5 h-5 mb-1" />
+                <span className="text-xs font-bold">Medium</span>
+                <span className="text-[10px] text-gray-400">(1 - 5 kg)</span>
+              </button>
+
+              {/* Large */}
+              <button
+                onClick={() => setParcelSize('large')}
+                className={`flex flex-col items-center justify-center p-3 rounded-2xl border transition-all ${
+                  parcelSize === 'large'
+                    ? 'border-black bg-yellow-50 text-black font-extrabold shadow-sm'
+                    : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                <Package className="w-5 h-5 mb-1" />
+                <span className="text-xs font-bold">Large</span>
+                <span className="text-[10px] text-gray-400">(&gt; 5 kg)</span>
+              </button>
+            </div>
+
+            {/* Item Type dropdown matching reference screenshot */}
+            <div>
+              <label className="text-[10px] text-gray-500 font-semibold block mb-1">Item Type</label>
+              <div className="relative">
+                <select
+                  value={itemType}
+                  onChange={(e) => setItemType(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-white text-xs font-bold text-gray-900 appearance-none focus:outline-none focus:border-black cursor-pointer"
+                >
+                  <option value="Documents">Documents</option>
+                  <option value="Clothes">Clothes & Apparel</option>
+                  <option value="Electronics">Electronics & Gadgets</option>
+                  <option value="Food & Snacks">Food & Home Snacks</option>
+                  <option value="Medicines">Medicines & Healthcare</option>
+                  <option value="Gift items">Gift items</option>
+                  <option value="Other">Other</option>
+                </select>
+                <ChevronDown className="w-4 h-4 text-gray-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              </div>
+            </div>
+
+            {/* Receiver Contact Details */}
+            <div className="grid grid-cols-2 gap-2.5 pt-1">
+              <div>
+                <label className="text-[10px] text-gray-500 font-semibold block mb-1">Receiver Name</label>
+                <input
+                  type="text"
+                  value={receiverName}
+                  onChange={(e) => setReceiverName(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs font-medium focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="text-[10px] text-gray-500 font-semibold block mb-1">Receiver Phone</label>
+                <input
+                  type="text"
+                  value={receiverPhone}
+                  onChange={(e) => setReceiverPhone(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl border border-gray-200 text-xs font-medium focus:outline-none"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Fare Summary */}
+          <div className="p-3 bg-gray-50 rounded-xl flex items-center justify-between text-xs">
+            <span className="font-semibold text-gray-600">Calculated Delivery Fare</span>
+            <span className="font-black text-gray-900 text-sm">₹{fareMap[parcelSize]}</span>
+          </div>
+
+          {/* Continue Button matching reference screenshot */}
+          <button
+            onClick={handleContinue}
+            className="w-full py-3.5 rounded-2xl bg-vride-yellow text-black font-extrabold text-sm shadow-yellow-glow hover:bg-yellow-400 transition active:scale-98"
+          >
+            Continue
+          </button>
+        </div>
+      ) : (
+        /* Confirmed State */
+        <div className="px-5 pt-6 space-y-4">
+          <div className="bg-green-50 border border-green-200 p-4 rounded-2xl text-center space-y-2">
+            <div className="w-12 h-12 rounded-full bg-green-500 text-white flex items-center justify-center mx-auto">
+              <CheckCircle2 className="w-6 h-6" />
+            </div>
+            <h3 className="font-extrabold text-base text-gray-900">Parcel Pickup Scheduled!</h3>
+            <p className="text-xs text-gray-600">Partner Suresh Reddy has been assigned and is heading to your pickup location.</p>
+          </div>
+
+          {/* OTPs */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="p-3 bg-yellow-50 rounded-2xl border border-yellow-300 text-center">
+              <span className="text-[10px] font-bold text-gray-500 uppercase">Pickup OTP</span>
+              <p className="text-xl font-black text-black">{pickupOtp}</p>
+            </div>
+            <div className="p-3 bg-blue-50 rounded-2xl border border-blue-300 text-center">
+              <span className="text-[10px] font-bold text-gray-500 uppercase">Delivery OTP</span>
+              <p className="text-xl font-black text-black">{deliveryOtp}</p>
+            </div>
+          </div>
+
+          <div className="bg-gray-50 p-3.5 rounded-2xl text-xs space-y-1.5">
+            <div className="flex justify-between font-bold">
+              <span>Estimated Fare:</span>
+              <span>₹{fareMap[parcelSize]}</span>
+            </div>
+            <div className="flex justify-between text-gray-500">
+              <span>Category:</span>
+              <span className="capitalize">{parcelSize} ({itemType})</span>
+            </div>
+            <div className="flex justify-between text-gray-500">
+              <span>Receiver:</span>
+              <span>{receiverName} ({receiverPhone})</span>
+            </div>
+          </div>
+
+          <button
+            onClick={() => {
+              setIsBooked(false);
+              onNavigate('home');
+            }}
+            className="w-full py-3 rounded-2xl bg-black text-white font-bold text-xs"
+          >
+            Back to Home
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+export default ParcelBooking;
