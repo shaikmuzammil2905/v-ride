@@ -1,23 +1,20 @@
 {
   "name": "v-ride-ecosystem",
   "version": "1.0.0",
-  "description": "V RIDE - Complete All-in-One Mobility and Delivery Ecosystem (Rides, Parcels, Pick & Drop, Food Delivery)",
+  "description": "V RIDE - Complete All-in-One Mobility and Delivery Ecosystem",
   "scripts": {
-    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
-    "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
-    "start:backend": "cd backend && npm run dev",
-    "start:frontend": "cd frontend && npm run dev",
-    "build": "cd frontend && npm run build"
+    "postinstall": "cd frontend && npm install",
+    "build": "cd frontend && npm run build",
+    "build:vercel": "cd frontend && npm install && npm run build",
+    "start": "cd backend && npm start",
+    "dev": "cd frontend && npm run dev"
   },
   "keywords": [
     "v-ride",
     "mobility",
-    "ride-booking",
-    "parcel-delivery",
-    "pick-and-drop",
-    "food-ordering",
-    "delivery-partner",
-    "admin-dashboard"
+    "delivery",
+    "food",
+    "parcels"
   ],
   "author": "V RIDE Team",
   "license": "MIT"
