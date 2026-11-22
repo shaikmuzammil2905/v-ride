@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import {
-  Home, ShoppingBag, Wallet, HelpCircle, User,
-  Signal, Wifi, Battery
+  Home, ShoppingBag, Wallet, HelpCircle, User
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 
@@ -18,7 +17,6 @@ import SupportScreen from './SupportScreen';
 import ProfileScreen from './ProfileScreen';
 
 export const CustomerApp = () => {
-  const { isPhoneFrame } = useApp();
   // Current screen state: 'home' | 'ride' | 'parcel' | 'pickdrop' | 'food' | 'restaurant' | 'track' | 'orders' | 'wallet' | 'support' | 'profile'
   const [currentScreen, setCurrentScreen] = useState('home');
   const [selectedRestaurantId, setSelectedRestaurantId] = useState('rest_paradise');
@@ -87,38 +85,19 @@ export const CustomerApp = () => {
 
   const showBottomNav = ['home', 'orders', 'wallet', 'support', 'profile'].includes(currentScreen);
 
-  // Phone Frame Simulator Container
+  // Pure standalone mobile-first application container
   return (
-    <div className={`w-full flex justify-center items-start ${isPhoneFrame ? 'py-4 px-2' : 'p-0'}`}>
-      <div
-        className={`w-full bg-white relative transition-all ${
-          isPhoneFrame
-            ? 'max-w-[400px] h-[850px] rounded-[48px] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] border-[10px] border-black overflow-hidden flex flex-col'
-            : 'max-w-2xl min-h-screen border-x border-gray-200 shadow-sm flex flex-col'
-        }`}
-      >
-        {/* Mobile Device Status Bar matching reference screenshot (9:41, Signal, Wifi, Battery) */}
-        {isPhoneFrame && (
-          <div className="bg-white px-7 pt-3 pb-1 flex items-center justify-between text-black text-xs font-bold select-none z-30">
-            <span>9:41</span>
-            {/* Dynamic Island / Speaker Notch */}
-            <div className="w-24 h-4 bg-black rounded-full"></div>
-            <div className="flex items-center gap-1.5">
-              <Signal className="w-3.5 h-3.5 stroke-[2.5]" />
-              <Wifi className="w-3.5 h-3.5 stroke-[2.5]" />
-              <Battery className="w-4 h-4 stroke-[2.5]" />
-            </div>
-          </div>
-        )}
-
-        {/* Screen Content */}
+    <div className="w-full min-h-screen min-h-[100dvh] bg-[#f8f9fa] flex flex-col justify-between relative overflow-x-hidden">
+      {/* Centered mobile screen container */}
+      <div className="w-full max-w-md mx-auto min-h-screen min-h-[100dvh] bg-white flex flex-col relative shadow-md">
+        {/* Main Content Area */}
         <div className="flex-1 overflow-y-auto no-scrollbar relative">
           {renderScreen()}
         </div>
 
-        {/* Bottom Navigation Bar matching reference screenshot: Home, Orders, Wallet, Support, Profile */}
+        {/* Bottom Navigation Bar */}
         {showBottomNav && (
-          <div className="bg-white border-t border-gray-100 px-3 py-2 flex items-center justify-around sticky bottom-0 z-40 shadow-soft">
+          <div className="bg-white border-t border-gray-100 px-3 py-2 flex items-center justify-around sticky bottom-0 z-40 shadow-soft pb-[max(0.5rem,env(safe-area-inset-bottom))]">
             {bottomTabs.map(tab => {
               const Icon = tab.icon;
               const isActive = currentScreen === tab.id;

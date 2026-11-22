@@ -4,11 +4,12 @@ import {
   ArrowRight, Shield, Award, Clock, Star, Phone, MessageSquare
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import DrawerMenu from '../common/DrawerMenu';
 
 export const CustomerHome = ({ onNavigate }) => {
   const { currentUser, selectedLocation, setSelectedLocation, activeRide, activeFoodOrder, notifications } = useApp();
   const [showLocationModal, setShowLocationModal] = useState(false);
-  const [showMenuDrawer, setShowMenuDrawer] = useState(false);
+  const [showDrawer, setShowDrawer] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
 
   const hyderabadLocations = [
@@ -23,11 +24,11 @@ export const CustomerHome = ({ onNavigate }) => {
 
   return (
     <div className="flex flex-col min-h-full bg-[#f8f9fa] pb-24 text-gray-900 select-none">
-      {/* --- TOP STATUS & HEADER --- */}
-      <div className="bg-white px-4 pt-3 pb-3 border-b border-gray-100 flex items-center justify-between sticky top-0 z-20">
+      {/* --- STANDALONE MOBILE APP HEADER --- */}
+      <div className="bg-white px-4 pt-3 pb-3 border-b border-gray-100 flex items-center justify-between sticky top-0 z-20 shadow-xs">
         <div className="flex items-center gap-3">
           <button
-            onClick={() => setShowMenuDrawer(true)}
+            onClick={() => setShowDrawer(true)}
             className="p-1.5 rounded-xl hover:bg-gray-100 text-gray-800 transition active:scale-95"
             aria-label="Open menu"
           >
@@ -36,7 +37,7 @@ export const CustomerHome = ({ onNavigate }) => {
 
           {/* V RIDE Brand Logo matching reference screenshot */}
           <div className="flex items-center gap-1.5 cursor-pointer" onClick={() => onNavigate('home')}>
-            <div className="w-7 h-7 rounded-lg bg-vride-yellow flex items-center justify-center shadow-sm">
+            <div className="w-7 h-7 rounded-lg bg-vride-yellow flex items-center justify-center shadow-xs">
               <span className="font-black text-black text-sm tracking-tight">V</span>
             </div>
             <span className="font-extrabold text-lg tracking-wider text-black">V RIDE</span>
@@ -323,75 +324,12 @@ export const CustomerHome = ({ onNavigate }) => {
         </div>
       )}
 
-      {/* --- MENU DRAWER --- */}
-      {showMenuDrawer && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex">
-          <div className="bg-white w-72 h-full shadow-2xl p-5 flex flex-col justify-between animate-slideRight">
-            <div>
-              <div className="flex items-center justify-between pb-4 border-b border-gray-100">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-vride-yellow flex items-center justify-center font-black text-black">
-                    V
-                  </div>
-                  <span className="font-black text-base tracking-wide">V RIDE</span>
-                </div>
-                <button
-                  onClick={() => setShowMenuDrawer(false)}
-                  className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 font-bold text-xs"
-                >
-                  ✕
-                </button>
-              </div>
-
-              {/* User summary */}
-              <div className="mt-4 p-3 rounded-2xl bg-yellow-50/60 border border-yellow-100 flex items-center gap-3">
-                <img
-                  src={currentUser.avatar}
-                  alt={currentUser.name}
-                  className="w-10 h-10 rounded-full object-cover ring-2 ring-yellow-400"
-                />
-                <div>
-                  <h4 className="font-bold text-xs text-gray-900">{currentUser.name}</h4>
-                  <p className="text-[11px] text-gray-500">{currentUser.phone}</p>
-                </div>
-              </div>
-
-              {/* Navigation links */}
-              <div className="mt-5 space-y-1">
-                <button
-                  onClick={() => { setShowMenuDrawer(false); onNavigate('orders'); }}
-                  className="w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold text-gray-700 hover:bg-gray-100 transition"
-                >
-                  📦 My Orders & Rides
-                </button>
-                <button
-                  onClick={() => { setShowMenuDrawer(false); onNavigate('wallet'); }}
-                  className="w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold text-gray-700 hover:bg-gray-100 transition"
-                >
-                  💳 V RIDE Wallet (₹{currentUser.walletBalance || 850})
-                </button>
-                <button
-                  onClick={() => { setShowMenuDrawer(false); onNavigate('support'); }}
-                  className="w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold text-gray-700 hover:bg-gray-100 transition"
-                >
-                  🎧 24/7 Help & Support
-                </button>
-                <button
-                  onClick={() => { setShowMenuDrawer(false); onNavigate('profile'); }}
-                  className="w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold text-gray-700 hover:bg-gray-100 transition"
-                >
-                  👤 Manage Profile & Addresses
-                </button>
-              </div>
-            </div>
-
-            <div className="pt-4 border-t border-gray-100 text-center">
-              <span className="text-[10px] text-gray-400 font-medium">V RIDE v2.4.0 · Made for India</span>
-            </div>
-          </div>
-          <div className="flex-1" onClick={() => setShowMenuDrawer(false)}></div>
-        </div>
-      )}
+      {/* --- REDESIGNED COMPLETE HAMBURGER DRAWER --- */}
+      <DrawerMenu
+        isOpen={showDrawer}
+        onClose={() => setShowDrawer(false)}
+        onNavigate={onNavigate}
+      />
     </div>
   );
 };
