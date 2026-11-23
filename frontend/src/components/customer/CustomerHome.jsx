@@ -32,7 +32,7 @@ export const CustomerHome = ({ onNavigate }) => {
   };
 
   return (
-    <div className="flex flex-col min-h-full bg-[#f8f9fa] pb-24 text-gray-900 select-none">
+    <div className="flex flex-col min-h-full bg-[#f8f9fa] pb-3 text-gray-900 select-none">
       {/* --- FIXED NATIVE HEADER WITH NEW OFFICIAL LOGO --- */}
       <header className="bg-white px-4 pt-3 pb-3 border-b border-gray-100 flex items-center justify-between sticky top-0 z-30 shadow-xs">
         <div className="flex items-center gap-2.5">
@@ -359,6 +359,22 @@ export const CustomerHome = ({ onNavigate }) => {
               <span className="text-sm block">🚨</span>
               <span className="font-bold text-gray-800 mt-0.5 block">24/7 SOS</span>
               <span className="text-[9px] text-gray-400">Police Hotline 112</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* --- GRAND HYDERABAD BRAND PROMISE BANNER (Fills and elevates bottom layout) --- */}
+      <div className="px-4 pt-3 pb-2">
+        <div className="p-3.5 rounded-2xl bg-gradient-to-r from-[#080808] to-[#1c1c1c] text-white border border-[#FFD600]/40 shadow-sm flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#FFD600] text-black flex items-center justify-center font-black text-base shadow-sm shrink-0">
+              <Zap className="w-5 h-5 fill-black stroke-black" />
+            </div>
+            <div>
+              <span className="text-[9px] font-black uppercase text-[#FFD600] tracking-wider block">Hyderabad's #1 Mobility App</span>
+              <h4 className="font-extrabold text-xs text-white">Fast Rides · Hot Food · Express Parcels</h4>
+              <p className="text-[10px] text-gray-300 font-medium">★ 4.8 Rating · Trusted by 50,000+ Hyderabadis</p>
             </div>
           </div>
         </div>

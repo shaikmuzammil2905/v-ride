@@ -208,22 +208,31 @@ export const FoodOrdering = ({ onNavigate, onBack, onSelectRestaurant }) => {
         </div>
       </div>
 
-      {/* Floating Cart bar if items exist (above bottom nav) */}
+      {/* Grand & Bright Floating Cart Bar (Above Bottom Navigation Bar) */}
       {cartCount > 0 && (
-        <div className="fixed bottom-16 inset-x-0 max-w-md mx-auto px-4 z-30">
+        <div className="fixed bottom-[78px] inset-x-0 max-w-md mx-auto px-4 z-40 pointer-events-auto">
           <div
             onClick={() => onSelectRestaurant('rest_paradise')}
-            className="bg-vride-yellow text-black font-extrabold px-4 py-3 rounded-2xl shadow-yellow-glow flex items-center justify-between cursor-pointer active:scale-98"
+            className="bg-[#080808] border-2 border-[#FFD600] text-white p-3.5 rounded-2xl shadow-[0_12px_35px_rgba(0,0,0,0.35)] flex items-center justify-between cursor-pointer hover:bg-neutral-900 transition active:scale-98"
           >
-            <div className="flex items-center gap-2 text-xs">
-              <span className="w-6 h-6 rounded-full bg-black text-white flex items-center justify-center text-xs font-black">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-[#FFD600] text-black flex items-center justify-center font-black text-sm shadow-md">
                 {cartCount}
-              </span>
-              <span>{cartCount} Items | ₹{cartSubtotal}</span>
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-black text-sm text-white tracking-wide">₹{cartSubtotal}</span>
+                  <span className="text-[10px] font-bold text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded-full border border-emerald-500/30">
+                    {cartCount} {cartCount === 1 ? 'Item' : 'Items'} Added
+                  </span>
+                </div>
+                <p className="text-[11px] text-gray-300 font-medium mt-0.5">Paradise Biryani · Tap to checkout</p>
+              </div>
             </div>
-            <div className="flex items-center gap-1 text-xs font-black">
+
+            <div className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#FFD600] text-black font-black text-xs shadow-sm hover:bg-yellow-400 transition">
               <span>View Cart</span>
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-4 h-4 stroke-[3]" />
             </div>
           </div>
         </div>

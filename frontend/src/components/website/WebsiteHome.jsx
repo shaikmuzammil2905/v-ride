@@ -31,12 +31,12 @@ export const WebsiteHome = () => {
       {/* Website Navigation Header */}
       <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-gray-100 px-4 md:px-6 py-3.5 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-vride-yellow text-black flex items-center justify-center font-black text-xl shadow-yellow-glow">
-            V
+          <div className="w-10 h-10 rounded-xl overflow-hidden border border-yellow-400 shadow-xs">
+            <img src="/logo.png" alt="V RIDE" className="w-full h-full object-cover" />
           </div>
           <div>
             <span className="font-extrabold text-xl tracking-wide text-black">V RIDE</span>
-            <span className="text-[10px] text-gray-500 block leading-none font-bold">Rides · Parcels · Food</span>
+            <span className="text-[10px] text-gray-500 block leading-none font-bold uppercase tracking-wider">Rides · Food · Parcel</span>
           </div>
         </div>
 
@@ -398,9 +398,11 @@ export const WebsiteHome = () => {
       <footer className="bg-black text-white pt-16 pb-8 px-6 border-t border-neutral-800">
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 pb-12 border-b border-neutral-800 text-xs">
           <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-vride-yellow text-black flex items-center justify-center font-black">V</div>
-              <span className="font-black text-base">V RIDE</span>
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-xl overflow-hidden border border-yellow-400">
+                <img src="/logo.png" alt="V RIDE" className="w-full h-full object-cover" />
+              </div>
+              <span className="font-black text-lg text-white">V RIDE</span>
             </div>
             <p className="text-gray-400 font-medium">India's leading unified on-demand mobility, courier parcel, and food ordering ecosystem.</p>
           </div>
