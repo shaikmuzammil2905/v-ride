@@ -81,7 +81,7 @@ export const FoodOrdering = ({ onNavigate, onBack, onSelectRestaurant }) => {
   });
 
   return (
-    <div className="flex flex-col min-h-full bg-white pb-20 select-none">
+    <div className="flex flex-col min-h-full bg-white pb-28 select-none">
       {/* Header matching image.png */}
       <div className="px-4 py-3 border-b border-gray-100 bg-white sticky top-0 z-20">
         <div className="flex items-center justify-between">
@@ -208,9 +208,9 @@ export const FoodOrdering = ({ onNavigate, onBack, onSelectRestaurant }) => {
         </div>
       </div>
 
-      {/* Floating Cart bar if items exist */}
+      {/* Floating Cart bar if items exist (above bottom nav) */}
       {cartCount > 0 && (
-        <div className="fixed bottom-16 inset-x-0 px-4 z-30">
+        <div className="fixed bottom-16 inset-x-0 max-w-md mx-auto px-4 z-30">
           <div
             onClick={() => onSelectRestaurant('rest_paradise')}
             className="bg-vride-yellow text-black font-extrabold px-4 py-3 rounded-2xl shadow-yellow-glow flex items-center justify-between cursor-pointer active:scale-98"

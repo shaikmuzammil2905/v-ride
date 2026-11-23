@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import {
-  Menu, Bell, ChevronDown, Bike, Package, MapPin, Utensils,
-  ArrowRight, Shield, Award, Clock, Star, Phone, MessageSquare,
+  Menu, Bell, ChevronDown, Bike, Package, Utensils,
+  ArrowRight, ShieldCheck, Clock, Star, Phone, MessageSquare,
   RotateCcw, Sparkles, ChevronRight, Gift, Copy, CheckCircle2,
-  ShieldCheck, AlertTriangle
+  Navigation, Zap
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import DrawerMenu from '../common/DrawerMenu';
@@ -32,10 +32,10 @@ export const CustomerHome = ({ onNavigate }) => {
   };
 
   return (
-    <div className="flex flex-col min-h-full bg-[#f8f9fa] pb-6 text-gray-900 select-none">
-      {/* --- STANDALONE MOBILE APP HEADER --- */}
-      <div className="bg-white px-4 pt-3 pb-3 border-b border-gray-100 flex items-center justify-between sticky top-0 z-20 shadow-xs">
-        <div className="flex items-center gap-3">
+    <div className="flex flex-col min-h-full bg-[#f8f9fa] pb-24 text-gray-900 select-none">
+      {/* --- FIXED NATIVE HEADER WITH NEW OFFICIAL LOGO --- */}
+      <header className="bg-white px-4 pt-3 pb-3 border-b border-gray-100 flex items-center justify-between sticky top-0 z-30 shadow-xs">
+        <div className="flex items-center gap-2.5">
           <button
             onClick={() => setShowDrawer(true)}
             className="p-1.5 rounded-xl hover:bg-gray-100 text-gray-800 transition active:scale-95"
@@ -44,12 +44,15 @@ export const CustomerHome = ({ onNavigate }) => {
             <Menu className="w-6 h-6 stroke-[2.2]" />
           </button>
 
-          {/* V RIDE Brand Logo matching reference screenshot */}
-          <div className="flex items-center gap-1.5 cursor-pointer" onClick={() => onNavigate('home')}>
-            <div className="w-7 h-7 rounded-lg bg-vride-yellow flex items-center justify-center shadow-xs">
-              <span className="font-black text-black text-sm tracking-tight">V</span>
+          {/* New Official V RIDE Logo */}
+          <div className="flex items-center gap-2 cursor-pointer" onClick={() => onNavigate('home')}>
+            <div className="w-8 h-8 rounded-lg overflow-hidden border border-yellow-400 shadow-xs">
+              <img src="/logo.png" alt="V RIDE" className="w-full h-full object-cover" />
             </div>
-            <span className="font-extrabold text-lg tracking-wider text-black">V RIDE</span>
+            <div>
+              <span className="font-black text-lg tracking-wider text-[#080808] leading-none block">V RIDE</span>
+              <span className="text-[9px] text-gray-500 font-bold uppercase tracking-wider block">Mobility · Food · Parcel</span>
+            </div>
           </div>
         </div>
 
@@ -64,151 +67,117 @@ export const CustomerHome = ({ onNavigate }) => {
             <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500 ring-2 ring-white"></span>
           </button>
         </div>
-      </div>
+      </header>
 
-      {/* --- USER GREETING & LOCATION BAR (Exact match to reference screenshot) --- */}
-      <div className="px-4 pt-3 pb-2 bg-white">
-        <h1 className="text-xl font-bold text-gray-900 flex items-center gap-1.5">
-          <span>Hi {currentUser.name || 'Sri Latha'}</span>
-          <span className="text-xl">👋</span>
-        </h1>
-        <p className="text-xs text-gray-500 font-medium mt-0.5">What would you like to do today?</p>
+      {/* --- USER GREETING & LOCATION PICKER --- */}
+      <div className="px-4 pt-3.5 pb-2 bg-white">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-xl font-black text-gray-900 flex items-center gap-1.5">
+              <span>Hi {currentUser.name || 'Sri Latha'}</span>
+              <span className="text-xl">👋</span>
+            </h1>
+            <p className="text-xs text-gray-500 font-medium mt-0.5">Where do you want to go or order today?</p>
+          </div>
+        </div>
 
         {/* Location Dropdown Pill */}
         <button
           onClick={() => setShowLocationModal(true)}
           className="mt-2.5 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-50 border border-gray-200 text-xs font-semibold text-gray-800 hover:bg-gray-100 transition active:scale-98"
         >
-          <div className="w-2 h-2 rounded-full bg-vride-yellow ring-2 ring-yellow-200"></div>
+          <div className="w-2 h-2 rounded-full bg-[#FFD600] ring-2 ring-yellow-200"></div>
           <span className="truncate max-w-[200px]">{selectedLocation}</span>
           <ChevronDown className="w-3.5 h-3.5 text-gray-500" />
         </button>
       </div>
 
-      {/* --- SERVICE CATEGORY CARDS (Exact match to reference screenshot) --- */}
+      {/* --- 3 MAIN PROMINENT SERVICE CARDS (RIDES, FOOD, PARCEL) --- */}
+      {/* Pick & Drop standalone removed per user instructions and image copy 4.png */}
       <div className="px-4 pt-3 pb-1">
-        <div className="grid grid-cols-4 gap-2">
-          {/* 1. Ride */}
+        <div className="grid grid-cols-3 gap-2.5">
+          {/* 1. RIDES (Rapido-inspired) */}
           <button
-            onClick={() => onNavigate('ride')}
-            className="flex flex-col items-center p-2.5 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-yellow-300 transition group active:scale-95"
+            onClick={() => onNavigate('rides')}
+            className="flex flex-col items-center justify-between p-3 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-yellow-400 transition group active:scale-95 relative overflow-hidden"
           >
-            <div className="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600 group-hover:scale-105 transition shadow-inner">
-              <Bike className="w-6 h-6 stroke-[2.2]" />
+            <span className="absolute top-1.5 right-1.5 bg-yellow-400 text-black text-[8px] font-black px-1.5 py-0.2 rounded-full uppercase">
+              Fast
+            </span>
+            <div className="w-13 h-13 rounded-2xl bg-yellow-50 flex items-center justify-center text-yellow-800 group-hover:scale-105 transition shadow-xs mt-1">
+              <Bike className="w-7 h-7 stroke-[2.3]" />
             </div>
-            <span className="font-bold text-xs text-gray-900 mt-2">Ride</span>
-            <span className="text-[10px] text-gray-400 font-medium text-center leading-tight">Book a<br />bike ride</span>
+            <div className="text-center mt-2">
+              <span className="font-black text-xs text-gray-900 block">Rides</span>
+              <span className="text-[10px] text-gray-500 font-semibold block leading-tight">Bike · Auto · Cab</span>
+            </div>
           </button>
 
-          {/* 2. Parcels */}
-          <button
-            onClick={() => onNavigate('parcel')}
-            className="flex flex-col items-center p-2.5 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-purple-300 transition group active:scale-95"
-          >
-            <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 group-hover:scale-105 transition shadow-inner">
-              <Package className="w-6 h-6 stroke-[2.2]" />
-            </div>
-            <span className="font-bold text-xs text-gray-900 mt-2">Parcels</span>
-            <span className="text-[10px] text-gray-400 font-medium text-center leading-tight">Send<br />packages</span>
-          </button>
-
-          {/* 3. Pick & Drop */}
-          <button
-            onClick={() => onNavigate('pickdrop')}
-            className="flex flex-col items-center p-2.5 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-blue-300 transition group active:scale-95"
-          >
-            <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 group-hover:scale-105 transition shadow-inner">
-              <MapPin className="w-6 h-6 stroke-[2.2]" />
-            </div>
-            <span className="font-bold text-xs text-gray-900 mt-2">Pick & Drop</span>
-            <span className="text-[10px] text-gray-400 font-medium text-center leading-tight">Send or<br />collect</span>
-          </button>
-
-          {/* 4. Food */}
+          {/* 2. FOOD (Swiggy-inspired) */}
           <button
             onClick={() => onNavigate('food')}
-            className="flex flex-col items-center p-2.5 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-red-300 transition group active:scale-95"
+            className="flex flex-col items-center justify-between p-3 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-red-400 transition group active:scale-95 relative overflow-hidden"
           >
-            <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center text-red-500 group-hover:scale-105 transition shadow-inner">
-              <Utensils className="w-6 h-6 stroke-[2.2]" />
+            <span className="absolute top-1.5 right-1.5 bg-red-500 text-white text-[8px] font-black px-1.5 py-0.2 rounded-full uppercase">
+              50% OFF
+            </span>
+            <div className="w-13 h-13 rounded-2xl bg-red-50 flex items-center justify-center text-red-500 group-hover:scale-105 transition shadow-xs mt-1">
+              <Utensils className="w-7 h-7 stroke-[2.3]" />
             </div>
-            <span className="font-bold text-xs text-gray-900 mt-2">Food</span>
-            <span className="text-[10px] text-gray-400 font-medium text-center leading-tight">Order<br />food</span>
+            <div className="text-center mt-2">
+              <span className="font-black text-xs text-gray-900 block">Food</span>
+              <span className="text-[10px] text-gray-500 font-semibold block leading-tight">Order Online</span>
+            </div>
+          </button>
+
+          {/* 3. PARCEL (Rapido Parcel-inspired) */}
+          <button
+            onClick={() => onNavigate('parcel')}
+            className="flex flex-col items-center justify-between p-3 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-purple-400 transition group active:scale-95 relative overflow-hidden"
+          >
+            <span className="absolute top-1.5 right-1.5 bg-purple-600 text-white text-[8px] font-black px-1.5 py-0.2 rounded-full uppercase">
+              Doorstep
+            </span>
+            <div className="w-13 h-13 rounded-2xl bg-purple-50 flex items-center justify-center text-purple-700 group-hover:scale-105 transition shadow-xs mt-1">
+              <Package className="w-7 h-7 stroke-[2.3]" />
+            </div>
+            <div className="text-center mt-2">
+              <span className="font-black text-xs text-gray-900 block">Parcel</span>
+              <span className="text-[10px] text-gray-500 font-semibold block leading-tight">Send Anywhere</span>
+            </div>
           </button>
         </div>
       </div>
 
-      {/* --- ACTIVE ORDER FLOATING PILL (If ride or food active) --- */}
+      {/* --- ACTIVE ORDER FLOATING CARD (If ride or food active) --- */}
       {activeFoodOrder && (
         <div className="px-4 pt-2.5">
           <div
             onClick={() => onNavigate('track')}
-            className="bg-black text-white p-3.5 rounded-2xl shadow-lg border border-yellow-500/40 flex items-center justify-between cursor-pointer hover:bg-neutral-900 transition active:scale-98"
+            className="bg-[#080808] text-white p-3.5 rounded-2xl shadow-lg border border-yellow-400/40 flex items-center justify-between cursor-pointer hover:bg-neutral-900 transition active:scale-98"
           >
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-vride-yellow flex items-center justify-center text-black font-bold text-sm">
+              <div className="w-10 h-10 rounded-full bg-[#FFD600] flex items-center justify-center text-black font-bold text-sm">
                 🛵
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-xs text-vride-yellow">{activeFoodOrder.etaText || 'Arriving in 8 min'}</span>
+                  <span className="font-black text-xs text-[#FFD600]">{activeFoodOrder.etaText || 'Arriving in 8 min'}</span>
                   <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-ping"></span>
                 </div>
                 <p className="text-[11px] text-gray-300 font-medium truncate max-w-[180px]">{activeFoodOrder.restaurantName || 'Paradise Biryani'}</p>
               </div>
             </div>
-            <div className="flex items-center gap-1 text-xs font-bold text-vride-yellow">
-              <span>Track</span>
+            <div className="flex items-center gap-1 text-xs font-bold text-[#FFD600]">
+              <span>Track Live</span>
               <ArrowRight className="w-4 h-4" />
             </div>
           </div>
         </div>
       )}
 
-      {/* --- PROMOTIONAL BANNER: Send Parcels Fast & Safe (Matches screenshot) --- */}
-      <div className="px-4 pt-2.5">
-        <div
-          onClick={() => onNavigate('parcel')}
-          className="relative overflow-hidden rounded-2xl bg-[#FFF9E6] border border-yellow-200 p-4 cursor-pointer hover:shadow-md transition active:scale-98"
-        >
-          <div className="max-w-[62%] relative z-10">
-            <h2 className="text-sm font-extrabold text-gray-900 leading-snug">
-              Send Parcels<br />Fast & Safe
-            </h2>
-            <p className="text-[11px] text-gray-600 mt-0.5">Doorstep pickup & delivery</p>
-            <button
-              onClick={(e) => { e.stopPropagation(); onNavigate('parcel'); }}
-              className="mt-2.5 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black text-white text-xs font-bold hover:bg-gray-800 transition shadow"
-            >
-              <span>Send Now</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
-
-          {/* Courier on Scooter Graphic Illustration */}
-          <div className="absolute right-2 bottom-1 w-32 h-24 flex items-end justify-center pointer-events-none">
-            <img
-              src="https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=300&auto=format&fit=crop&q=80"
-              alt="Fast Parcel Delivery Scooter"
-              className="w-28 h-20 object-cover rounded-xl shadow-sm mix-blend-multiply opacity-90"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* --- OFFERS FOR YOU (Exact match to screenshot) --- */}
-      <div className="px-4 pt-3.5">
-        <div className="flex items-center justify-between mb-2">
-          <h2 className="text-sm font-bold text-gray-900">Offers for You</h2>
-          <button
-            onClick={() => onNavigate('food')}
-            className="text-xs font-bold text-blue-600 hover:text-blue-700"
-          >
-            View All
-          </button>
-        </div>
-
-        {/* Offer Card: Flat 20% OFF on Food Orders */}
+      {/* --- SWIGGY-INSPIRED FOOD OFFER PROMO --- */}
+      <div className="px-4 pt-3">
         <div
           onClick={() => onNavigate('food')}
           className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-red-600 to-red-500 text-white p-4 cursor-pointer hover:shadow-md transition active:scale-98"
@@ -220,7 +189,7 @@ export const CustomerHome = ({ onNavigate }) => {
             <h3 className="text-base font-black mt-1.5 leading-tight">
               Flat 20% OFF
             </h3>
-            <p className="text-xs text-red-100 font-medium">on Food Orders</p>
+            <p className="text-xs text-red-100 font-medium">on all food deliveries in Hyderabad</p>
           </div>
 
           <div className="absolute right-3 top-1/2 -translate-y-1/2 w-20 h-20 rounded-xl overflow-hidden shadow-md">
@@ -233,47 +202,15 @@ export const CustomerHome = ({ onNavigate }) => {
         </div>
       </div>
 
-      {/* --- QUICK ACTIONS --- */}
-      <div className="px-4 pt-3.5">
-        <h2 className="text-sm font-bold text-gray-900 mb-2">Quick Actions</h2>
-        <div className="grid grid-cols-2 gap-2.5">
-          <div
-            onClick={() => onNavigate('ride')}
-            className="p-3 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow transition cursor-pointer flex items-center gap-3 active:scale-98"
-          >
-            <div className="w-10 h-10 rounded-xl bg-yellow-50 flex items-center justify-center text-yellow-600 font-bold">
-              ⚡
-            </div>
-            <div>
-              <p className="text-xs font-bold text-gray-900">Daily Commute</p>
-              <p className="text-[10px] text-gray-400">Bike rides from ₹35</p>
-            </div>
-          </div>
-
-          <div
-            onClick={() => onNavigate('pickdrop')}
-            className="p-3 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow transition cursor-pointer flex items-center gap-3 active:scale-98"
-          >
-            <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 font-bold">
-              📄
-            </div>
-            <div>
-              <p className="text-xs font-bold text-gray-900">Send Documents</p>
-              <p className="text-[10px] text-gray-400">Safe doorstep transit</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* --- 1-TAP REBOOK / RECENT RIDE SECTION --- */}
+      {/* --- RAPIDO-INSPIRED 1-TAP REBOOK ROUTE --- */}
       <div className="px-4 pt-3.5">
         <div className="flex items-center justify-between mb-2">
-          <h2 className="text-sm font-bold text-gray-900">Recent Route</h2>
+          <h2 className="text-sm font-bold text-gray-900">Recent Route (Rapido Style)</h2>
           <button
-            onClick={() => onNavigate('orders')}
+            onClick={() => onNavigate('rides')}
             className="text-xs font-bold text-blue-600 hover:text-blue-700"
           >
-            Ride History
+            All Rides
           </button>
         </div>
 
@@ -284,13 +221,13 @@ export const CustomerHome = ({ onNavigate }) => {
             </div>
             <div>
               <h3 className="font-extrabold text-xs text-gray-900">Miyapur Metro → Kukatpally</h3>
-              <p className="text-[10px] text-gray-500 font-medium">₹56–₹72 · 5.4 km · Yesterday</p>
+              <p className="text-[10px] text-gray-500 font-medium">₹56–₹72 · 5.4 km · Bike Taxi</p>
             </div>
           </div>
 
           <button
-            onClick={() => onNavigate('ride')}
-            className="px-3 py-1.5 rounded-xl bg-vride-yellow text-black font-extrabold text-xs shadow-xs hover:bg-yellow-400 transition flex items-center gap-1 active:scale-95"
+            onClick={() => onNavigate('rides')}
+            className="px-3 py-1.5 rounded-xl bg-[#FFD600] text-black font-extrabold text-xs shadow-xs hover:bg-yellow-400 transition flex items-center gap-1 active:scale-95"
           >
             <RotateCcw className="w-3 h-3 stroke-[2.5]" />
             <span>Rebook</span>
@@ -298,18 +235,18 @@ export const CustomerHome = ({ onNavigate }) => {
         </div>
       </div>
 
-      {/* --- POPULAR RESTAURANTS IN HYDERABAD (From image.png screen 6) --- */}
-      <div className="px-4 pt-4">
-        <div className="flex items-center justify-between mb-2.5">
+      {/* --- POPULAR RESTAURANTS IN HYDERABAD (Swiggy-inspired) --- */}
+      <div className="px-4 pt-3.5">
+        <div className="flex items-center justify-between mb-2">
           <div>
-            <h2 className="text-sm font-bold text-gray-900">Top Food Near You</h2>
-            <p className="text-[10px] text-gray-500">Popular Hyderabadi cravings in 30 mins</p>
+            <h2 className="text-sm font-bold text-gray-900">Popular Restaurants (Swiggy Style)</h2>
+            <p className="text-[10px] text-gray-500">Delivered hot & fresh to your doorstep</p>
           </div>
           <button
             onClick={() => onNavigate('food')}
             className="text-xs font-bold text-blue-600 hover:text-blue-700"
           >
-            Explore Menu →
+            View All →
           </button>
         </div>
 
@@ -374,37 +311,33 @@ export const CustomerHome = ({ onNavigate }) => {
         </div>
       </div>
 
-      {/* --- REFER & EARN CASHBACK BANNER --- */}
+      {/* --- RAPIDO PARCEL PROMO BANNER --- */}
       <div className="px-4 pt-3.5">
-        <div className="p-3.5 rounded-2xl bg-gradient-to-r from-amber-50 to-yellow-100 border border-yellow-300 flex items-center justify-between">
+        <div
+          onClick={() => onNavigate('parcel')}
+          className="p-3.5 rounded-2xl bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 flex items-center justify-between cursor-pointer hover:border-purple-400 transition"
+        >
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-vride-yellow text-black flex items-center justify-center text-lg font-black shadow-xs">
-              🎁
+            <div className="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center font-black shadow-xs">
+              📦
             </div>
             <div>
-              <span className="text-[9px] font-black uppercase text-amber-800 tracking-wider">Referral Reward</span>
-              <h3 className="font-extrabold text-xs text-gray-900">Invite Friends & Earn ₹100</h3>
-              <p className="text-[10px] text-gray-600">Get ₹100 in V RIDE wallet on their first trip</p>
+              <span className="text-[9px] font-black uppercase text-purple-700 tracking-wider">Rapido Parcel Style</span>
+              <h3 className="font-extrabold text-xs text-gray-900">Send Packages Doorstep</h3>
+              <p className="text-[10px] text-gray-600">Documents, clothes & gifts delivered across Hyderabad</p>
             </div>
           </div>
-
-          <button
-            onClick={handleCopyCode}
-            className="px-2.5 py-1.5 rounded-xl bg-black text-white text-[11px] font-bold flex items-center gap-1 hover:bg-neutral-800 transition active:scale-95"
-          >
-            <Copy className="w-3 h-3" />
-            <span>{copiedCode ? 'Copied!' : 'Code'}</span>
-          </button>
+          <ArrowRight className="w-4 h-4 text-purple-600" />
         </div>
       </div>
 
-      {/* --- V RIDE TRUST & SAFETY SHIELD --- */}
-      <div className="px-4 pt-3.5 pb-2">
+      {/* --- V RIDE TRUST & SAFETY GUARANTEE --- */}
+      <div className="px-4 pt-3.5">
         <div className="p-3.5 rounded-2xl bg-white border border-gray-100 shadow-xs space-y-2.5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-green-600" />
-              <h3 className="font-extrabold text-xs text-gray-900">V RIDE Safety Guarantee</h3>
+              <h3 className="font-extrabold text-xs text-gray-900">V RIDE Assured Safety</h3>
             </div>
             <span className="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
               100% Protected
@@ -457,7 +390,7 @@ export const CustomerHome = ({ onNavigate }) => {
                   }`}
                 >
                   <span className="flex items-center gap-2">
-                    <MapPin className="w-3.5 h-3.5 text-gray-400" />
+                    <Navigation className="w-3.5 h-3.5 text-gray-400" />
                     {loc}
                   </span>
                   {selectedLocation === loc && <span className="text-xs text-yellow-600 font-bold">✓</span>}
@@ -474,7 +407,7 @@ export const CustomerHome = ({ onNavigate }) => {
           <div className="bg-white w-full max-w-sm rounded-t-3xl sm:rounded-2xl p-5 shadow-2xl">
             <div className="flex items-center justify-between pb-3 border-b border-gray-100">
               <h3 className="font-bold text-base text-gray-900 flex items-center gap-2">
-                <Bell className="w-4 h-4 text-vride-yellow" />
+                <Bell className="w-4 h-4 text-[#FFD600]" />
                 Notifications
               </h3>
               <button
@@ -499,7 +432,7 @@ export const CustomerHome = ({ onNavigate }) => {
         </div>
       )}
 
-      {/* --- REDESIGNED COMPLETE HAMBURGER DRAWER --- */}
+      {/* --- REDESIGNED HAMBURGER DRAWER --- */}
       <DrawerMenu
         isOpen={showDrawer}
         onClose={() => setShowDrawer(false)}

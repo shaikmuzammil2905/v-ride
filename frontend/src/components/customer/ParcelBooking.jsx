@@ -49,8 +49,8 @@ export const ParcelBooking = ({ onNavigate, onBack }) => {
   };
 
   return (
-    <div className="flex flex-col min-h-full bg-white pb-8 select-none">
-      {/* Header matching image.png */}
+    <div className="flex flex-col min-h-full bg-white pb-28 select-none">
+      {/* Header matching mobile design */}
       <div className="flex items-center px-4 py-3.5 border-b border-gray-100 bg-white sticky top-0 z-20">
         <button
           onClick={onBack}
@@ -64,40 +64,7 @@ export const ParcelBooking = ({ onNavigate, onBack }) => {
 
       {!isBooked ? (
         <div className="px-5 pt-4 space-y-4">
-          {/* Banner matching reference screenshot */}
-          <div className="relative overflow-hidden rounded-2xl bg-[#FFF9E6] border border-yellow-200 p-4">
-            <div className="max-w-[62%] relative z-10">
-              <h2 className="text-sm font-extrabold text-gray-900 leading-snug">
-                Send Anything<br />Anywhere
-              </h2>
-              <div className="mt-2 space-y-1">
-                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-gray-700">
-                  <span className="w-3.5 h-3.5 rounded-full bg-yellow-400 text-black flex items-center justify-center text-[9px] font-black">✓</span>
-                  <span>Quick Pickup</span>
-                </div>
-                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-gray-700">
-                  <span className="w-3.5 h-3.5 rounded-full bg-yellow-400 text-black flex items-center justify-center text-[9px] font-black">✓</span>
-                  <span>Real-time Tracking</span>
-                </div>
-                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-gray-700">
-                  <span className="w-3.5 h-3.5 rounded-full bg-yellow-400 text-black flex items-center justify-center text-[9px] font-black">✓</span>
-                  <span>Safe & Reliable</span>
-                </div>
-              </div>
-            </div>
-
-            {/* 3D Parcel Box illustration on right */}
-            <div className="absolute right-2 top-1/2 -translate-y-1/2 w-28 h-24 flex items-center justify-center pointer-events-none">
-              <div className="relative">
-                <div className="w-16 h-16 bg-[#e69500] rounded-lg transform rotate-6 shadow-md flex items-center justify-center font-bold text-white text-xs border-2 border-yellow-600">
-                  📦 V RIDE
-                </div>
-                <div className="w-12 h-12 bg-[#cca022] rounded-md absolute -bottom-2 -left-3 transform -rotate-12 shadow flex items-center justify-center text-xs">
-                  📦
-                </div>
-              </div>
-            </div>
-          </div>
+          {/* Top banner removed per user instruction image copy 7.png */}
 
           {/* Locations Card matching reference screenshot */}
           <div className="bg-[#f9fafb] p-3.5 rounded-2xl border border-gray-200 space-y-3">

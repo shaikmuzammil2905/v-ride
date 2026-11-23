@@ -249,12 +249,12 @@ export const RestaurantDetail = ({ onBack, onNavigateToTrack }) => {
         })}
       </div>
 
-      {/* Floating Bottom Cart Bar matching Screen 7 in image.png */}
+      {/* Floating Bottom Cart Bar (positioned right above permanently fixed bottom nav) */}
       {cartCount > 0 && (
-        <div className="fixed bottom-0 inset-x-0 p-4 bg-white/95 backdrop-blur-md border-t border-gray-100 z-30">
+        <div className="fixed bottom-16 inset-x-0 max-w-md mx-auto px-4 py-2 z-30 pointer-events-auto">
           <div
             onClick={() => setShowCartModal(true)}
-            className="bg-vride-yellow text-black font-extrabold px-4 py-3.5 rounded-2xl shadow-yellow-glow flex items-center justify-between cursor-pointer active:scale-98"
+            className="bg-[#FFD600] text-black font-extrabold px-4 py-3 rounded-2xl shadow-lg flex items-center justify-between cursor-pointer active:scale-98 border border-black/10"
           >
             <div className="flex items-center gap-2 text-xs">
               <span className="w-5 h-5 rounded-full bg-black text-white flex items-center justify-center text-[10px] font-black">

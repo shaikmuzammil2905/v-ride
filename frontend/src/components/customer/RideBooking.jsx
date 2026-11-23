@@ -53,7 +53,7 @@ export const RideBooking = ({ onNavigate, onBack }) => {
   };
 
   return (
-    <div className="flex flex-col min-h-full bg-white pb-8 select-none">
+    <div className="flex flex-col min-h-full bg-white pb-28 select-none">
       {/* Header matching image.png */}
       <div className="flex items-center px-4 py-3.5 border-b border-gray-100 bg-white sticky top-0 z-20">
         <button
