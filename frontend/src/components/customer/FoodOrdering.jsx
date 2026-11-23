@@ -6,9 +6,11 @@ import {
 import { useApp } from '../../context/AppContext';
 
 export const FoodOrdering = ({ onNavigate, onBack, onSelectRestaurant }) => {
-  const { selectedLocation, setSelectedLocation, cartCount, cartSubtotal } = useApp();
+  const { selectedLocation, setSelectedLocation, cartCount, cartSubtotal, addToCart } = useApp();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
+  const [vegOnly, setVegOnly] = useState(false);
+  const [activeSubTab, setActiveSubTab] = useState('ALL');
 
   const categories = [
     { id: 'All', name: 'All', icon: '🍽️' },
@@ -16,6 +18,24 @@ export const FoodOrdering = ({ onNavigate, onBack, onSelectRestaurant }) => {
     { id: 'Pizza', name: 'Pizza', icon: '🍕' },
     { id: 'Burgers', name: 'Burgers', icon: '🍔' },
     { id: 'Meals', name: 'Meals', icon: '🍛' }
+  ];
+
+  const whatsOnYourMind = [
+    { name: 'Fried rice', icon: '🍚' },
+    { name: 'Cakes', icon: '🍰' },
+    { name: 'Dosa', icon: '🥞' },
+    { name: 'Noodles', icon: '🍜' },
+    { name: 'Idli', icon: '🥟' },
+    { name: 'Biryani', icon: '🍲' },
+    { name: 'Burgers', icon: '🍔' },
+    { name: 'Pizza', icon: '🍕' }
+  ];
+
+  const store99Items = [
+    { id: 'item_shw', name: 'Veg Shawarma', price: 99, isVeg: true },
+    { id: 'item_corn_pizza', name: 'Sweet Corns Pizza', price: 99, isVeg: true },
+    { id: 'item_ghee_dosa', name: 'Ghee Dosa', price: 79, isVeg: true },
+    { id: 'item_popcorn', name: 'Crispy Popcorn', price: 99, isVeg: false }
   ];
 
   const restaurants = [
@@ -104,16 +124,97 @@ export const FoodOrdering = ({ onNavigate, onBack, onSelectRestaurant }) => {
           </div>
         </div>
 
-        {/* Search bar matching screenshot */}
-        <div className="mt-3 relative">
-          <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search for restaurants, dishes..."
-            className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-gray-100 text-xs font-medium text-gray-900 focus:outline-none focus:ring-1 focus:ring-black placeholder-gray-400"
-          />
+        {/* Search bar with VEG toggle switch matching image copy 13.png */}
+        <div className="mt-3 flex items-center gap-2">
+          <div className="relative flex-1">
+            <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search for restaurants, dishes..."
+              className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-gray-100 text-xs font-bold text-gray-900 focus:outline-none focus:ring-1 focus:ring-black placeholder-gray-400"
+            />
+          </div>
+
+          <button
+            onClick={() => setVegOnly(!vegOnly)}
+            className={`px-3 py-2 rounded-2xl text-[10px] font-black flex items-center gap-1 border transition ${
+              vegOnly
+                ? 'bg-emerald-600 text-white border-emerald-500 shadow-xs'
+                : 'bg-gray-100 text-gray-800 border-gray-200'
+            }`}
+          >
+            <span className={`w-2 h-2 rounded-full ${vegOnly ? 'bg-white' : 'bg-green-600'}`}></span>
+            <span>VEG</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Sub Filter Tabs (image copy 13.png) */}
+      <div className="px-4 py-2 bg-gray-50 border-b border-gray-100 flex items-center gap-2 overflow-x-auto no-scrollbar text-xs">
+        {['ALL', '99 STORE', 'OFFERS', '⚡ BOLT', 'TOP RATED'].map(tab => (
+          <button
+            key={tab}
+            onClick={() => setActiveSubTab(tab)}
+            className={`px-3 py-1 rounded-full whitespace-nowrap text-[10px] font-black transition ${
+              activeSubTab === tab
+                ? 'bg-black text-white'
+                : 'bg-white text-gray-600 border border-gray-200'
+            }`}
+          >
+            {tab}
+          </button>
+        ))}
+      </div>
+
+      {/* "What's on your mind?" circular dishes (image copy 14.png) */}
+      <div className="px-4 pt-3 pb-2 bg-white">
+        <h3 className="font-black text-xs text-gray-900 mb-2">What's on your mind?</h3>
+        <div className="flex gap-3 overflow-x-auto no-scrollbar pb-1">
+          {whatsOnYourMind.map((item, idx) => (
+            <div
+              key={idx}
+              onClick={() => setSearchQuery(item.name)}
+              className="flex flex-col items-center min-w-[54px] cursor-pointer group"
+            >
+              <div className="w-12 h-12 rounded-full bg-gray-50 border border-gray-200 flex items-center justify-center text-2xl group-hover:scale-105 group-hover:border-yellow-400 transition shadow-xs">
+                {item.icon}
+              </div>
+              <span className="text-[10px] font-bold text-gray-700 mt-1 truncate">{item.name}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* "99 store" Section with 1-tap ADD buttons (image copy 14.png) */}
+      <div className="px-4 pt-2 pb-1">
+        <div className="bg-[#FFFBF0] p-3 rounded-2xl border border-yellow-200 space-y-2.5">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <span className="px-2 py-0.5 rounded-lg bg-black text-[#FFD600] font-black text-xs">99 store</span>
+              <span className="text-xs font-bold text-gray-900">Meals at ₹99 + Free Delivery</span>
+            </div>
+            <span className="text-[10px] font-bold text-blue-600">View All →</span>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            {store99Items.map(item => (
+              <div key={item.id} className="bg-white p-2.5 rounded-xl border border-gray-200 flex items-center justify-between">
+                <div>
+                  <span className="w-2 h-2 rounded-full bg-emerald-600 block mb-0.5"></span>
+                  <h4 className="font-extrabold text-[11px] text-gray-900 leading-tight">{item.name}</h4>
+                  <span className="font-black text-xs text-gray-900">₹{item.price}</span>
+                </div>
+                <button
+                  onClick={() => addToCart({ id: item.id, name: item.name, price: item.price }, 'rest_paradise')}
+                  className="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-300 font-black text-xs hover:bg-emerald-600 hover:text-white transition active:scale-95"
+                >
+                  + ADD
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 

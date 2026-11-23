@@ -16,6 +16,7 @@ export const RideBooking = ({ onNavigate, onBack }) => {
   const [rideOtp] = useState('7391');
   const [showSosModal, setShowSosModal] = useState(false);
   const [sosAlertSent, setSosAlertSent] = useState(false);
+  const [showAllServicesModal, setShowAllServicesModal] = useState(false);
 
   // Swap pickup & drop
   const handleSwap = () => {
@@ -27,7 +28,13 @@ export const RideBooking = ({ onNavigate, onBack }) => {
   const vehicleFares = {
     bike: { label: 'Bike', fareRange: '₹56 - ₹72', time: '12 min', icon: '🛵' },
     auto: { label: 'Auto', fareRange: '₹85 - ₹105', time: '14 min', icon: '🛺' },
-    car: { label: 'Car', fareRange: '₹145 - ₹180', time: '16 min', icon: '🚗' }
+    car: { label: 'Car', fareRange: '₹145 - ₹180', time: '16 min', icon: '🚗' },
+    shared_auto: { label: 'Shared Auto', fareRange: '₹35 - ₹45', time: '18 min', icon: '🛺' },
+    parcel_bike: { label: 'Parcel on Bike', fareRange: '₹40 - ₹60', time: '15 min', icon: '📦' },
+    cab_economy: { label: 'Cab Economy', fareRange: '₹120 - ₹150', time: '15 min', icon: '🚗' },
+    bike_lite: { label: 'Bike Lite', fareRange: '₹45 - ₹55', time: '14 min', icon: '⚡' },
+    cab_premium: { label: 'Cab Premium', fareRange: '₹190 - ₹240', time: '15 min', icon: '✨' },
+    travel: { label: 'Travel', fareRange: '₹850 - ₹1200', time: '1.5 hrs', icon: '🧳' }
   };
 
   const handleBookRide = () => {
@@ -80,45 +87,65 @@ export const RideBooking = ({ onNavigate, onBack }) => {
 
       {bookingStep === 'select' && (
         <div className="px-5 space-y-4">
-          {/* Vehicle Category Selector Pills (Bike / Auto / Car matching screenshot) */}
-          <div className="grid grid-cols-3 gap-3">
+          {/* Vehicle Category Selector Pills with "All Services" button matching image copy 11.png & 12.png */}
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-black text-gray-900">Choose Service</span>
+            <button
+              onClick={() => setShowAllServicesModal(true)}
+              className="text-[11px] font-extrabold text-blue-600 hover:text-blue-800 flex items-center gap-0.5"
+            >
+              <span>All 8 Services</span>
+              <span className="text-[10px]">→</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-4 gap-2">
             {/* 1. Bike */}
             <button
               onClick={() => setSelectedVehicle('bike')}
-              className={`flex flex-col items-center justify-center py-2.5 px-3 rounded-2xl border transition-all ${
+              className={`flex flex-col items-center justify-center py-2 px-1 rounded-2xl border transition-all ${
                 selectedVehicle === 'bike'
                   ? 'bg-vride-yellow border-black text-black font-extrabold shadow-sm'
                   : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
               }`}
             >
-              <span className="text-xl">🛵</span>
-              <span className="text-xs font-bold mt-1">Bike</span>
+              <span className="text-lg">🛵</span>
+              <span className="text-[11px] font-bold mt-0.5">Bike</span>
             </button>
 
             {/* 2. Auto */}
             <button
               onClick={() => setSelectedVehicle('auto')}
-              className={`flex flex-col items-center justify-center py-2.5 px-3 rounded-2xl border transition-all ${
+              className={`flex flex-col items-center justify-center py-2 px-1 rounded-2xl border transition-all ${
                 selectedVehicle === 'auto'
                   ? 'bg-vride-yellow border-black text-black font-extrabold shadow-sm'
                   : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
               }`}
             >
-              <span className="text-xl">🛺</span>
-              <span className="text-xs font-bold mt-1">Auto</span>
+              <span className="text-lg">🛺</span>
+              <span className="text-[11px] font-bold mt-0.5">Auto</span>
             </button>
 
             {/* 3. Car */}
             <button
               onClick={() => setSelectedVehicle('car')}
-              className={`flex flex-col items-center justify-center py-2.5 px-3 rounded-2xl border transition-all ${
+              className={`flex flex-col items-center justify-center py-2 px-1 rounded-2xl border transition-all ${
                 selectedVehicle === 'car'
                   ? 'bg-vride-yellow border-black text-black font-extrabold shadow-sm'
                   : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
               }`}
             >
-              <span className="text-xl">🚗</span>
-              <span className="text-xs font-bold mt-1">Car</span>
+              <span className="text-lg">🚗</span>
+              <span className="text-[11px] font-bold mt-0.5">Car</span>
+            </button>
+
+            {/* 4. All Services */}
+            <button
+              onClick={() => setShowAllServicesModal(true)}
+              className="flex flex-col items-center justify-center py-2 px-1 rounded-2xl border border-gray-200 bg-gray-50 hover:bg-gray-100 text-gray-700"
+            >
+              <span className="text-lg">✨</span>
+              <span className="text-[11px] font-bold mt-0.5">All</span>
             </button>
           </div>
 
@@ -294,6 +321,53 @@ export const RideBooking = ({ onNavigate, onBack }) => {
             >
               Simulate Complete Trip & Pay →
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* ALL SERVICES MODAL (image copy 12.png) */}
+      {showAllServicesModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+          <div className="bg-white w-full max-w-sm rounded-t-3xl sm:rounded-2xl p-5 shadow-2xl max-h-[85vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-3 border-b border-gray-100">
+              <h3 className="font-extrabold text-base text-gray-900">All Services</h3>
+              <button
+                onClick={() => setShowAllServicesModal(false)}
+                className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 font-bold text-xs"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="grid grid-cols-3 gap-3 py-4">
+              {[
+                { id: 'shared_auto', name: 'Shared Auto', icon: '🛺', fare: '₹35' },
+                { id: 'bike', name: 'Bike', icon: '🛵', fare: '₹56' },
+                { id: 'auto', name: 'Auto', icon: '🛺', fare: '₹85' },
+                { id: 'parcel_bike', name: 'Parcel on Bike', icon: '📦', fare: '₹40' },
+                { id: 'cab_economy', name: 'Cab Economy', icon: '🚗', fare: '₹120' },
+                { id: 'bike_lite', name: 'Bike Lite', icon: '⚡', fare: '₹45' },
+                { id: 'cab_premium', name: 'Cab Premium', icon: '✨', fare: '₹190' },
+                { id: 'travel', name: 'Travel', icon: '🧳', fare: '₹850' }
+              ].map(s => (
+                <button
+                  key={s.id}
+                  onClick={() => {
+                    setSelectedVehicle(s.id);
+                    setShowAllServicesModal(false);
+                  }}
+                  className={`p-3 rounded-2xl border text-center transition flex flex-col items-center justify-center ${
+                    selectedVehicle === s.id
+                      ? 'border-black bg-yellow-50 text-black font-extrabold shadow-sm'
+                      : 'border-gray-100 bg-[#F9FAFB] text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  <span className="text-2xl mb-1">{s.icon}</span>
+                  <span className="text-xs font-bold block leading-tight">{s.name}</span>
+                  <span className="text-[10px] text-gray-500 mt-0.5">{s.fare}</span>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       )}

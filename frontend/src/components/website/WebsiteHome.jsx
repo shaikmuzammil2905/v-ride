@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import {
   Bike, Package, MapPin, Utensils, Smartphone, Shield,
   Star, CheckCircle2, ArrowRight, Download, Phone, Mail,
-  ChevronDown, HelpCircle, DollarSign, Award, Heart
+  ChevronDown, HelpCircle, DollarSign, Award, Heart, Search,
+  Clock, Compass, Plus, Sparkles, Navigation, X, Mic, Flame,
+  Percent, ChevronRight, Zap, ShoppingBag
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 
@@ -15,6 +17,18 @@ export const WebsiteHome = () => {
   const [partnerName, setPartnerName] = useState('');
   const [partnerPhone, setPartnerPhone] = useState('');
   const [partnerSubmitted, setPartnerSubmitted] = useState(false);
+
+  // Rapido Rides Interactive State (image copy 11.png & 12.png)
+  const [showAllRideServices, setShowAllRideServices] = useState(false);
+  const [selectedRideService, setSelectedRideService] = useState('bike');
+  const [rideDestinationSearch, setRideDestinationSearch] = useState('');
+
+  // Swiggy Food Interactive State (image copy 13.png & 14.png)
+  const [vegOnly, setVegOnly] = useState(false);
+  const [foodActiveSubTab, setFoodActiveSubTab] = useState('ALL');
+  const [addedFoodItems, setAddedFoodItems] = useState([
+    { id: 'item_shw', name: 'Veg Shawarma', price: 99, count: 1 }
+  ]);
 
   // Estimate partner earnings
   const ratePerHour = partnerVehicle === 'bike' ? 95 : partnerVehicle === 'auto' ? 125 : 170;
@@ -165,84 +179,584 @@ export const WebsiteHome = () => {
         </div>
       </section>
 
-      {/* Services Section */}
-      <section id="services" className="py-12 md:py-16 px-4 md:px-6 bg-gray-50 border-y border-gray-100">
-        <div className="max-w-6xl mx-auto space-y-10">
-          <div className="text-center max-w-xl mx-auto space-y-2">
-            <span className="text-xs font-extrabold text-vride-yellowDark uppercase tracking-wider">Our Solutions</span>
-            <h2 className="text-3xl font-black text-gray-900">Four Core Services, Infinite Convenience</h2>
-            <p className="text-xs text-gray-600 font-medium">Built specifically for the dynamic streets of Hyderabad and Indian cities.</p>
+      {/* Services Section with Direct High-Fidelity Rapido & Swiggy Implementations */}
+      <section id="services" className="py-12 md:py-16 px-4 md:px-6 bg-[#f8f9fa] border-y border-gray-100">
+        <div className="max-w-6xl mx-auto space-y-8">
+          <div className="text-center max-w-2xl mx-auto space-y-2">
+            <span className="text-xs font-extrabold text-[#D97706] uppercase tracking-wider bg-yellow-100/80 px-3 py-1 rounded-full border border-yellow-200">
+              Interactive Platform Experience
+            </span>
+            <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tight">
+              Rides · Food · Parcels
+            </h2>
+            <p className="text-xs md:text-sm text-gray-600 font-medium">
+              Experience the exact interfaces of India's favorite mobility and food ecosystems in one unified platform.
+            </p>
           </div>
 
-          {/* Service Selector Tabs */}
-          <div className="flex justify-center gap-3 overflow-x-auto">
+          {/* 3 Core Service Selector Tabs */}
+          <div className="flex justify-center gap-3 overflow-x-auto pb-1">
             {[
-              { id: 'ride', label: 'Ride Booking', icon: Bike },
-              { id: 'parcel', label: 'Send Parcels', icon: Package },
-              { id: 'pickdrop', label: 'Pick & Drop', icon: MapPin },
-              { id: 'food', label: 'Food Delivery', icon: Utensils }
+              { id: 'ride', label: 'Rides (Rapido Style)', icon: Bike, desc: 'Bike Taxi, Auto & Cabs' },
+              { id: 'food', label: 'Food (Swiggy Style)', icon: Utensils, desc: 'Flavourfest & 99 Store' },
+              { id: 'parcel', label: 'Parcel (Rapido Parcel)', icon: Package, desc: 'Doorstep Delivery' }
             ].map(tab => {
               const Icon = tab.icon;
+              const isActive = activeServiceTab === tab.id;
               return (
                 <button
                   key={tab.id}
                   onClick={() => setActiveServiceTab(tab.id)}
-                  className={`flex items-center gap-2 px-5 py-3 rounded-2xl text-xs font-extrabold transition shadow-xs ${
-                    activeServiceTab === tab.id
-                      ? 'bg-vride-yellow text-black ring-2 ring-black'
-                      : 'bg-white text-gray-700 hover:bg-gray-100'
+                  className={`flex items-center gap-2.5 px-6 py-3.5 rounded-2xl text-xs font-black transition-all shadow-xs ${
+                    isActive
+                      ? 'bg-[#FFD600] text-black ring-2 ring-black shadow-md scale-102'
+                      : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
                   }`}
                 >
-                  <Icon className="w-4 h-4" />
-                  <span>{tab.label}</span>
+                  <Icon className="w-5 h-5" />
+                  <div className="text-left">
+                    <span className="block leading-tight">{tab.label}</span>
+                    <span className="text-[10px] text-gray-500 font-semibold block">{tab.desc}</span>
+                  </div>
                 </button>
               );
             })}
           </div>
 
-          {/* Service Detail Showcase */}
-          <div className="bg-white rounded-3xl p-8 border border-gray-200 shadow-sm max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-            <div className="space-y-4">
-              <span className="text-xs font-black uppercase text-yellow-600 tracking-wider">
-                {activeServiceTab.toUpperCase()} HIGHLIGHTS
-              </span>
-              <h3 className="text-2xl font-black text-gray-900">
-                {activeServiceTab === 'ride' && 'Instant Bike, Auto & Cab Rides Across Hyderabad'}
-                {activeServiceTab === 'parcel' && 'Doorstep Parcel Pickup With OTP Delivery Security'}
-                {activeServiceTab === 'pickdrop' && 'Send Important Documents & Items Anywhere'}
-                {activeServiceTab === 'food' && 'Order Hot Meals From Top Local Hyderabadi Restaurants'}
-              </h3>
-              <p className="text-xs text-gray-600 leading-relaxed font-medium">
-                {activeServiceTab === 'ride' && 'Skip traffic jams with quick bike taxis or travel comfortably in verified cabs and autos with upfront transparent pricing.'}
-                {activeServiceTab === 'parcel' && 'Whether it is small documents or large packages up to 10 kg, our delivery fleet ensures swift doorstep transfer.'}
-                {activeServiceTab === 'pickdrop' && 'Forgot keys, urgent contracts, or gifts? Our pick & drop agents handle your belongings with maximum care.'}
-                {activeServiceTab === 'food' && 'From authentic Paradise Biryani to Domino’s pizzas and Subway subs, enjoy fast delivery with live GPS order tracking.'}
-              </p>
-              <button
-                onClick={() => setCurrentPortal('customer')}
-                className="px-5 py-2.5 rounded-xl bg-black text-white font-extrabold text-xs flex items-center gap-2 hover:bg-neutral-800 transition"
-              >
-                <span>Book {activeServiceTab.toUpperCase()} Now</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
+          {/* ========================================================================= */}
+          {/* TAB 1: RIDES SECTION - EXACT MATCH TO image copy 11.png & image copy 12.png */}
+          {/* ========================================================================= */}
+          {activeServiceTab === 'ride' && (
+            <div className="bg-white rounded-3xl p-4 md:p-8 border border-gray-200 shadow-xl max-w-4xl mx-auto space-y-6 animate-fadeIn">
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between pb-4 border-b border-gray-100 gap-3">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse"></span>
+                    <h3 className="text-xl font-black text-gray-900">V RIDE Rides — Rapido Inspired Experience</h3>
+                  </div>
+                  <p className="text-xs text-gray-500 font-medium mt-0.5">Beat the traffic in minutes with verified bike taxis, autos and cabs.</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setShowAllRideServices(!showAllRideServices)}
+                    className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-black font-extrabold text-xs transition"
+                  >
+                    {showAllRideServices ? '← Back to Ride Screen' : 'View All 8 Services →'}
+                  </button>
+                  <button
+                    onClick={() => setCurrentPortal('customer')}
+                    className="px-4 py-2 rounded-xl bg-[#FFD600] text-black font-black text-xs hover:bg-yellow-400 transition"
+                  >
+                    Launch Live in App
+                  </button>
+                </div>
+              </div>
 
-            <div className="rounded-2xl overflow-hidden shadow-md h-64 bg-gray-100">
-              <img
-                src={
-                  activeServiceTab === 'ride'
-                    ? 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=600&auto=format&fit=crop&q=80'
-                    : activeServiceTab === 'parcel'
-                    ? 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80'
-                    : activeServiceTab === 'pickdrop'
-                    ? 'https://images.unsplash.com/photo-1577705998148-6da4f3963bc8?w=600&auto=format&fit=crop&q=80'
-                    : 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=600&auto=format&fit=crop&q=80'
-                }
-                alt="Service Preview"
-                className="w-full h-full object-cover"
-              />
+              {/* Mobile Phone Mockup Frame Container */}
+              <div className="max-w-md mx-auto bg-[#fafafa] rounded-3xl border border-gray-200 shadow-inner overflow-hidden">
+                {/* 1. MAP BACKGROUND WITH PING PILL (From image copy 11.png) */}
+                <div className="relative h-44 bg-gradient-to-b from-blue-50 via-slate-100 to-yellow-50/50 p-4 flex flex-col justify-between overflow-hidden border-b border-gray-200">
+                  {/* Subtle map grid graphic */}
+                  <div className="absolute inset-0 opacity-15 pointer-events-none bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:16px_16px]"></div>
+                  
+                  {/* Top Location Pill "Trying to find where you are..." */}
+                  <div className="relative z-10 self-center bg-white/95 backdrop-blur-md px-4 py-2 rounded-full shadow-md border border-gray-200 flex items-center gap-2 text-xs font-bold text-gray-800">
+                    <div className="w-3.5 h-3.5 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin"></div>
+                    <span>Trying to find where you are... Miyapur, Hyderabad</span>
+                  </div>
+
+                  {/* Pulsing Location Pin on map */}
+                  <div className="relative z-10 self-center flex flex-col items-center">
+                    <div className="w-4 h-4 rounded-full bg-emerald-500 ring-4 ring-emerald-200 animate-pulse"></div>
+                    <span className="text-[10px] font-black text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full mt-1">You are here</span>
+                  </div>
+                </div>
+
+                {/* 2. BOTTOM SHEET VIEW: Search & Recents OR All Services View */}
+                {!showAllRideServices ? (
+                  <div className="p-4 bg-white space-y-4">
+                    {/* "Where do you want to go?" Search Bar matching image copy 11.png */}
+                    <div className="relative">
+                      <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-700">
+                        <Search className="w-4 h-4 stroke-[2.5]" />
+                      </div>
+                      <input
+                        type="text"
+                        value={rideDestinationSearch}
+                        onChange={(e) => setRideDestinationSearch(e.target.value)}
+                        placeholder="Where do you want to go?"
+                        className="w-full pl-10 pr-4 py-3 rounded-2xl bg-white border-2 border-yellow-400 text-xs font-bold text-gray-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 placeholder:text-gray-700 placeholder:font-bold"
+                      />
+                    </div>
+
+                    {/* Recent Destination List with clock & heart icons matching image copy 11.png */}
+                    <div className="space-y-3 pt-1">
+                      {[
+                        {
+                          title: 'Royal Brothers - Bike Rentals - Miyapur',
+                          desc: '4th Lane, Miyapur Cross Road, Hyderabad',
+                          fav: true
+                        },
+                        {
+                          title: 'Hindu College of Pharmacy',
+                          desc: 'Amaravati Road, Venugopalnagar, Guntur / Hyderabad',
+                          fav: true
+                        },
+                        {
+                          title: 'Acharya Nagarjuna University (ANU)',
+                          desc: 'Nagarjuna Nagar, Main Campus Gate, Hyderabad',
+                          fav: true
+                        }
+                      ].map((item, idx) => (
+                        <div
+                          key={idx}
+                          onClick={() => setRideDestinationSearch(item.title)}
+                          className="flex items-center justify-between pb-2.5 border-b border-dashed border-gray-100 cursor-pointer hover:bg-yellow-50/50 p-1.5 rounded-xl transition"
+                        >
+                          <div className="flex items-start gap-2.5">
+                            <Clock className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
+                            <div>
+                              <h4 className="font-extrabold text-xs text-gray-900 leading-snug">{item.title}</h4>
+                              <p className="text-[10px] text-gray-400 font-medium">{item.desc}</p>
+                            </div>
+                          </div>
+                          <Heart className="w-4 h-4 text-gray-400 hover:text-red-500 hover:fill-red-500 transition shrink-0 ml-2" />
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* "Everything In Minutes" Header matching image copy 11.png */}
+                    <div className="pt-2">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="font-black text-sm text-gray-900">Everything In Minutes</h4>
+                        <button
+                          onClick={() => setShowAllRideServices(true)}
+                          className="text-xs font-bold text-gray-500 hover:text-black flex items-center gap-0.5"
+                        >
+                          <span>View All</span>
+                          <ChevronRight className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+
+                      {/* 4 Cards Grid from image copy 11.png */}
+                      <div className="grid grid-cols-2 gap-3">
+                        {/* 1. Bike Taxi - Beat the traffic */}
+                        <div
+                          onClick={() => setSelectedRideService('bike')}
+                          className={`p-3.5 rounded-2xl border transition cursor-pointer relative overflow-hidden flex flex-col justify-between h-32 ${
+                            selectedRideService === 'bike'
+                              ? 'bg-gradient-to-br from-yellow-50 to-amber-50 border-black shadow-sm ring-1 ring-black'
+                              : 'bg-[#F6F8FA] border-gray-100 hover:border-yellow-300'
+                          }`}
+                        >
+                          <div>
+                            <span className="text-[10px] text-gray-500 font-semibold block leading-tight">Beat the traffic</span>
+                            <h5 className="font-black text-sm text-gray-900">Bike Taxi</h5>
+                          </div>
+                          <div className="self-end text-3xl">🛵</div>
+                          <span className="text-[9px] font-black text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded-md w-fit">From ₹25 · 3 min</span>
+                        </div>
+
+                        {/* 2. Send Anything - Parcel */}
+                        <div
+                          onClick={() => setActiveServiceTab('parcel')}
+                          className="p-3.5 rounded-2xl bg-[#F6F8FA] border border-gray-100 hover:border-purple-300 transition cursor-pointer relative overflow-hidden flex flex-col justify-between h-32"
+                        >
+                          <div>
+                            <span className="text-[10px] text-gray-500 font-semibold block leading-tight">Send anything</span>
+                            <h5 className="font-black text-sm text-gray-900">Parcel</h5>
+                          </div>
+                          <div className="self-end text-3xl">📦</div>
+                          <span className="text-[9px] font-black text-purple-700 bg-purple-100 px-1.5 py-0.5 rounded-md w-fit">Doorstep · Instant</span>
+                        </div>
+
+                        {/* 3. Your Everyday Rides - Book Now */}
+                        <div
+                          onClick={() => setSelectedRideService('auto')}
+                          className={`p-3.5 rounded-2xl border transition cursor-pointer relative overflow-hidden flex flex-col justify-between h-32 ${
+                            selectedRideService === 'auto'
+                              ? 'bg-gradient-to-br from-yellow-50 to-amber-50 border-black shadow-sm ring-1 ring-black'
+                              : 'bg-[#F6F8FA] border-gray-100 hover:border-yellow-300'
+                          }`}
+                        >
+                          <div>
+                            <span className="text-[10px] text-gray-500 font-semibold block leading-tight">Your everyday rides</span>
+                            <h5 className="font-black text-sm text-gray-900">Book now</h5>
+                          </div>
+                          <div className="self-end text-3xl">🛺 🚗</div>
+                          <span className="text-[9px] font-black text-blue-700 bg-blue-100 px-1.5 py-0.5 rounded-md w-fit">Auto & Cabs</span>
+                        </div>
+
+                        {/* 4. All Services */}
+                        <div
+                          onClick={() => setShowAllRideServices(true)}
+                          className="p-3.5 rounded-2xl bg-[#F6F8FA] border border-gray-100 hover:border-yellow-400 transition cursor-pointer flex flex-col justify-between h-32"
+                        >
+                          <div>
+                            <span className="text-[10px] text-gray-500 font-semibold block leading-tight">Explore 8 options</span>
+                            <h5 className="font-black text-sm text-gray-900">All Services</h5>
+                          </div>
+                          <div className="self-end flex items-center gap-1 text-2xl">
+                            <span>🛺</span>
+                            <span className="w-5 h-5 rounded-full bg-black text-white text-[10px] flex items-center justify-center font-black">→</span>
+                          </div>
+                          <span className="text-[9px] font-bold text-gray-600">Tap to view all</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Book Now Quick CTA */}
+                    <button
+                      onClick={() => setCurrentPortal('customer')}
+                      className="w-full py-3.5 rounded-2xl bg-[#FFD600] text-black font-black text-xs shadow-md hover:bg-yellow-400 transition flex items-center justify-center gap-2"
+                    >
+                      <span>Confirm & Book {selectedRideService.toUpperCase()} Ride (₹56 - ₹72)</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  /* ========================================================== */
+                  /* ALL SERVICES GRID SCREEN - EXACT MATCH TO image copy 12.png */
+                  /* ========================================================== */
+                  <div className="p-5 bg-white space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-black text-base text-gray-900">All Services</h4>
+                      <button
+                        onClick={() => setShowAllRideServices(false)}
+                        className="text-xs font-bold text-gray-500 hover:text-black underline"
+                      >
+                        ✕ Close
+                      </button>
+                    </div>
+
+                    {/* 8 Grid items matching image copy 12.png */}
+                    <div className="grid grid-cols-3 gap-3">
+                      {[
+                        { id: 'shared_auto', name: 'Shared Auto', icon: '🛺', tag: 'Affordable' },
+                        { id: 'bike', name: 'Bike', icon: '🛵', tag: 'Fastest' },
+                        { id: 'auto', name: 'Auto', icon: '🛺', tag: 'Everyday' },
+                        { id: 'parcel_bike', name: 'Parcel on Bike', icon: '📦', tag: 'Instant' },
+                        { id: 'cab_economy', name: 'Cab Economy', icon: '🚗', tag: 'Pocket friendly' },
+                        { id: 'bike_lite', name: 'Bike Lite', icon: '⚡', tag: 'Flat % OFF' },
+                        { id: 'cab_premium', name: 'Cab Premium', icon: '✨', tag: 'Luxury' },
+                        { id: 'travel', name: 'Travel', icon: '🧳', tag: 'Outstation' }
+                      ].map(item => (
+                        <button
+                          key={item.id}
+                          onClick={() => {
+                            setSelectedRideService(item.id);
+                            setShowAllRideServices(false);
+                          }}
+                          className={`flex flex-col items-center justify-center p-3 rounded-2xl border transition active:scale-95 ${
+                            selectedRideService === item.id
+                              ? 'bg-yellow-50 border-black ring-1 ring-black shadow-xs'
+                              : 'bg-[#F9FAFB] border-gray-100 hover:bg-gray-100'
+                          }`}
+                        >
+                          <div className="w-12 h-12 rounded-xl bg-white shadow-xs border border-gray-100 flex items-center justify-center text-2xl mb-1.5">
+                            {item.icon}
+                          </div>
+                          <span className="font-extrabold text-xs text-gray-900 text-center leading-tight">
+                            {item.name}
+                          </span>
+                          <span className="text-[9px] text-gray-400 font-semibold mt-0.5">{item.tag}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
+          )}
+
+          {/* ========================================================================= */}
+          {/* TAB 2: FOOD SECTION - EXACT MATCH TO image copy 13.png & image copy 14.png */}
+          {/* ========================================================================= */}
+          {activeServiceTab === 'food' && (
+            <div className="bg-white rounded-3xl p-4 md:p-8 border border-gray-200 shadow-xl max-w-4xl mx-auto space-y-6 animate-fadeIn">
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between pb-4 border-b border-gray-100 gap-3">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
+                    <h3 className="text-xl font-black text-gray-900">V RIDE Food — Swiggy Flavourfest & 99 Store</h3>
+                  </div>
+                  <p className="text-xs text-gray-500 font-medium mt-0.5">Order from Hyderabad's top rated restaurants or discover meals at flat ₹99.</p>
+                </div>
+                <button
+                  onClick={() => setCurrentPortal('customer')}
+                  className="px-4 py-2 rounded-xl bg-[#FFD600] text-black font-black text-xs hover:bg-yellow-400 transition"
+                >
+                  Order Food in App →
+                </button>
+              </div>
+
+              {/* Mobile Phone Mockup Frame Container for Food */}
+              <div className="max-w-md mx-auto bg-white rounded-3xl border border-gray-200 shadow-inner overflow-hidden">
+                {/* 1. TOP HEADER (Deep Crimson / Maroon background from image copy 13.png) */}
+                <div className="bg-[#1f020f] text-white p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="flex items-center gap-1 text-xs font-black text-white">
+                        <span>Work</span>
+                        <ChevronRight className="w-3.5 h-3.5 text-gray-400" />
+                      </div>
+                      <p className="text-[10px] text-gray-300 font-medium truncate max-w-[220px]">
+                        Sangadigunta, Ipd Colony, Miyapur, Hyderabad...
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full bg-[#FFD600] text-black flex items-center justify-center font-black text-xs shadow-xs">
+                        VR
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Top Category Tabs: Food (Selected), Instamart, Dineout */}
+                  <div className="flex items-center gap-2 pt-1">
+                    <div className="px-3 py-1.5 rounded-xl bg-white/20 border border-white/30 text-white font-extrabold text-xs flex items-center gap-1.5 shadow-xs">
+                      <span>🍔</span>
+                      <span>Food</span>
+                    </div>
+                    <div className="px-3 py-1.5 rounded-xl bg-white/5 text-gray-300 font-bold text-xs flex items-center gap-1.5">
+                      <span>🛒</span>
+                      <span>Instamart (4 mins)</span>
+                    </div>
+                    <div className="px-3 py-1.5 rounded-xl bg-white/5 text-gray-300 font-bold text-xs flex items-center gap-1.5">
+                      <span>🍽️</span>
+                      <span>Dineout</span>
+                    </div>
+                  </div>
+
+                  {/* Search Bar with Mic & VEG Toggle Switch (image copy 13.png) */}
+                  <div className="flex items-center gap-2 pt-1">
+                    <div className="relative flex-1">
+                      <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="text"
+                        placeholder="Search for 'Biryani', 'Pizza', 'EatRight'..."
+                        className="w-full pl-9 pr-9 py-2.5 rounded-2xl bg-white text-xs font-bold text-gray-900 focus:outline-none placeholder:text-gray-400"
+                      />
+                      <Mic className="w-4 h-4 text-orange-500 absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer" />
+                    </div>
+
+                    {/* VEG Toggle Button */}
+                    <button
+                      onClick={() => setVegOnly(!vegOnly)}
+                      className={`px-2.5 py-2 rounded-2xl text-[10px] font-black flex items-center gap-1 border transition ${
+                        vegOnly
+                          ? 'bg-emerald-600 text-white border-emerald-400'
+                          : 'bg-white text-gray-800 border-gray-300'
+                      }`}
+                    >
+                      <span className={`w-2.5 h-2.5 rounded-full ${vegOnly ? 'bg-white' : 'bg-green-600'}`}></span>
+                      <span>VEG</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* 2. SUB-FILTER TABS (image copy 13.png) */}
+                <div className="px-4 py-2 bg-gray-50 border-b border-gray-100 flex items-center gap-2 overflow-x-auto no-scrollbar text-xs font-bold">
+                  {['ALL', '99 STORE', 'OFFERS', '⚡ BOLT', 'GOURMET'].map(tab => (
+                    <button
+                      key={tab}
+                      onClick={() => setFoodActiveSubTab(tab)}
+                      className={`px-3 py-1 rounded-full whitespace-nowrap text-[11px] font-extrabold transition ${
+                        foodActiveSubTab === tab
+                          ? 'bg-black text-white'
+                          : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-100'
+                      }`}
+                    >
+                      {tab}
+                    </button>
+                  ))}
+                </div>
+
+                {/* 3. FLAVOURFEST HERO PROMO BANNER (image copy 13.png) */}
+                <div className="p-4 bg-gradient-to-r from-[#C2185B] via-[#AD1457] to-[#880E4F] text-white">
+                  <div className="flex items-center justify-between pb-3">
+                    <div>
+                      <h4 className="text-xl font-black tracking-wider text-[#FFD600] leading-none">FLAVOURFEST</h4>
+                      <span className="text-[10px] font-bold tracking-widest text-white/90 uppercase mt-0.5 block">ORDER NOW</span>
+                    </div>
+                    <span className="text-2xl">🍔🍟</span>
+                  </div>
+
+                  {/* Promo Deal Cards Horizontal Carousel */}
+                  <div className="grid grid-cols-4 gap-2 text-center text-black">
+                    <div className="p-2 rounded-xl bg-pink-100 border border-pink-200">
+                      <span className="text-base block">🏷️</span>
+                      <span className="text-[9px] font-black leading-tight block mt-0.5">Get 70% OFF</span>
+                    </div>
+                    <div className="p-2 rounded-xl bg-yellow-100 border border-yellow-200">
+                      <span className="text-base block">💰</span>
+                      <span className="text-[9px] font-black leading-tight block mt-0.5">Flat ₹200 OFF</span>
+                    </div>
+                    <div className="p-2 rounded-xl bg-orange-100 border border-orange-200">
+                      <span className="text-base block">🍛</span>
+                      <span className="text-[9px] font-black leading-tight block mt-0.5">Meals At ₹49</span>
+                    </div>
+                    <div className="p-2 rounded-xl bg-emerald-100 border border-emerald-200">
+                      <span className="text-base block">🚀</span>
+                      <span className="text-[9px] font-black leading-tight block mt-0.5">Free Delivery</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 4. "WHAT'S ON YOUR MIND?" DISHES (image copy 14.png) */}
+                <div className="p-4 bg-white border-b border-gray-100 space-y-2">
+                  <h4 className="font-black text-sm text-gray-900">What's on your mind?</h4>
+                  <div className="grid grid-cols-4 gap-3 text-center">
+                    {[
+                      { name: 'Fried rice', icon: '🍚' },
+                      { name: 'Cakes', icon: '🍰' },
+                      { name: 'Dosa', icon: '🥞' },
+                      { name: 'Noodles', icon: '🍜' },
+                      { name: 'Idli', icon: '🥟' },
+                      { name: 'Biryani', icon: '🍲' },
+                      { name: 'Burgers', icon: '🍔' },
+                      { name: 'Pizza', icon: '🍕' }
+                    ].map((dish, i) => (
+                      <div
+                        key={i}
+                        onClick={() => setCurrentPortal('customer')}
+                        className="flex flex-col items-center cursor-pointer group"
+                      >
+                        <div className="w-12 h-12 rounded-full bg-gray-50 border border-gray-200 flex items-center justify-center text-2xl group-hover:scale-105 group-hover:border-yellow-400 transition shadow-xs">
+                          {dish.icon}
+                        </div>
+                        <span className="text-[10px] font-bold text-gray-700 mt-1">{dish.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 5. "99 STORE" SECTION WITH REAL ADD BUTTONS (image copy 14.png) */}
+                <div className="p-4 bg-[#FFFBF0] border-b border-yellow-200 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <span className="px-2 py-0.5 rounded-lg bg-black text-[#FFD600] font-black text-xs">99 store</span>
+                      <span className="text-xs font-bold text-gray-800">Meals at ₹99 + Free Delivery</span>
+                    </div>
+                    <span className="text-xs font-bold text-blue-600 cursor-pointer">View All →</span>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2.5">
+                    {[
+                      { id: 'item_shw', name: 'Veg Shawarma', price: 99, veg: true },
+                      { id: 'item_piz', name: 'Sweet Corn Pizza', price: 99, veg: true },
+                      { id: 'item_dosa', name: 'Ghee Dosa', price: 79, veg: true }
+                    ].map(item => (
+                      <div key={item.id} className="bg-white p-2.5 rounded-2xl border border-gray-200 shadow-xs flex flex-col justify-between">
+                        <div>
+                          <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 block mb-1"></span>
+                          <h5 className="font-extrabold text-[11px] text-gray-900 leading-snug">{item.name}</h5>
+                          <span className="font-black text-xs text-gray-900 block mt-1">₹{item.price}</span>
+                        </div>
+                        <button
+                          onClick={() => {
+                            setAddedFoodItems(prev => [...prev, { ...item, count: 1 }]);
+                          }}
+                          className="mt-2 w-full py-1 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-300 font-black text-xs hover:bg-emerald-600 hover:text-white transition flex items-center justify-center gap-1"
+                        >
+                          <Plus className="w-3 h-3 stroke-[3]" />
+                          <span>ADD</span>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 6. FLOATING LIVE CART PILL (image copy 13.png & image copy 14.png) */}
+                <div className="p-3 bg-white border-t border-gray-100">
+                  <div className="p-3 rounded-2xl bg-gradient-to-r from-emerald-950 to-neutral-900 border border-emerald-500/40 text-white flex items-center justify-between shadow-lg">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-xl bg-emerald-500 text-white flex items-center justify-center font-black text-xs">
+                        {addedFoodItems.length}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-black text-xs text-white">Paradise Biryani</span>
+                          <span className="text-[9px] text-emerald-400 font-bold bg-emerald-900/60 px-1.5 py-0.2 rounded-full">
+                            ₹{addedFoodItems.reduce((acc, curr) => acc + curr.price, 0)} Total
+                          </span>
+                        </div>
+                        <span className="text-[10px] text-gray-400 block">NEW: Order from multiple restaurants</span>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => setCurrentPortal('customer')}
+                      className="px-3.5 py-1.5 rounded-xl bg-emerald-500 text-white font-black text-xs hover:bg-emerald-400 transition shadow-sm"
+                    >
+                      View Cart →
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ========================================================================= */}
+          {/* TAB 3: PARCEL SECTION (Rapido Parcel Doorstep Delivery) */}
+          {/* ========================================================================= */}
+          {activeServiceTab === 'parcel' && (
+            <div className="bg-white rounded-3xl p-4 md:p-8 border border-gray-200 shadow-xl max-w-4xl mx-auto space-y-6 animate-fadeIn">
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between pb-4 border-b border-gray-100 gap-3">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-purple-600 animate-pulse"></span>
+                    <h3 className="text-xl font-black text-gray-900">V RIDE Parcel — Doorstep Pickup & Safe Transit</h3>
+                  </div>
+                  <p className="text-xs text-gray-500 font-medium mt-0.5">Send documents, packages, clothes and gifts anywhere in Hyderabad within 45 minutes.</p>
+                </div>
+                <button
+                  onClick={() => setCurrentPortal('customer')}
+                  className="px-4 py-2 rounded-xl bg-[#FFD600] text-black font-black text-xs hover:bg-yellow-400 transition"
+                >
+                  Send Parcel Now →
+                </button>
+              </div>
+
+              <div className="max-w-md mx-auto bg-white rounded-3xl border border-gray-200 p-5 space-y-4 shadow-inner">
+                <div className="bg-gray-50 p-3 rounded-2xl border border-gray-200 space-y-2">
+                  <div className="flex items-center gap-2 pb-2 border-b border-gray-200 text-xs">
+                    <span className="w-2.5 h-2.5 rounded-full bg-green-500"></span>
+                    <span className="font-bold text-gray-800">Pickup: Miyapur Metro Station</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs">
+                    <span className="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+                    <span className="font-bold text-gray-800">Drop: Gachibowli Financial District</span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2 text-center text-xs">
+                  <div className="p-3 rounded-2xl bg-yellow-50 border border-yellow-300 font-bold">
+                    <span className="text-lg block">📄</span>
+                    <span className="text-xs font-black block mt-1">Small (≤ 1 kg)</span>
+                    <span className="text-gray-500 text-[10px]">₹85 Flat</span>
+                  </div>
+                  <div className="p-3 rounded-2xl bg-white border border-gray-200 font-bold">
+                    <span className="text-lg block">📦</span>
+                    <span className="text-xs font-black block mt-1">Medium (1-5 kg)</span>
+                    <span className="text-gray-500 text-[10px]">₹120 Flat</span>
+                  </div>
+                  <div className="p-3 rounded-2xl bg-white border border-gray-200 font-bold">
+                    <span className="text-lg block">🚚</span>
+                    <span className="text-xs font-black block mt-1">Large (&gt; 5 kg)</span>
+                    <span className="text-gray-500 text-[10px]">₹175 Flat</span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setCurrentPortal('customer')}
+                  className="w-full py-3.5 rounded-2xl bg-[#FFD600] text-black font-black text-xs shadow-md hover:bg-yellow-400 transition"
+                >
+                  Book Doorstep Pickup (₹85) →
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
