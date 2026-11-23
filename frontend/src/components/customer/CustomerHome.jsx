@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import {
   Menu, Bell, ChevronDown, Bike, Package, MapPin, Utensils,
-  ArrowRight, Shield, Award, Clock, Star, Phone, MessageSquare
+  ArrowRight, Shield, Award, Clock, Star, Phone, MessageSquare,
+  RotateCcw, Sparkles, ChevronRight, Gift, Copy, CheckCircle2,
+  ShieldCheck, AlertTriangle
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import DrawerMenu from '../common/DrawerMenu';
@@ -11,6 +13,7 @@ export const CustomerHome = ({ onNavigate }) => {
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [showDrawer, setShowDrawer] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [copiedCode, setCopiedCode] = useState(false);
 
   const hyderabadLocations = [
     'Miyapur, Hyderabad',
@@ -22,8 +25,14 @@ export const CustomerHome = ({ onNavigate }) => {
     'Madhapur, Hyderabad'
   ];
 
+  const handleCopyCode = () => {
+    navigator.clipboard?.writeText('VRIDE100');
+    setCopiedCode(true);
+    setTimeout(() => setCopiedCode(false), 2000);
+  };
+
   return (
-    <div className="flex flex-col min-h-full bg-[#f8f9fa] pb-24 text-gray-900 select-none">
+    <div className="flex flex-col min-h-full bg-[#f8f9fa] pb-6 text-gray-900 select-none">
       {/* --- STANDALONE MOBILE APP HEADER --- */}
       <div className="bg-white px-4 pt-3 pb-3 border-b border-gray-100 flex items-center justify-between sticky top-0 z-20 shadow-xs">
         <div className="flex items-center gap-3">
@@ -58,7 +67,7 @@ export const CustomerHome = ({ onNavigate }) => {
       </div>
 
       {/* --- USER GREETING & LOCATION BAR (Exact match to reference screenshot) --- */}
-      <div className="px-5 pt-4 pb-2 bg-white">
+      <div className="px-4 pt-3 pb-2 bg-white">
         <h1 className="text-xl font-bold text-gray-900 flex items-center gap-1.5">
           <span>Hi {currentUser.name || 'Sri Latha'}</span>
           <span className="text-xl">👋</span>
@@ -68,7 +77,7 @@ export const CustomerHome = ({ onNavigate }) => {
         {/* Location Dropdown Pill */}
         <button
           onClick={() => setShowLocationModal(true)}
-          className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-50 border border-gray-200 text-xs font-semibold text-gray-800 hover:bg-gray-100 transition active:scale-98"
+          className="mt-2.5 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-50 border border-gray-200 text-xs font-semibold text-gray-800 hover:bg-gray-100 transition active:scale-98"
         >
           <div className="w-2 h-2 rounded-full bg-vride-yellow ring-2 ring-yellow-200"></div>
           <span className="truncate max-w-[200px]">{selectedLocation}</span>
@@ -77,8 +86,8 @@ export const CustomerHome = ({ onNavigate }) => {
       </div>
 
       {/* --- SERVICE CATEGORY CARDS (Exact match to reference screenshot) --- */}
-      <div className="px-5 pt-4 pb-2">
-        <div className="grid grid-cols-4 gap-2.5">
+      <div className="px-4 pt-3 pb-1">
+        <div className="grid grid-cols-4 gap-2">
           {/* 1. Ride */}
           <button
             onClick={() => onNavigate('ride')}
@@ -131,7 +140,7 @@ export const CustomerHome = ({ onNavigate }) => {
 
       {/* --- ACTIVE ORDER FLOATING PILL (If ride or food active) --- */}
       {activeFoodOrder && (
-        <div className="px-5 pt-2">
+        <div className="px-4 pt-2.5">
           <div
             onClick={() => onNavigate('track')}
             className="bg-black text-white p-3.5 rounded-2xl shadow-lg border border-yellow-500/40 flex items-center justify-between cursor-pointer hover:bg-neutral-900 transition active:scale-98"
@@ -157,7 +166,7 @@ export const CustomerHome = ({ onNavigate }) => {
       )}
 
       {/* --- PROMOTIONAL BANNER: Send Parcels Fast & Safe (Matches screenshot) --- */}
-      <div className="px-5 pt-3">
+      <div className="px-4 pt-2.5">
         <div
           onClick={() => onNavigate('parcel')}
           className="relative overflow-hidden rounded-2xl bg-[#FFF9E6] border border-yellow-200 p-4 cursor-pointer hover:shadow-md transition active:scale-98"
@@ -188,8 +197,8 @@ export const CustomerHome = ({ onNavigate }) => {
       </div>
 
       {/* --- OFFERS FOR YOU (Exact match to screenshot) --- */}
-      <div className="px-5 pt-5">
-        <div className="flex items-center justify-between mb-2.5">
+      <div className="px-4 pt-3.5">
+        <div className="flex items-center justify-between mb-2">
           <h2 className="text-sm font-bold text-gray-900">Offers for You</h2>
           <button
             onClick={() => onNavigate('food')}
@@ -224,13 +233,13 @@ export const CustomerHome = ({ onNavigate }) => {
         </div>
       </div>
 
-      {/* --- RECOMMENDED SERVICES / POPULAR IN HYDERABAD --- */}
-      <div className="px-5 pt-5">
-        <h2 className="text-sm font-bold text-gray-900 mb-2.5">Quick Actions</h2>
+      {/* --- QUICK ACTIONS --- */}
+      <div className="px-4 pt-3.5">
+        <h2 className="text-sm font-bold text-gray-900 mb-2">Quick Actions</h2>
         <div className="grid grid-cols-2 gap-2.5">
           <div
             onClick={() => onNavigate('ride')}
-            className="p-3 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow transition cursor-pointer flex items-center gap-3"
+            className="p-3 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow transition cursor-pointer flex items-center gap-3 active:scale-98"
           >
             <div className="w-10 h-10 rounded-xl bg-yellow-50 flex items-center justify-center text-yellow-600 font-bold">
               ⚡
@@ -243,7 +252,7 @@ export const CustomerHome = ({ onNavigate }) => {
 
           <div
             onClick={() => onNavigate('pickdrop')}
-            className="p-3 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow transition cursor-pointer flex items-center gap-3"
+            className="p-3 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow transition cursor-pointer flex items-center gap-3 active:scale-98"
           >
             <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 font-bold">
               📄
@@ -251,6 +260,172 @@ export const CustomerHome = ({ onNavigate }) => {
             <div>
               <p className="text-xs font-bold text-gray-900">Send Documents</p>
               <p className="text-[10px] text-gray-400">Safe doorstep transit</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* --- 1-TAP REBOOK / RECENT RIDE SECTION --- */}
+      <div className="px-4 pt-3.5">
+        <div className="flex items-center justify-between mb-2">
+          <h2 className="text-sm font-bold text-gray-900">Recent Route</h2>
+          <button
+            onClick={() => onNavigate('orders')}
+            className="text-xs font-bold text-blue-600 hover:text-blue-700"
+          >
+            Ride History
+          </button>
+        </div>
+
+        <div className="p-3.5 rounded-2xl bg-white border border-gray-200/80 shadow-xs flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-yellow-100 text-yellow-800 flex items-center justify-center text-lg">
+              🛵
+            </div>
+            <div>
+              <h3 className="font-extrabold text-xs text-gray-900">Miyapur Metro → Kukatpally</h3>
+              <p className="text-[10px] text-gray-500 font-medium">₹56–₹72 · 5.4 km · Yesterday</p>
+            </div>
+          </div>
+
+          <button
+            onClick={() => onNavigate('ride')}
+            className="px-3 py-1.5 rounded-xl bg-vride-yellow text-black font-extrabold text-xs shadow-xs hover:bg-yellow-400 transition flex items-center gap-1 active:scale-95"
+          >
+            <RotateCcw className="w-3 h-3 stroke-[2.5]" />
+            <span>Rebook</span>
+          </button>
+        </div>
+      </div>
+
+      {/* --- POPULAR RESTAURANTS IN HYDERABAD (From image.png screen 6) --- */}
+      <div className="px-4 pt-4">
+        <div className="flex items-center justify-between mb-2.5">
+          <div>
+            <h2 className="text-sm font-bold text-gray-900">Top Food Near You</h2>
+            <p className="text-[10px] text-gray-500">Popular Hyderabadi cravings in 30 mins</p>
+          </div>
+          <button
+            onClick={() => onNavigate('food')}
+            className="text-xs font-bold text-blue-600 hover:text-blue-700"
+          >
+            Explore Menu →
+          </button>
+        </div>
+
+        <div className="space-y-2.5">
+          {/* Restaurant 1: Paradise Biryani */}
+          <div
+            onClick={() => onNavigate('food')}
+            className="p-3 rounded-2xl bg-white border border-gray-200/80 shadow-xs flex items-center justify-between cursor-pointer hover:border-yellow-300 transition active:scale-98"
+          >
+            <div className="flex items-center gap-3">
+              <img
+                src="https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=200&auto=format&fit=crop&q=80"
+                alt="Paradise Biryani"
+                className="w-14 h-14 rounded-xl object-cover shadow-xs"
+              />
+              <div>
+                <h3 className="font-extrabold text-xs text-gray-900">Paradise Biryani</h3>
+                <div className="flex items-center gap-1.5 text-[10px] text-gray-500 mt-0.5">
+                  <span className="flex items-center gap-0.5 font-bold text-gray-900">
+                    <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                    4.4
+                  </span>
+                  <span>·</span>
+                  <span>30–40 min</span>
+                  <span>·</span>
+                  <span className="text-green-600 font-bold">50% OFF</span>
+                </div>
+                <p className="text-[10px] text-gray-400 font-medium">Authentic Chicken & Mutton Dum Biryani</p>
+              </div>
+            </div>
+            <ChevronRight className="w-4 h-4 text-gray-400" />
+          </div>
+
+          {/* Restaurant 2: Domino's */}
+          <div
+            onClick={() => onNavigate('food')}
+            className="p-3 rounded-2xl bg-white border border-gray-200/80 shadow-xs flex items-center justify-between cursor-pointer hover:border-yellow-300 transition active:scale-98"
+          >
+            <div className="flex items-center gap-3">
+              <img
+                src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=200&auto=format&fit=crop&q=80"
+                alt="Domino's Pizza"
+                className="w-14 h-14 rounded-xl object-cover shadow-xs"
+              />
+              <div>
+                <h3 className="font-extrabold text-xs text-gray-900">Domino's Pizza</h3>
+                <div className="flex items-center gap-1.5 text-[10px] text-gray-500 mt-0.5">
+                  <span className="flex items-center gap-0.5 font-bold text-gray-900">
+                    <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                    4.3
+                  </span>
+                  <span>·</span>
+                  <span>25–35 min</span>
+                  <span>·</span>
+                  <span className="text-green-600 font-bold">Flat ₹100 OFF</span>
+                </div>
+                <p className="text-[10px] text-gray-400 font-medium">Farmhouse, Pepperoni & Garlic Breads</p>
+              </div>
+            </div>
+            <ChevronRight className="w-4 h-4 text-gray-400" />
+          </div>
+        </div>
+      </div>
+
+      {/* --- REFER & EARN CASHBACK BANNER --- */}
+      <div className="px-4 pt-3.5">
+        <div className="p-3.5 rounded-2xl bg-gradient-to-r from-amber-50 to-yellow-100 border border-yellow-300 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-vride-yellow text-black flex items-center justify-center text-lg font-black shadow-xs">
+              🎁
+            </div>
+            <div>
+              <span className="text-[9px] font-black uppercase text-amber-800 tracking-wider">Referral Reward</span>
+              <h3 className="font-extrabold text-xs text-gray-900">Invite Friends & Earn ₹100</h3>
+              <p className="text-[10px] text-gray-600">Get ₹100 in V RIDE wallet on their first trip</p>
+            </div>
+          </div>
+
+          <button
+            onClick={handleCopyCode}
+            className="px-2.5 py-1.5 rounded-xl bg-black text-white text-[11px] font-bold flex items-center gap-1 hover:bg-neutral-800 transition active:scale-95"
+          >
+            <Copy className="w-3 h-3" />
+            <span>{copiedCode ? 'Copied!' : 'Code'}</span>
+          </button>
+        </div>
+      </div>
+
+      {/* --- V RIDE TRUST & SAFETY SHIELD --- */}
+      <div className="px-4 pt-3.5 pb-2">
+        <div className="p-3.5 rounded-2xl bg-white border border-gray-100 shadow-xs space-y-2.5">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-green-600" />
+              <h3 className="font-extrabold text-xs text-gray-900">V RIDE Safety Guarantee</h3>
+            </div>
+            <span className="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
+              100% Protected
+            </span>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2 text-center text-[10px] pt-1">
+            <div className="p-2 bg-gray-50 rounded-xl">
+              <span className="text-sm block">🛡️</span>
+              <span className="font-bold text-gray-800 mt-0.5 block">Verified Fleet</span>
+              <span className="text-[9px] text-gray-400">Police Checked</span>
+            </div>
+            <div className="p-2 bg-gray-50 rounded-xl">
+              <span className="text-sm block">📍</span>
+              <span className="font-bold text-gray-800 mt-0.5 block">Live GPS</span>
+              <span className="text-[9px] text-gray-400">Share with family</span>
+            </div>
+            <div className="p-2 bg-gray-50 rounded-xl">
+              <span className="text-sm block">🚨</span>
+              <span className="font-bold text-gray-800 mt-0.5 block">24/7 SOS</span>
+              <span className="text-[9px] text-gray-400">Police Hotline 112</span>
             </div>
           </div>
         </div>

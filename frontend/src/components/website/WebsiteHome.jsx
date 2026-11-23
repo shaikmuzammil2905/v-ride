@@ -29,7 +29,7 @@ export const WebsiteHome = () => {
   return (
     <div className="min-h-screen bg-white text-gray-900 select-none font-sans">
       {/* Website Navigation Header */}
-      <header className="sticky top-12 z-30 bg-white/95 backdrop-blur-md border-b border-gray-100 px-6 py-4 flex items-center justify-between">
+      <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-gray-100 px-4 md:px-6 py-3.5 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-vride-yellow text-black flex items-center justify-center font-black text-xl shadow-yellow-glow">
             V
@@ -59,7 +59,7 @@ export const WebsiteHome = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-yellow-50/70 via-white to-white pt-16 pb-20 px-6">
+      <section className="relative overflow-hidden bg-gradient-to-b from-yellow-50/70 via-white to-white pt-8 md:pt-14 pb-10 md:pb-16 px-4 md:px-6">
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           <div className="space-y-6">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-yellow-100 border border-yellow-300 text-xs font-black text-black">
@@ -166,7 +166,7 @@ export const WebsiteHome = () => {
       </section>
 
       {/* Services Section */}
-      <section id="services" className="py-20 px-6 bg-gray-50 border-y border-gray-100">
+      <section id="services" className="py-12 md:py-16 px-4 md:px-6 bg-gray-50 border-y border-gray-100">
         <div className="max-w-6xl mx-auto space-y-10">
           <div className="text-center max-w-xl mx-auto space-y-2">
             <span className="text-xs font-extrabold text-vride-yellowDark uppercase tracking-wider">Our Solutions</span>
@@ -247,7 +247,7 @@ export const WebsiteHome = () => {
       </section>
 
       {/* Become a Delivery Partner Section */}
-      <section id="partner" className="py-20 px-6 bg-black text-white">
+      <section id="partner" className="py-12 md:py-16 px-4 md:px-6 bg-black text-white">
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           <div className="space-y-6">
             <span className="text-xs font-black text-vride-yellow uppercase tracking-widest">
@@ -353,7 +353,7 @@ export const WebsiteHome = () => {
       </section>
 
       {/* Safety & Trust */}
-      <section id="safety" className="py-20 px-6 bg-white">
+      <section id="safety" className="py-12 md:py-16 px-4 md:px-6 bg-white">
         <div className="max-w-6xl mx-auto space-y-12">
           <div className="text-center max-w-xl mx-auto space-y-2">
             <span className="text-xs font-extrabold text-green-600 uppercase tracking-wider">Uncompromising Safety</span>

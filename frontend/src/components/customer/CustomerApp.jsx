@@ -87,9 +87,9 @@ export const CustomerApp = () => {
 
   // Pure standalone mobile-first application container
   return (
-    <div className="w-full min-h-screen min-h-[100dvh] bg-[#f8f9fa] flex flex-col justify-between relative overflow-x-hidden">
+    <div className="w-full min-h-screen min-h-[100dvh] bg-[#f8f9fa] flex flex-col items-center justify-start relative overflow-x-hidden">
       {/* Centered mobile screen container */}
-      <div className="w-full max-w-md mx-auto min-h-screen min-h-[100dvh] bg-white flex flex-col relative shadow-md">
+      <div className="w-full max-w-md min-h-screen min-h-[100dvh] bg-white flex flex-col relative shadow-md">
         {/* Main Content Area */}
         <div className="flex-1 overflow-y-auto no-scrollbar relative">
           {renderScreen()}
@@ -97,7 +97,7 @@ export const CustomerApp = () => {
 
         {/* Bottom Navigation Bar */}
         {showBottomNav && (
-          <div className="bg-white border-t border-gray-100 px-3 py-2 flex items-center justify-around sticky bottom-0 z-40 shadow-soft pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+          <div className="bg-white/95 backdrop-blur-md border-t border-gray-100 px-3 py-2 flex items-center justify-around sticky bottom-0 z-40 shadow-soft pb-[max(0.5rem,env(safe-area-inset-bottom))]">
             {bottomTabs.map(tab => {
               const Icon = tab.icon;
               const isActive = currentScreen === tab.id;
