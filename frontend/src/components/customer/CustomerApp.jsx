@@ -14,6 +14,7 @@ import TrackOrder from './TrackOrder';
 import OrdersHistory from './OrdersHistory';
 import SupportScreen from './SupportScreen';
 import ProfileScreen from './ProfileScreen';
+import TravelScreen from './TravelScreen';
 
 export const CustomerApp = () => {
   // Splash Screen State
@@ -102,6 +103,8 @@ export const CustomerApp = () => {
         );
       case 'support':
         return <SupportScreen onBack={() => setCurrentScreen('home')} />;
+      case 'travel':
+        return <TravelScreen onBack={() => setCurrentScreen('ride')} onNavigate={setCurrentScreen} />;
       case 'profile':
         return <ProfileScreen onNavigate={setCurrentScreen} />;
       default:
