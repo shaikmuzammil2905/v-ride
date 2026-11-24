@@ -104,7 +104,7 @@ export const RideBooking = ({ onNavigate, onBack }) => {
   };
 
   return (
-    <div className="flex flex-col min-h-full bg-white pb-28 select-none">
+    <div className="flex flex-col bg-white pb-2 select-none">
       {/* ============================================================ */}
       {/* 1. DARK HEADER WITH YELLOW WAVE & 3D RIDER SILHOUETTE        */}
       {/* EXACT MATCH TO image copy 29.png                             */}

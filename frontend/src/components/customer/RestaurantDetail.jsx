@@ -103,7 +103,7 @@ export const RestaurantDetail = ({ onBack, onNavigateToTrack }) => {
   };
 
   return (
-    <div className="flex flex-col min-h-full bg-white pb-24 select-none">
+    <div className="flex flex-col bg-white pb-2 select-none">
       {/* Banner & Header matching Screen 7 in image.png */}
       <div className="relative h-48 bg-gray-900">
         <img

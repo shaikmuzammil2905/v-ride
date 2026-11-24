@@ -24,7 +24,7 @@ export const CustomerHome = ({ onNavigate }) => {
   ];
 
   return (
-    <div className="flex flex-col min-h-full bg-[#f8f9fa] pb-24 text-gray-900 select-none">
+    <div className="flex flex-col bg-[#f8f9fa] pb-2 text-gray-900 select-none">
       {/* ============================================================ */}
       {/* 1. DARK HERO SECTION WITH YELLOW WAVE & GLASSY LOCATION PILL */}
       {/* EXACT MATCH TO image copy 32.png                             */}

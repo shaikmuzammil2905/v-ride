@@ -120,8 +120,8 @@ export const CustomerApp = () => {
       {/* Standalone Native Mobile Container */}
       <div className="w-full min-h-screen min-h-[100dvh] bg-[#f8f9fa] flex flex-col items-center justify-start relative overflow-x-hidden">
         <div className="w-full max-w-md min-h-screen min-h-[100dvh] bg-white flex flex-col relative shadow-md">
-          {/* Scrollable Screen Content with bottom clearance for fixed navigation */}
-          <main className="flex-1 overflow-y-auto no-scrollbar relative pb-20">
+          {/* Scrollable Screen Content with exact clearance for fixed bottom navigation */}
+          <main className="flex-1 overflow-y-auto no-scrollbar relative pb-[68px]">
             {renderScreen()}
           </main>
 

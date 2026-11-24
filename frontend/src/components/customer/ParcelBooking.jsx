@@ -49,7 +49,7 @@ export const ParcelBooking = ({ onNavigate, onBack }) => {
   };
 
   return (
-    <div className="flex flex-col min-h-full bg-white pb-28 select-none">
+    <div className="flex flex-col bg-white pb-2 select-none">
       {/* Header matching mobile design */}
       <div className="flex items-center px-4 py-3.5 border-b border-gray-100 bg-white sticky top-0 z-20">
         <button

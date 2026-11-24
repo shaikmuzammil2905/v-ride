@@ -21,7 +21,7 @@ export const WalletScreen = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-full bg-[#f8f9fa] pb-24 select-none">
+    <div className="flex flex-col bg-[#f8f9fa] pb-2 select-none">
       <div className="px-5 py-4 bg-white border-b border-gray-100">
         <h1 className="text-base font-bold text-gray-900">V RIDE Wallet</h1>
       </div>

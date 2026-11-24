@@ -77,7 +77,7 @@ export const FoodOrdering = ({ onNavigate, onBack, onSelectRestaurant }) => {
   ];
 
   return (
-    <div className="flex flex-col min-h-full bg-[#f8f9fa] pb-28 select-none">
+    <div className="flex flex-col bg-[#f8f9fa] pb-2 select-none">
       {/* ============================================================ */}
       {/* 1. DARK HERO SECTION WITH BIRYANI ILLUSTRATION & YELLOW WAVE */}
       {/* EXACT MATCH TO image copy 30.png                             */}
