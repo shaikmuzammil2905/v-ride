@@ -26,9 +26,9 @@ export const CustomerApp = () => {
 
   // Bottom Navigation tabs strictly per instructions:
   // 1. Home
-  // 2. Rides (Rapido inspired)
-  // 3. Food (Swiggy inspired)
-  // 4. Parcel (Rapido Parcel inspired)
+  // 2. Rides
+  // 3. Food
+  // 4. Parcel
   // 5. Profile
   // (Wallet and Pick & Drop permanently removed)
   const bottomTabs = [

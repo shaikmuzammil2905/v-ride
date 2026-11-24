@@ -93,10 +93,9 @@ export const CustomerHome = ({ onNavigate }) => {
       </div>
 
       {/* --- 3 MAIN PROMINENT SERVICE CARDS (RIDES, FOOD, PARCEL) --- */}
-      {/* Pick & Drop standalone removed per user instructions and image copy 4.png */}
       <div className="px-4 pt-3 pb-1">
         <div className="grid grid-cols-3 gap-2.5">
-          {/* 1. RIDES (Rapido-inspired) */}
+          {/* 1. RIDES */}
           <button
             onClick={() => onNavigate('rides')}
             className="flex flex-col items-center justify-between p-3 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-yellow-400 transition group active:scale-95 relative overflow-hidden"
@@ -113,7 +112,7 @@ export const CustomerHome = ({ onNavigate }) => {
             </div>
           </button>
 
-          {/* 2. FOOD (Swiggy-inspired) */}
+          {/* 2. FOOD */}
           <button
             onClick={() => onNavigate('food')}
             className="flex flex-col items-center justify-between p-3 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-red-400 transition group active:scale-95 relative overflow-hidden"
@@ -130,7 +129,7 @@ export const CustomerHome = ({ onNavigate }) => {
             </div>
           </button>
 
-          {/* 3. PARCEL (Rapido Parcel-inspired) */}
+          {/* 3. PARCEL */}
           <button
             onClick={() => onNavigate('parcel')}
             className="flex flex-col items-center justify-between p-3 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-purple-400 transition group active:scale-95 relative overflow-hidden"
@@ -176,7 +175,7 @@ export const CustomerHome = ({ onNavigate }) => {
         </div>
       )}
 
-      {/* --- SWIGGY-INSPIRED FOOD OFFER PROMO --- */}
+      {/* --- FOOD OFFER PROMO BANNER --- */}
       <div className="px-4 pt-3">
         <div
           onClick={() => onNavigate('food')}
@@ -202,10 +201,10 @@ export const CustomerHome = ({ onNavigate }) => {
         </div>
       </div>
 
-      {/* --- RAPIDO-INSPIRED 1-TAP REBOOK ROUTE --- */}
+      {/* --- QUICK 1-TAP REBOOK ROUTE --- */}
       <div className="px-4 pt-3.5">
         <div className="flex items-center justify-between mb-2">
-          <h2 className="text-sm font-bold text-gray-900">Recent Route (Rapido Style)</h2>
+          <h2 className="text-sm font-bold text-gray-900">Recent Route</h2>
           <button
             onClick={() => onNavigate('rides')}
             className="text-xs font-bold text-blue-600 hover:text-blue-700"
@@ -235,11 +234,11 @@ export const CustomerHome = ({ onNavigate }) => {
         </div>
       </div>
 
-      {/* --- POPULAR RESTAURANTS IN HYDERABAD (Swiggy-inspired) --- */}
+      {/* --- POPULAR RESTAURANTS IN HYDERABAD --- */}
       <div className="px-4 pt-3.5">
         <div className="flex items-center justify-between mb-2">
           <div>
-            <h2 className="text-sm font-bold text-gray-900">Popular Restaurants (Swiggy Style)</h2>
+            <h2 className="text-sm font-bold text-gray-900">Popular Restaurants</h2>
             <p className="text-[10px] text-gray-500">Delivered hot & fresh to your doorstep</p>
           </div>
           <button
@@ -311,7 +310,7 @@ export const CustomerHome = ({ onNavigate }) => {
         </div>
       </div>
 
-      {/* --- RAPIDO PARCEL PROMO BANNER --- */}
+      {/* --- V RIDE PARCEL PROMO BANNER --- */}
       <div className="px-4 pt-3.5">
         <div
           onClick={() => onNavigate('parcel')}
@@ -322,7 +321,7 @@ export const CustomerHome = ({ onNavigate }) => {
               📦
             </div>
             <div>
-              <span className="text-[9px] font-black uppercase text-purple-700 tracking-wider">Rapido Parcel Style</span>
+              <span className="text-[9px] font-black uppercase text-purple-700 tracking-wider">V RIDE Express Parcel</span>
               <h3 className="font-extrabold text-xs text-gray-900">Send Packages Doorstep</h3>
               <p className="text-[10px] text-gray-600">Documents, clothes & gifts delivered across Hyderabad</p>
             </div>

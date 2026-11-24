@@ -18,12 +18,12 @@ export const WebsiteHome = () => {
   const [partnerPhone, setPartnerPhone] = useState('');
   const [partnerSubmitted, setPartnerSubmitted] = useState(false);
 
-  // Rapido Rides Interactive State (image copy 11.png & 12.png)
+  // Rides Interactive State
   const [showAllRideServices, setShowAllRideServices] = useState(false);
   const [selectedRideService, setSelectedRideService] = useState('bike');
   const [rideDestinationSearch, setRideDestinationSearch] = useState('');
 
-  // Swiggy Food Interactive State (image copy 13.png & 14.png)
+  // Food Interactive State
   const [vegOnly, setVegOnly] = useState(false);
   const [foodActiveSubTab, setFoodActiveSubTab] = useState('ALL');
   const [addedFoodItems, setAddedFoodItems] = useState([
@@ -179,7 +179,7 @@ export const WebsiteHome = () => {
         </div>
       </section>
 
-      {/* Services Section with Direct High-Fidelity Rapido & Swiggy Implementations */}
+      {/* Services Section with Direct High-Fidelity Interactive Implementations */}
       <section id="services" className="py-12 md:py-16 px-4 md:px-6 bg-[#f8f9fa] border-y border-gray-100">
         <div className="max-w-6xl mx-auto space-y-8">
           <div className="text-center max-w-2xl mx-auto space-y-2">
@@ -197,9 +197,9 @@ export const WebsiteHome = () => {
           {/* 3 Core Service Selector Tabs */}
           <div className="flex justify-center gap-3 overflow-x-auto pb-1">
             {[
-              { id: 'ride', label: 'Rides (Rapido Style)', icon: Bike, desc: 'Bike Taxi, Auto & Cabs' },
-              { id: 'food', label: 'Food (Swiggy Style)', icon: Utensils, desc: 'Flavourfest & 99 Store' },
-              { id: 'parcel', label: 'Parcel (Rapido Parcel)', icon: Package, desc: 'Doorstep Delivery' }
+              { id: 'ride', label: 'V RIDE Rides', icon: Bike, desc: 'Bike Taxi, Auto & Cabs' },
+              { id: 'food', label: 'V RIDE Food', icon: Utensils, desc: 'Flavourfest & 99 Store' },
+              { id: 'parcel', label: 'V RIDE Parcel', icon: Package, desc: 'Doorstep Delivery' }
             ].map(tab => {
               const Icon = tab.icon;
               const isActive = activeServiceTab === tab.id;
@@ -232,7 +232,7 @@ export const WebsiteHome = () => {
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse"></span>
-                    <h3 className="text-xl font-black text-gray-900">V RIDE Rides — Rapido Inspired Experience</h3>
+                    <h3 className="text-xl font-black text-gray-900">V RIDE Rides — Instant Mobility</h3>
                   </div>
                   <p className="text-xs text-gray-500 font-medium mt-0.5">Beat the traffic in minutes with verified bike taxis, autos and cabs.</p>
                 </div>
@@ -478,7 +478,7 @@ export const WebsiteHome = () => {
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
-                    <h3 className="text-xl font-black text-gray-900">V RIDE Food — Swiggy Flavourfest & 99 Store</h3>
+                    <h3 className="text-xl font-black text-gray-900">V RIDE Food — Flavourfest & 99 Store Deals</h3>
                   </div>
                   <p className="text-xs text-gray-500 font-medium mt-0.5">Order from Hyderabad's top rated restaurants or discover meals at flat ₹99.</p>
                 </div>
@@ -698,7 +698,7 @@ export const WebsiteHome = () => {
           )}
 
           {/* ========================================================================= */}
-          {/* TAB 3: PARCEL SECTION (Rapido Parcel Doorstep Delivery) */}
+          {/* TAB 3: PARCEL SECTION (V RIDE Parcel Doorstep Delivery) */}
           {/* ========================================================================= */}
           {activeServiceTab === 'parcel' && (
             <div className="bg-white rounded-3xl p-4 md:p-8 border border-gray-200 shadow-xl max-w-4xl mx-auto space-y-6 animate-fadeIn">

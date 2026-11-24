@@ -81,7 +81,7 @@ export const DrawerMenu = ({ isOpen, onClose, onNavigate }) => {
                 <div className="w-7 h-7 rounded-lg bg-yellow-100 text-yellow-800 flex items-center justify-center">
                   <Bike className="w-4 h-4 stroke-[2.2]" />
                 </div>
-                <span>My Rides (Rapido Style)</span>
+                <span>My Rides</span>
               </div>
               <ChevronRight className="w-4 h-4 text-gray-400" />
             </button>
@@ -95,7 +95,7 @@ export const DrawerMenu = ({ isOpen, onClose, onNavigate }) => {
                 <div className="w-7 h-7 rounded-lg bg-red-100 text-red-600 flex items-center justify-center">
                   <Utensils className="w-4 h-4 stroke-[2.2]" />
                 </div>
-                <span>Food Orders (Swiggy Style)</span>
+                <span>Food Orders</span>
               </div>
               <ChevronRight className="w-4 h-4 text-gray-400" />
             </button>
@@ -109,7 +109,7 @@ export const DrawerMenu = ({ isOpen, onClose, onNavigate }) => {
                 <div className="w-7 h-7 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center">
                   <Package className="w-4 h-4 stroke-[2.2]" />
                 </div>
-                <span>Send Parcels (Rapido Parcel)</span>
+                <span>Send Parcels</span>
               </div>
               <ChevronRight className="w-4 h-4 text-gray-400" />
             </button>
@@ -345,7 +345,7 @@ export const DrawerMenu = ({ isOpen, onClose, onNavigate }) => {
             </div>
             <h3 className="font-black text-base text-gray-900">V RIDE Platform</h3>
             <p className="text-xs text-gray-500 font-medium">
-              Unified on-demand mobility (Rapido-inspired rides), online food ordering (Swiggy-inspired), and parcel courier delivery.
+              Unified on-demand mobility, online food ordering, and express doorstep parcel delivery.
             </p>
             <div className="p-3 bg-gray-50 rounded-2xl text-[11px] text-gray-600 text-left space-y-1">
               <p><strong>App Version:</strong> 2.5.0 Production</p>

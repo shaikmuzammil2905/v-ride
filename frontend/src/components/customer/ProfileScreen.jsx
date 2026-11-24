@@ -13,7 +13,7 @@ export const ProfileScreen = ({ onNavigate }) => {
   const [showReferModal, setShowReferModal] = useState(false);
   const [showPassModal, setShowPassModal] = useState(false);
 
-  // Rapido Profile Menu Items matching image copy 15.png
+  // V RIDE Profile Menu Items
   const profileMenuItems = [
     {
       id: 'help',
@@ -72,7 +72,7 @@ export const ProfileScreen = ({ onNavigate }) => {
       <div className="px-5 pt-4 pb-3 bg-white border-b border-gray-100 flex items-center justify-between sticky top-0 z-20">
         <h1 className="text-xl font-black text-gray-900 tracking-tight">Profile</h1>
         <span className="text-[10px] font-black uppercase text-yellow-800 bg-yellow-100 px-2 py-0.5 rounded-full">
-          Rapido Style
+          V RIDE Verified
         </span>
       </div>
 

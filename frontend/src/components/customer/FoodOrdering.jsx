@@ -9,7 +9,7 @@ import { useApp } from '../../context/AppContext';
 export const FoodOrdering = ({ onNavigate, onBack, onSelectRestaurant }) => {
   const { selectedLocation, cartCount, cartSubtotal, addToCart } = useApp();
 
-  // Swiggy sub-tabs: 'food' | 'bolt' | '99store' | 'eatright' | 'reorder'
+  // Food sub-tabs: 'food' | 'bolt' | '99store' | 'eatright' | 'reorder'
   const [currentFoodTab, setCurrentFoodTab] = useState('food');
 
   // Search & Filters
@@ -18,7 +18,7 @@ export const FoodOrdering = ({ onNavigate, onBack, onSelectRestaurant }) => {
   const [activeSubFilter, setActiveSubFilter] = useState('ALL');
   const [selected99PriceRange, setSelected99PriceRange] = useState('under_39');
 
-  // What's on your mind categories matching Swiggy references
+  // What's on your mind categories
   const whatsOnYourMind = [
     { name: 'Dosa', icon: '🥞' },
     { name: 'Idli', icon: '🥟' },
@@ -187,8 +187,8 @@ export const FoodOrdering = ({ onNavigate, onBack, onSelectRestaurant }) => {
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-black uppercase text-red-600 bg-red-50 px-2 py-0.5 rounded-full border border-red-200">
-              Swiggy Style
+            <span className="text-[10px] font-black uppercase text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200">
+              V RIDE Food
             </span>
           </div>
         </div>
