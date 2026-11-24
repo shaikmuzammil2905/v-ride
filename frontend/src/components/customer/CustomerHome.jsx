@@ -1,19 +1,17 @@
 import React, { useState } from 'react';
 import {
   Menu, Bell, ChevronDown, Bike, Package, Utensils,
-  ArrowRight, ShieldCheck, Clock, Star, Phone, MessageSquare,
-  RotateCcw, Sparkles, ChevronRight, Gift, Copy, CheckCircle2,
-  Navigation, Zap
+  ArrowRight, ShieldCheck, Star, RotateCcw, Zap,
+  Navigation, CheckCircle2, ChevronRight
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import DrawerMenu from '../common/DrawerMenu';
 
 export const CustomerHome = ({ onNavigate }) => {
-  const { currentUser, selectedLocation, setSelectedLocation, activeRide, activeFoodOrder, notifications } = useApp();
+  const { currentUser, selectedLocation, setSelectedLocation, activeFoodOrder, notifications } = useApp();
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [showDrawer, setShowDrawer] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [copiedCode, setCopiedCode] = useState(false);
 
   const hyderabadLocations = [
     'Miyapur, Hyderabad',
@@ -25,90 +23,105 @@ export const CustomerHome = ({ onNavigate }) => {
     'Madhapur, Hyderabad'
   ];
 
-  const handleCopyCode = () => {
-    navigator.clipboard?.writeText('VRIDE100');
-    setCopiedCode(true);
-    setTimeout(() => setCopiedCode(false), 2000);
-  };
-
   return (
-    <div className="flex flex-col min-h-full bg-[#f8f9fa] pb-3 text-gray-900 select-none">
-      {/* --- FIXED NATIVE HEADER WITH NEW OFFICIAL LOGO --- */}
-      <header className="bg-white px-4 pt-3 pb-3 border-b border-gray-100 flex items-center justify-between sticky top-0 z-30 shadow-xs">
-        <div className="flex items-center gap-2.5">
+    <div className="flex flex-col min-h-full bg-[#f8f9fa] pb-24 text-gray-900 select-none">
+      {/* ============================================================ */}
+      {/* 1. DARK HERO SECTION WITH YELLOW WAVE & GLASSY LOCATION PILL */}
+      {/* EXACT MATCH TO image copy 32.png                             */}
+      {/* ============================================================ */}
+      <div className="relative bg-[#0b0e14] text-white pt-3 pb-6 px-4 overflow-hidden">
+        {/* Subtle background glow */}
+        <div className="absolute -top-12 -right-12 w-48 h-48 bg-[#FFD600]/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        {/* Top Bar inside Dark Hero */}
+        <div className="flex items-center justify-between relative z-10">
           <button
             onClick={() => setShowDrawer(true)}
-            className="p-1.5 rounded-xl hover:bg-gray-100 text-gray-800 transition active:scale-95"
+            className="p-2 rounded-xl glass-btn-dark hover:bg-white/10 text-white transition active:scale-95"
             aria-label="Open menu"
           >
-            <Menu className="w-6 h-6 stroke-[2.2]" />
+            <Menu className="w-5 h-5 stroke-[2.2]" />
           </button>
 
-          {/* New Official V RIDE Logo */}
+          {/* Centered V RIDE Logo */}
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => onNavigate('home')}>
-            <div className="w-8 h-8 rounded-lg overflow-hidden border border-yellow-400 shadow-xs">
+            <div className="w-7 h-7 rounded-lg overflow-hidden border border-[#FFD600] shadow-sm">
               <img src="/logo.png" alt="V RIDE" className="w-full h-full object-cover" />
             </div>
-            <div>
-              <span className="font-black text-lg tracking-wider text-[#080808] leading-none block">V RIDE</span>
-              <span className="text-[9px] text-gray-500 font-bold uppercase tracking-wider block">Mobility · Food · Parcel</span>
+            <div className="text-center">
+              <span className="font-black text-base tracking-wider text-white leading-none block">V RIDE</span>
+              <span className="text-[8px] text-[#FFD600] font-black uppercase tracking-wider block">Mobility · Food · Parcel</span>
             </div>
           </div>
-        </div>
 
-        <div className="flex items-center gap-2">
           {/* Notification Bell */}
           <button
             onClick={() => setShowNotifications(true)}
-            className="relative p-2 rounded-xl hover:bg-gray-100 text-gray-800 transition active:scale-95"
+            className="relative p-2 rounded-xl glass-btn-dark hover:bg-white/10 text-white transition active:scale-95"
             aria-label="Notifications"
           >
             <Bell className="w-5 h-5 stroke-[2]" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500 ring-2 ring-white"></span>
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#FFD600] ring-2 ring-[#0b0e14]"></span>
           </button>
         </div>
-      </header>
 
-      {/* --- USER GREETING & LOCATION PICKER --- */}
-      <div className="px-4 pt-3.5 pb-2 bg-white">
-        <div className="flex items-center justify-between">
+        {/* Greeting & Location Row with 3D Rider Silhouette */}
+        <div className="mt-4 flex items-end justify-between relative z-10">
           <div>
-            <h1 className="text-xl font-black text-gray-900 flex items-center gap-1.5">
-              <span>Hi {currentUser.name || 'Sri Latha'}</span>
+            <h1 className="text-xl font-black text-white flex items-center gap-1.5 tracking-tight">
+              <span>Hi {currentUser?.name || 'Sri Latha'}</span>
               <span className="text-xl">👋</span>
             </h1>
-            <p className="text-xs text-gray-500 font-medium mt-0.5">Where do you want to go or order today?</p>
+            <p className="text-xs text-gray-300 font-medium mt-0.5">
+              Where do you want to go or order today?
+            </p>
+
+            {/* Glassy Location Dropdown Pill */}
+            <button
+              onClick={() => setShowLocationModal(true)}
+              className="mt-3 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full glass-btn-dark hover:bg-white/15 text-xs font-bold text-white transition active:scale-98"
+            >
+              <span className="w-2 h-2 rounded-full bg-[#FFD600] ring-2 ring-yellow-400/40"></span>
+              <span className="truncate max-w-[190px]">{selectedLocation}</span>
+              <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
+            </button>
+          </div>
+
+          {/* 3D Delivery Rider Illustration */}
+          <div className="shrink-0 w-20 h-20 -mr-1 relative pointer-events-none">
+            <div className="w-full h-full rounded-2xl bg-gradient-to-br from-[#FFD600]/20 to-transparent flex items-center justify-center text-4xl transform hover:scale-105 transition">
+              🛵
+            </div>
           </div>
         </div>
 
-        {/* Location Dropdown Pill */}
-        <button
-          onClick={() => setShowLocationModal(true)}
-          className="mt-2.5 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-50 border border-gray-200 text-xs font-semibold text-gray-800 hover:bg-gray-100 transition active:scale-98"
-        >
-          <div className="w-2 h-2 rounded-full bg-[#FFD600] ring-2 ring-yellow-200"></div>
-          <span className="truncate max-w-[200px]">{selectedLocation}</span>
-          <ChevronDown className="w-3.5 h-3.5 text-gray-500" />
-        </button>
+        {/* Bottom Curved Yellow Accent Wave */}
+        <div className="absolute bottom-0 left-0 right-0 h-2 bg-[#FFD600]"></div>
       </div>
 
-      {/* --- 3 MAIN PROMINENT SERVICE CARDS (RIDES, FOOD, PARCEL) --- */}
-      <div className="px-4 pt-3 pb-1">
+      {/* ============================================================ */}
+      {/* 2. THREE PROMINENT SERVICE CARDS (RIDES, FOOD, PARCEL)       */}
+      {/* EXACT MATCH TO image copy 32.png                             */}
+      {/* ============================================================ */}
+      <div className="px-4 -mt-1 pt-3 pb-1">
         <div className="grid grid-cols-3 gap-2.5">
           {/* 1. RIDES */}
           <button
             onClick={() => onNavigate('rides')}
             className="flex flex-col items-center justify-between p-3 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-yellow-400 transition group active:scale-95 relative overflow-hidden"
           >
-            <span className="absolute top-1.5 right-1.5 bg-yellow-400 text-black text-[8px] font-black px-1.5 py-0.2 rounded-full uppercase">
+            <span className="absolute top-1.5 right-1.5 bg-[#FFD600] text-black text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider">
               Fast
             </span>
-            <div className="w-13 h-13 rounded-2xl bg-yellow-50 flex items-center justify-center text-yellow-800 group-hover:scale-105 transition shadow-xs mt-1">
-              <Bike className="w-7 h-7 stroke-[2.3]" />
+            <div className="w-12 h-12 rounded-2xl bg-yellow-50 flex items-center justify-center text-2xl group-hover:scale-110 transition mt-1 shadow-2xs">
+              🛵
             </div>
-            <div className="text-center mt-2">
+            <div className="text-center mt-2 w-full">
               <span className="font-black text-xs text-gray-900 block">Rides</span>
-              <span className="text-[10px] text-gray-500 font-semibold block leading-tight">Bike · Auto · Cab</span>
+              <span className="text-[9px] text-gray-500 font-semibold block leading-tight">Bike · Auto · Cab</span>
+            </div>
+            <div className="mt-2 w-6 h-6 rounded-full glass-btn-yellow flex items-center justify-center">
+              <ChevronRight className="w-3.5 h-3.5 text-black stroke-[3]" />
             </div>
           </button>
 
@@ -117,15 +130,18 @@ export const CustomerHome = ({ onNavigate }) => {
             onClick={() => onNavigate('food')}
             className="flex flex-col items-center justify-between p-3 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-red-400 transition group active:scale-95 relative overflow-hidden"
           >
-            <span className="absolute top-1.5 right-1.5 bg-red-500 text-white text-[8px] font-black px-1.5 py-0.2 rounded-full uppercase">
+            <span className="absolute top-1.5 right-1.5 bg-red-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider">
               50% OFF
             </span>
-            <div className="w-13 h-13 rounded-2xl bg-red-50 flex items-center justify-center text-red-500 group-hover:scale-105 transition shadow-xs mt-1">
-              <Utensils className="w-7 h-7 stroke-[2.3]" />
+            <div className="w-12 h-12 rounded-2xl bg-red-50 flex items-center justify-center text-2xl group-hover:scale-110 transition mt-1 shadow-2xs">
+              🍔
             </div>
-            <div className="text-center mt-2">
+            <div className="text-center mt-2 w-full">
               <span className="font-black text-xs text-gray-900 block">Food</span>
-              <span className="text-[10px] text-gray-500 font-semibold block leading-tight">Order Online</span>
+              <span className="text-[9px] text-gray-500 font-semibold block leading-tight">Order Online</span>
+            </div>
+            <div className="mt-2 w-6 h-6 rounded-full glass-btn-yellow flex items-center justify-center">
+              <ChevronRight className="w-3.5 h-3.5 text-black stroke-[3]" />
             </div>
           </button>
 
@@ -134,61 +150,68 @@ export const CustomerHome = ({ onNavigate }) => {
             onClick={() => onNavigate('parcel')}
             className="flex flex-col items-center justify-between p-3 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-purple-400 transition group active:scale-95 relative overflow-hidden"
           >
-            <span className="absolute top-1.5 right-1.5 bg-purple-600 text-white text-[8px] font-black px-1.5 py-0.2 rounded-full uppercase">
+            <span className="absolute top-1.5 right-1.5 bg-purple-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider">
               Doorstep
             </span>
-            <div className="w-13 h-13 rounded-2xl bg-purple-50 flex items-center justify-center text-purple-700 group-hover:scale-105 transition shadow-xs mt-1">
-              <Package className="w-7 h-7 stroke-[2.3]" />
+            <div className="w-12 h-12 rounded-2xl bg-purple-50 flex items-center justify-center text-2xl group-hover:scale-110 transition mt-1 shadow-2xs">
+              📦
             </div>
-            <div className="text-center mt-2">
+            <div className="text-center mt-2 w-full">
               <span className="font-black text-xs text-gray-900 block">Parcel</span>
-              <span className="text-[10px] text-gray-500 font-semibold block leading-tight">Send Anywhere</span>
+              <span className="text-[9px] text-gray-500 font-semibold block leading-tight">Send Anywhere</span>
+            </div>
+            <div className="mt-2 w-6 h-6 rounded-full glass-btn-yellow flex items-center justify-center">
+              <ChevronRight className="w-3.5 h-3.5 text-black stroke-[3]" />
             </div>
           </button>
         </div>
       </div>
 
-      {/* --- ACTIVE ORDER FLOATING CARD (If ride or food active) --- */}
-      {activeFoodOrder && (
-        <div className="px-4 pt-2.5">
-          <div
-            onClick={() => onNavigate('track')}
-            className="bg-[#080808] text-white p-3.5 rounded-2xl shadow-lg border border-yellow-400/40 flex items-center justify-between cursor-pointer hover:bg-neutral-900 transition active:scale-98"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-[#FFD600] flex items-center justify-center text-black font-bold text-sm">
-                🛵
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-black text-xs text-[#FFD600]">{activeFoodOrder.etaText || 'Arriving in 8 min'}</span>
-                  <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-ping"></span>
-                </div>
-                <p className="text-[11px] text-gray-300 font-medium truncate max-w-[180px]">{activeFoodOrder.restaurantName || 'Paradise Biryani'}</p>
-              </div>
+      {/* ============================================================ */}
+      {/* 3. ACTIVE ORDER LIVE TRACKING PILL                           */}
+      {/* ============================================================ */}
+      <div className="px-4 pt-2.5">
+        <div
+          onClick={() => onNavigate('track')}
+          className="bg-[#0b0e14] text-white p-3.5 rounded-2xl shadow-lg border border-[#FFD600]/30 flex items-center justify-between cursor-pointer hover:border-[#FFD600] transition active:scale-98"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-[#FFD600] flex items-center justify-center text-black font-bold text-lg shadow-sm">
+              🛵
             </div>
-            <div className="flex items-center gap-1 text-xs font-bold text-[#FFD600]">
-              <span>Track Live</span>
-              <ArrowRight className="w-4 h-4" />
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-black text-xs text-[#FFD600]">{activeFoodOrder?.etaText || 'Arriving in 8 min'}</span>
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              </div>
+              <p className="text-[11px] text-gray-300 font-medium truncate max-w-[170px]">
+                {activeFoodOrder?.restaurantName || 'Paradise Biryani'}
+              </p>
             </div>
           </div>
+          <button className="glass-btn-yellow px-3 py-1.5 rounded-xl text-black font-black text-xs flex items-center gap-1 active:scale-95">
+            <span>Track Live</span>
+            <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
+          </button>
         </div>
-      )}
+      </div>
 
-      {/* --- FOOD OFFER PROMO BANNER --- */}
+      {/* ============================================================ */}
+      {/* 4. FOOD OFFER PROMO BANNER (VRIDE20)                         */}
+      {/* ============================================================ */}
       <div className="px-4 pt-3">
         <div
           onClick={() => onNavigate('food')}
-          className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-red-600 to-red-500 text-white p-4 cursor-pointer hover:shadow-md transition active:scale-98"
+          className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 text-white p-4 cursor-pointer hover:shadow-md transition active:scale-98"
         >
           <div className="max-w-[65%]">
-            <span className="bg-white/20 text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider backdrop-blur-sm">
+            <span className="glass-pill px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider text-white inline-block">
               Code: VRIDE20
             </span>
             <h3 className="text-base font-black mt-1.5 leading-tight">
               Flat 20% OFF
             </h3>
-            <p className="text-xs text-red-100 font-medium">on all food deliveries in Hyderabad</p>
+            <p className="text-xs text-rose-100 font-medium">on all food deliveries in Hyderabad</p>
           </div>
 
           <div className="absolute right-3 top-1/2 -translate-y-1/2 w-20 h-20 rounded-xl overflow-hidden shadow-md">
@@ -201,21 +224,23 @@ export const CustomerHome = ({ onNavigate }) => {
         </div>
       </div>
 
-      {/* --- QUICK 1-TAP REBOOK ROUTE --- */}
+      {/* ============================================================ */}
+      {/* 5. QUICK 1-TAP REBOOK ROUTE                                  */}
+      {/* ============================================================ */}
       <div className="px-4 pt-3.5">
         <div className="flex items-center justify-between mb-2">
           <h2 className="text-sm font-bold text-gray-900">Recent Route</h2>
           <button
             onClick={() => onNavigate('rides')}
-            className="text-xs font-bold text-blue-600 hover:text-blue-700"
+            className="text-xs font-bold text-gray-700 hover:text-black"
           >
-            All Rides
+            All Rides →
           </button>
         </div>
 
         <div className="p-3.5 rounded-2xl bg-white border border-gray-200/80 shadow-xs flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-yellow-100 text-yellow-800 flex items-center justify-center text-lg">
+            <div className="w-10 h-10 rounded-xl bg-yellow-100 text-yellow-900 flex items-center justify-center text-lg">
               🛵
             </div>
             <div>
@@ -226,7 +251,7 @@ export const CustomerHome = ({ onNavigate }) => {
 
           <button
             onClick={() => onNavigate('rides')}
-            className="px-3 py-1.5 rounded-xl bg-[#FFD600] text-black font-extrabold text-xs shadow-xs hover:bg-yellow-400 transition flex items-center gap-1 active:scale-95"
+            className="glass-btn-yellow px-3.5 py-1.5 rounded-xl text-black font-extrabold text-xs flex items-center gap-1.5 active:scale-95"
           >
             <RotateCcw className="w-3 h-3 stroke-[2.5]" />
             <span>Rebook</span>
@@ -234,7 +259,9 @@ export const CustomerHome = ({ onNavigate }) => {
         </div>
       </div>
 
-      {/* --- POPULAR RESTAURANTS IN HYDERABAD --- */}
+      {/* ============================================================ */}
+      {/* 6. POPULAR RESTAURANTS IN HYDERABAD                          */}
+      {/* ============================================================ */}
       <div className="px-4 pt-3.5">
         <div className="flex items-center justify-between mb-2">
           <div>
@@ -243,7 +270,7 @@ export const CustomerHome = ({ onNavigate }) => {
           </div>
           <button
             onClick={() => onNavigate('food')}
-            className="text-xs font-bold text-blue-600 hover:text-blue-700"
+            className="text-xs font-bold text-gray-700 hover:text-black"
           >
             View All →
           </button>
@@ -310,7 +337,9 @@ export const CustomerHome = ({ onNavigate }) => {
         </div>
       </div>
 
-      {/* --- V RIDE PARCEL PROMO BANNER --- */}
+      {/* ============================================================ */}
+      {/* 7. V RIDE PARCEL PROMO BANNER                                */}
+      {/* ============================================================ */}
       <div className="px-4 pt-3.5">
         <div
           onClick={() => onNavigate('parcel')}
@@ -330,7 +359,9 @@ export const CustomerHome = ({ onNavigate }) => {
         </div>
       </div>
 
-      {/* --- V RIDE TRUST & SAFETY GUARANTEE --- */}
+      {/* ============================================================ */}
+      {/* 8. V RIDE TRUST & SAFETY GUARANTEE                           */}
+      {/* ============================================================ */}
       <div className="px-4 pt-3.5">
         <div className="p-3.5 rounded-2xl bg-white border border-gray-100 shadow-xs space-y-2.5">
           <div className="flex items-center justify-between">
@@ -363,7 +394,9 @@ export const CustomerHome = ({ onNavigate }) => {
         </div>
       </div>
 
-      {/* --- GRAND HYDERABAD BRAND PROMISE BANNER (Fills and elevates bottom layout) --- */}
+      {/* ============================================================ */}
+      {/* 9. HYDERABAD BRAND PROMISE BANNER                            */}
+      {/* ============================================================ */}
       <div className="px-4 pt-3 pb-2">
         <div className="p-3.5 rounded-2xl bg-gradient-to-r from-[#080808] to-[#1c1c1c] text-white border border-[#FFD600]/40 shadow-sm flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -379,9 +412,11 @@ export const CustomerHome = ({ onNavigate }) => {
         </div>
       </div>
 
-      {/* --- LOCATION PICKER MODAL --- */}
+      {/* ============================================================ */}
+      {/* 10. LOCATION PICKER MODAL                                    */}
+      {/* ============================================================ */}
       {showLocationModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 animate-fadeIn">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 animate-fadeIn">
           <div className="bg-white w-full max-w-sm rounded-t-3xl sm:rounded-2xl p-5 shadow-2xl animate-slideUp">
             <div className="flex items-center justify-between pb-3 border-b border-gray-100">
               <h3 className="font-bold text-base text-gray-900">Select Location</h3>
@@ -416,9 +451,11 @@ export const CustomerHome = ({ onNavigate }) => {
         </div>
       )}
 
-      {/* --- NOTIFICATIONS MODAL --- */}
+      {/* ============================================================ */}
+      {/* 11. NOTIFICATIONS MODAL                                      */}
+      {/* ============================================================ */}
       {showNotifications && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
           <div className="bg-white w-full max-w-sm rounded-t-3xl sm:rounded-2xl p-5 shadow-2xl">
             <div className="flex items-center justify-between pb-3 border-b border-gray-100">
               <h3 className="font-bold text-base text-gray-900 flex items-center gap-2">
@@ -433,7 +470,7 @@ export const CustomerHome = ({ onNavigate }) => {
               </button>
             </div>
             <div className="mt-3 space-y-2.5 max-h-72 overflow-y-auto">
-              {notifications.map(n => (
+              {notifications?.map(n => (
                 <div key={n.id} className="p-3 rounded-xl bg-gray-50 border border-gray-100 text-xs">
                   <div className="flex items-center justify-between">
                     <h4 className="font-bold text-gray-900">{n.title}</h4>
@@ -447,7 +484,7 @@ export const CustomerHome = ({ onNavigate }) => {
         </div>
       )}
 
-      {/* --- REDESIGNED HAMBURGER DRAWER --- */}
+      {/* Drawer Menu */}
       <DrawerMenu
         isOpen={showDrawer}
         onClose={() => setShowDrawer(false)}
@@ -456,4 +493,5 @@ export const CustomerHome = ({ onNavigate }) => {
     </div>
   );
 };
+
 export default CustomerHome;

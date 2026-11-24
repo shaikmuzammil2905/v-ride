@@ -125,10 +125,10 @@ export const CustomerApp = () => {
             {renderScreen()}
           </main>
 
-          {/* PERMANENTLY FIXED BOTTOM NAVIGATION BAR - VISIBLE ACROSS ALL SECTIONS */}
+          {/* PERMANENTLY FIXED BOTTOM NAVIGATION BAR - EXACT MATCH TO image copy 29, 30, 31, 32 */}
           <nav
             aria-label="Bottom Navigation"
-            className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white/95 backdrop-blur-md border-t border-gray-100 px-3 py-1.5 flex items-center justify-around z-40 shadow-[0_-4px_16px_rgba(0,0,0,0.06)] pb-[max(0.6rem,env(safe-area-inset-bottom))]"
+            className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-[#0a0d14]/95 backdrop-blur-xl border-t border-white/10 px-3 py-1.5 flex items-center justify-around z-40 shadow-[0_-8px_24px_rgba(0,0,0,0.4)] pb-[max(0.6rem,env(safe-area-inset-bottom))]"
           >
             {bottomTabs.map(tab => {
               const Icon = tab.icon;
@@ -137,15 +137,15 @@ export const CustomerApp = () => {
                 <button
                   key={tab.id}
                   onClick={() => handleTabClick(tab)}
-                  className={`flex flex-col items-center justify-center py-1 px-3 rounded-2xl transition-all active:scale-95 ${
-                    active ? 'text-black font-extrabold' : 'text-gray-400 hover:text-gray-700 font-medium'
+                  className={`flex flex-col items-center justify-center transition-all active:scale-95 ${
+                    active
+                      ? 'bg-[#FFD600] text-black px-4 py-1.5 rounded-2xl shadow-[0_2px_14px_rgba(255,214,0,0.4)]'
+                      : 'text-white/60 hover:text-white py-1 px-2.5'
                   }`}
                   aria-label={tab.label}
                 >
-                  <div className={`p-1.5 rounded-xl transition ${active ? 'bg-[#FFD600] text-black shadow-xs' : ''}`}>
-                    <Icon className={`w-5 h-5 ${active ? 'stroke-[2.5] text-black' : 'stroke-[1.8]'}`} />
-                  </div>
-                  <span className={`text-[10px] mt-0.5 tracking-tight ${active ? 'font-extrabold text-black' : 'font-semibold'}`}>
+                  <Icon className={`w-5 h-5 ${active ? 'stroke-[2.5] text-black' : 'stroke-[1.8] text-white/80'}`} />
+                  <span className={`text-[10px] mt-0.5 tracking-tight ${active ? 'font-black text-black' : 'font-semibold text-white/70'}`}>
                     {tab.label}
                   </span>
                 </button>

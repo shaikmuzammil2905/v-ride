@@ -13,7 +13,7 @@ export const RideBooking = ({ onNavigate, onBack }) => {
   // Booking states
   const [pickup, setPickup] = useState('19-7-326, I.P.D Colony, Miyapur, Hyderabad');
   const [drop, setDrop] = useState('');
-  const [selectedVehicle, setSelectedVehicle] = useState('bike'); // 'bike' | 'auto' | 'shared_auto' | 'cab_economy' | 'cab_premium' | 'parcel_bike'
+  const [selectedVehicle, setSelectedVehicle] = useState('bike');
   const [bookingStep, setBookingStep] = useState('select'); // 'select' | 'searching' | 'confirmed' | 'live'
   const [rideOtp] = useState('7391');
 
@@ -36,72 +36,46 @@ export const RideBooking = ({ onNavigate, onBack }) => {
   const vehicleFares = {
     bike: { label: 'Bike', fare: 68, fareRange: '₹56 - ₹72', time: '12 min', icon: '🛵', desc: 'Beat the traffic' },
     auto: { label: 'Auto', fare: 95, fareRange: '₹85 - ₹105', time: '14 min', icon: '🛺', desc: 'Everyday ride' },
-    shared_auto: { label: 'Shared Auto', fare: 40, fareRange: '₹35 - ₹45', time: '18 min', icon: '🛺', desc: 'Super pocket friendly' },
-    cab_economy: { label: 'Cab Economy', fare: 135, fareRange: '₹120 - ₹150', time: '15 min', icon: '🚗', desc: 'Comfortable AC Hatch' },
-    cab_premium: { label: 'Cab Premium', fare: 210, fareRange: '₹190 - ₹240', time: '15 min', icon: '✨', desc: 'Top rated Prime Sedan' },
-    parcel_bike: { label: 'Parcel on Bike', fare: 50, fareRange: '₹40 - ₹60', time: '15 min', icon: '📦', desc: 'Quick package delivery' }
+    shared_auto: { label: 'Shared Auto', fare: 40, fareRange: '₹35 - ₹45', time: '18 min', icon: '🛺', desc: 'Pocket friendly' },
+    cab_economy: { label: 'Cab Economy', fare: 135, fareRange: '₹120 - ₹150', time: '15 min', icon: '🚗', desc: 'Comfortable AC' },
+    cab_premium: { label: 'Cab Premium', fare: 210, fareRange: '₹190 - ₹240', time: '15 min', icon: '✨', desc: 'Prime Sedan' }
   };
 
-  // Recent / Saved Locations matching image copy 18.png & 19.png
   const recentDestinations = [
     {
       id: 'loc_1',
       title: 'Hindu College of Pharmacy',
-      address: 'Amaravati Road, Venugopalnagar, Gauthami Nagar...',
+      address: 'Amaravati Road, Venugopalnagar, Gauthami Nagar, Hyderabad',
       fav: true
     },
     {
       id: 'loc_2',
       title: 'RTO Office Road',
-      address: 'Swarnabharathi Nagar, Main Ring Road, Hyderabad...',
+      address: 'Swarnabharathi Nagar, Main Ring Road, Hyderabad',
       fav: true
     },
     {
       id: 'loc_3',
-      title: 'Shriram Automall Guntur',
-      address: 'Chennai - Srikakulam National Highway, near Bharat...',
+      title: 'Kukatpally Metro Station',
+      address: 'JNTU Road, Kukatpally, Hyderabad',
       fav: true
     },
     {
       id: 'loc_4',
-      title: 'Shri hospital Darapaneni buildings',
-      address: 'Doka Road, Kakumanu Vari Thota, Donka Road, M...',
+      title: 'Hitec City Cyber Towers',
+      address: 'Madhapur, Hitec City, Hyderabad',
       fav: false
     },
     {
       id: 'loc_5',
-      title: 'NTR Stadium Walking Track',
-      address: 'Ashok Nagar, Sports Complex Road, Hyderabad',
+      title: 'Gachibowli Stadium',
+      address: 'Old Mumbai Highway, Gachibowli, Hyderabad',
       fav: false
-    },
-    {
-      id: 'loc_6',
-      title: 'SR COLLEGE',
-      address: 'Gorantla, Main Road, Guntur / Hyderabad',
-      fav: false
-    },
-    {
-      id: 'loc_7',
-      title: 'Acharya Nagarjuna University (ANU)',
-      address: 'Nagarjuna Nagar, Andhra Pradesh / Telangana Highway',
-      fav: true
-    },
-    {
-      id: 'loc_8',
-      title: 'Vivaha Convention',
-      address: 'Etukuru Road, near Indian Petrol Bunk, R Agrahara...',
-      fav: false
-    },
-    {
-      id: 'loc_9',
-      title: 'NTR Bus Station Guntur',
-      address: 'Arrival Block Road, Coastal Andhra Region, Tham...',
-      fav: true
     }
   ];
 
   const handleSelectDestination = (dest) => {
-    setDrop(dest.title);
+    setDrop(dest.title + ', ' + dest.address);
   };
 
   const handleBookRide = () => {
@@ -131,60 +105,81 @@ export const RideBooking = ({ onNavigate, onBack }) => {
 
   return (
     <div className="flex flex-col min-h-full bg-white pb-28 select-none">
-      {/* 1. Header with 'For me v' dropdown matching image copy 18.png */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-white sticky top-0 z-20">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={onBack}
-            className="p-1 rounded-full hover:bg-gray-100 text-gray-800 transition active:scale-95"
-            aria-label="Go back"
-          >
-            <ArrowLeft className="w-5 h-5 stroke-[2.2]" />
-          </button>
-          <span className="font-extrabold text-sm text-gray-900">Where would you like to go?</span>
+      {/* ============================================================ */}
+      {/* 1. DARK HEADER WITH YELLOW WAVE & 3D RIDER SILHOUETTE        */}
+      {/* EXACT MATCH TO image copy 29.png                             */}
+      {/* ============================================================ */}
+      <div className="relative bg-[#0b0e14] text-white pt-3 pb-5 px-4 overflow-hidden">
+        {/* Subtle glow */}
+        <div className="absolute -top-12 -right-12 w-44 h-44 bg-[#FFD600]/15 rounded-full blur-3xl pointer-events-none"></div>
+
+        {/* Top bar with back arrow and glassy dropdown */}
+        <div className="flex items-center justify-between relative z-10">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={onBack}
+              className="p-1.5 rounded-full glass-btn-dark hover:bg-white/10 text-white transition active:scale-95"
+              aria-label="Go back"
+            >
+              <ArrowLeft className="w-5 h-5 stroke-[2.2]" />
+            </button>
+            <span className="font-extrabold text-sm text-white">Where would you like to go?</span>
+          </div>
+
+          {/* Glassy 'For me v' Dropdown Pill */}
+          <div className="relative">
+            <button
+              onClick={() => setShowForMeDropdown(!showForMeDropdown)}
+              className="glass-pill-dark px-3 py-1 rounded-full text-xs font-bold text-white flex items-center gap-1.5 active:scale-95"
+            >
+              <span>{selectedRideFor}</span>
+              <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
+            </button>
+
+            {showForMeDropdown && (
+              <div className="absolute right-0 mt-2 w-44 bg-[#161c28] border border-white/15 rounded-2xl shadow-2xl z-30 p-1.5 text-xs font-bold animate-fadeIn text-white">
+                <button
+                  onClick={() => { setSelectedRideFor('For me'); setShowForMeDropdown(false); }}
+                  className="w-full text-left px-3 py-2 rounded-xl hover:bg-white/10 text-white flex items-center gap-2"
+                >
+                  <span>👤 For me</span>
+                </button>
+                <button
+                  onClick={() => { setSelectedRideFor('For someone else'); setShowForMeDropdown(false); }}
+                  className="w-full text-left px-3 py-2 rounded-xl hover:bg-white/10 text-white flex items-center gap-2"
+                >
+                  <span>👥 For someone else</span>
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* 'For me v' Dropdown Pill (image copy 18.png) */}
-        <div className="relative">
-          <button
-            onClick={() => setShowForMeDropdown(!showForMeDropdown)}
-            className="flex items-center gap-1.5 px-3 py-1 rounded-full border border-gray-200 text-xs font-extrabold text-gray-800 bg-white shadow-2xs hover:bg-gray-50 active:scale-95"
-          >
-            <span>{selectedRideFor}</span>
-            <ChevronDown className="w-3.5 h-3.5 text-gray-500" />
-          </button>
-
-          {showForMeDropdown && (
-            <div className="absolute right-0 mt-1.5 w-44 bg-white border border-gray-200 rounded-2xl shadow-xl z-30 p-1.5 text-xs font-bold animate-fadeIn">
-              <button
-                onClick={() => { setSelectedRideFor('For me'); setShowForMeDropdown(false); }}
-                className="w-full text-left px-3 py-2 rounded-xl hover:bg-yellow-50 text-gray-800"
-              >
-                👤 For me
-              </button>
-              <button
-                onClick={() => { setSelectedRideFor('For someone else'); setShowForMeDropdown(false); }}
-                className="w-full text-left px-3 py-2 rounded-xl hover:bg-yellow-50 text-gray-800"
-              >
-                👥 For someone else
-              </button>
-            </div>
-          )}
+        {/* 3D Scooter Graphic on Yellow Wave */}
+        <div className="mt-3 flex items-center justify-between relative z-10">
+          <div>
+            <span className="text-[10px] font-black uppercase text-[#FFD600] tracking-wider block">
+              V RIDE FAST MOBILITY
+            </span>
+            <p className="text-xs text-gray-300 font-medium mt-0.5">
+              Doorstep pickup in 2 to 5 minutes across Hyderabad
+            </p>
+          </div>
+          <div className="shrink-0 text-3xl -mr-1">
+            🛵
+          </div>
         </div>
+
+        {/* Yellow Wave Bottom Accent */}
+        <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-[#FFD600]"></div>
       </div>
 
-      {/* 2. PICKUP & DROP INPUT CARD (NO GIANT MAP - EXACT MATCH TO image copy 18.png & 19.png) */}
+      {/* ============================================================ */}
+      {/* 2. PICKUP & DROP INPUT CARD                                  */}
+      {/* ============================================================ */}
       {bookingStep === 'select' && (
         <div className="p-4 space-y-4">
           <div className="bg-[#f9fafb] p-3.5 rounded-3xl border border-gray-200 relative space-y-3 shadow-2xs">
-            {/* Tooltip: You can now book a ride for someone else */}
-            {selectedRideFor === 'For someone else' && (
-              <div className="bg-blue-600 text-white text-[11px] font-bold px-3 py-1.5 rounded-xl shadow-sm flex items-center justify-between">
-                <span>✓ Booking for family/friends enabled</span>
-                <span className="text-[10px] opacity-80">Share live OTP</span>
-              </div>
-            )}
-
             {/* Pickup Location input with green dot */}
             <div className="flex items-center gap-2.5 pb-2 border-b border-gray-200/80">
               <span className="w-3 h-3 rounded-full bg-emerald-500 ring-2 ring-emerald-200 shrink-0"></span>
@@ -220,7 +215,7 @@ export const RideBooking = ({ onNavigate, onBack }) => {
                   type="text"
                   value={drop}
                   onChange={(e) => setDrop(e.target.value)}
-                  placeholder="Drop location (Search destination)"
+                  placeholder="Search destination"
                   className="w-full text-xs font-bold text-gray-900 bg-transparent focus:outline-none placeholder:text-gray-400"
                 />
               </div>
@@ -236,11 +231,11 @@ export const RideBooking = ({ onNavigate, onBack }) => {
             </button>
           </div>
 
-          {/* Map Location Picker Pill Button matching image copy 18.png */}
+          {/* Action Row: Glassy Map Picker button & All Ride Options */}
           <div className="flex items-center justify-between px-1">
             <button
               onClick={() => setShowMapModal(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-gray-200 bg-white text-xs font-extrabold text-gray-800 shadow-xs hover:bg-gray-50 active:scale-95"
+              className="glass-btn inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-extrabold text-gray-900 active:scale-95"
             >
               <MapPin className="w-3.5 h-3.5 text-black" />
               <span>Map Picker</span>
@@ -248,13 +243,16 @@ export const RideBooking = ({ onNavigate, onBack }) => {
 
             <button
               onClick={() => setShowAllServicesModal(true)}
-              className="text-xs font-extrabold text-blue-600 hover:underline"
+              className="text-xs font-extrabold text-gray-800 hover:text-black hover:underline"
             >
-              All 8 Services →
+              All Ride Options →
             </button>
           </div>
 
-          {/* 3. VEHICLE CATEGORIES BELOW FIELDS (Bike, Auto, Shared Auto, Cab Economy, Cab Premium, Parcel) */}
+          {/* ============================================================ */}
+          {/* 3. SELECT VEHICLE CATEGORY (5 CARDS)                         */}
+          {/* EXACT MATCH TO image copy 29.png                             */}
+          {/* ============================================================ */}
           <div className="space-y-2 pt-1">
             <h3 className="font-extrabold text-xs text-gray-900 uppercase tracking-wide">
               Select Vehicle Category
@@ -266,20 +264,24 @@ export const RideBooking = ({ onNavigate, onBack }) => {
                 { id: 'auto', label: 'Auto', icon: '🛺', fare: '₹85 - ₹105' },
                 { id: 'shared_auto', label: 'Shared Auto', icon: '🛺', fare: '₹35 - ₹45' },
                 { id: 'cab_economy', label: 'Cab Economy', icon: '🚗', fare: '₹120 - ₹150' },
-                { id: 'cab_premium', label: 'Cab Premium', icon: '✨', fare: '₹190 - ₹240' },
-                { id: 'parcel_bike', label: 'Parcel on Bike', icon: '📦', fare: '₹40 - ₹60' }
+                { id: 'cab_premium', label: 'Cab Premium', icon: '✨', fare: '₹190 - ₹240' }
               ].map((v) => {
                 const isSelected = selectedVehicle === v.id;
                 return (
                   <button
                     key={v.id}
                     onClick={() => setSelectedVehicle(v.id)}
-                    className={`p-2.5 rounded-2xl border transition-all text-left flex flex-col justify-between ${
+                    className={`p-2.5 rounded-2xl border transition-all text-left flex flex-col justify-between relative ${
                       isSelected
-                        ? 'border-black bg-[#FFFBE6] text-black font-extrabold ring-1 ring-black shadow-xs'
+                        ? 'border-yellow-400 bg-[#FFFBE6] text-black font-extrabold shadow-sm'
                         : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
                     }`}
                   >
+                    {isSelected && (
+                      <span className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-black text-white text-[9px] flex items-center justify-center font-black">
+                        ✓
+                      </span>
+                    )}
                     <span className="text-xl mb-1">{v.icon}</span>
                     <span className="text-xs font-black block leading-tight">{v.label}</span>
                     <span className="text-[10px] text-gray-500 font-bold block mt-0.5">{v.fare}</span>
@@ -289,76 +291,56 @@ export const RideBooking = ({ onNavigate, onBack }) => {
             </div>
           </div>
 
-          {/* 4. "EVERYTHING IN MINUTES" 4-CARD SECTION (image copy 19.png) */}
+          {/* ============================================================ */}
+          {/* 4. EVERYTHING IN MINUTES BANNER                              */}
+          {/* ============================================================ */}
           <div className="pt-2 space-y-2">
-            <h3 className="font-black text-sm text-gray-900">Everything In Minutes</h3>
-
-            <div className="grid grid-cols-2 gap-2.5">
-              {/* Bike Taxi */}
-              <div
-                onClick={() => setSelectedVehicle('bike')}
-                className={`p-3 rounded-2xl border transition cursor-pointer flex flex-col justify-between h-28 ${
-                  selectedVehicle === 'bike' ? 'bg-[#FFFBE6] border-black' : 'bg-[#F9FAFB] border-gray-100 hover:border-yellow-300'
-                }`}
-              >
-                <div>
-                  <span className="text-[10px] text-gray-500 font-semibold block leading-tight">Beat the traffic</span>
-                  <h4 className="font-black text-sm text-gray-900">Bike Taxi</h4>
-                </div>
-                <div className="self-end text-3xl">🛵</div>
+            <div className="p-3.5 rounded-2xl bg-[#FFF9D2] border border-yellow-300/80 flex items-center justify-between">
+              <div>
+                <span className="text-[9px] font-black uppercase tracking-wider text-yellow-900 block">
+                  Everything In Minutes
+                </span>
+                <h4 className="font-black text-xs text-black">Beat the traffic with Bike Taxi</h4>
+                <p className="text-[10px] text-gray-700 font-medium">Fast · Safe · Affordable</p>
               </div>
+              <div className="text-2xl">🛵</div>
+            </div>
 
-              {/* Parcel */}
-              <div
-                onClick={() => onNavigate && onNavigate('parcel')}
-                className="p-3 rounded-2xl bg-[#F9FAFB] border border-gray-100 hover:border-purple-300 transition cursor-pointer flex flex-col justify-between h-28"
-              >
-                <div>
-                  <span className="text-[10px] text-gray-500 font-semibold block leading-tight">Send anything</span>
-                  <h4 className="font-black text-sm text-gray-900">Parcel</h4>
-                </div>
-                <div className="self-end text-3xl">📦</div>
-              </div>
-
-              {/* Book Now Auto/Cab */}
+            <div className="grid grid-cols-2 gap-2">
               <div
                 onClick={() => setSelectedVehicle('auto')}
-                className={`p-3 rounded-2xl border transition cursor-pointer flex flex-col justify-between h-28 ${
-                  selectedVehicle === 'auto' ? 'bg-[#FFFBE6] border-black' : 'bg-[#F9FAFB] border-gray-100 hover:border-yellow-300'
-                }`}
+                className="p-3 rounded-2xl bg-white border border-gray-200/80 hover:border-yellow-300 transition cursor-pointer flex items-center justify-between"
               >
                 <div>
-                  <span className="text-[10px] text-gray-500 font-semibold block leading-tight">Your everyday rides</span>
-                  <h4 className="font-black text-sm text-gray-900">Book now</h4>
+                  <h5 className="font-black text-xs text-gray-900">Your everyday rides</h5>
+                  <p className="text-[10px] text-gray-500">Auto & Cabs</p>
                 </div>
-                <div className="self-end text-2xl">🛺 🚗</div>
+                <ChevronRight className="w-4 h-4 text-gray-400" />
               </div>
 
-              {/* All Services */}
               <div
                 onClick={() => setShowAllServicesModal(true)}
-                className="p-3 rounded-2xl bg-[#F9FAFB] border border-gray-100 hover:border-yellow-400 transition cursor-pointer flex flex-col justify-between h-28"
+                className="p-3 rounded-2xl bg-white border border-gray-200/80 hover:border-yellow-300 transition cursor-pointer flex items-center justify-between"
               >
                 <div>
-                  <span className="text-[10px] text-gray-500 font-semibold block leading-tight">Explore options</span>
-                  <h4 className="font-black text-sm text-gray-900">All Services</h4>
+                  <h5 className="font-black text-xs text-gray-900">Explore options</h5>
+                  <p className="text-[10px] text-gray-500">All 5 categories</p>
                 </div>
-                <div className="self-end text-xl flex items-center gap-1 font-bold">
-                  <span>🛺</span>
-                  <span className="w-5 h-5 rounded-full bg-black text-white text-[10px] flex items-center justify-center font-black">→</span>
-                </div>
+                <ChevronRight className="w-4 h-4 text-gray-400" />
               </div>
             </div>
           </div>
 
-          {/* 5. RECENT / SAVED LOCATIONS LIST (image copy 18.png & 19.png) */}
-          <div className="space-y-2 pt-2">
+          {/* ============================================================ */}
+          {/* 5. RECENT / SAVED PLACES LIST                                */}
+          {/* ============================================================ */}
+          <div className="space-y-2 pt-1">
             <h3 className="font-extrabold text-xs text-gray-900 uppercase tracking-wide">
               Recent & Saved Places
             </h3>
 
             <div className="divide-y divide-gray-100 border border-gray-100 rounded-3xl bg-white overflow-hidden shadow-2xs">
-              {recentDestinations.slice(0, 6).map((dest) => (
+              {recentDestinations.map((dest) => (
                 <div
                   key={dest.id}
                   onClick={() => handleSelectDestination(dest)}
@@ -377,11 +359,13 @@ export const RideBooking = ({ onNavigate, onBack }) => {
             </div>
           </div>
 
-          {/* 6. CONFIRM & BOOK RIDE BUTTON */}
+          {/* ============================================================ */}
+          {/* 6. GLASSY BOOK RIDE BUTTON                                   */}
+          {/* ============================================================ */}
           <div className="pt-2">
             <button
               onClick={handleBookRide}
-              className="w-full py-4 rounded-2xl bg-[#FFD600] text-black font-black text-sm shadow-md hover:bg-yellow-400 transition active:scale-98 flex items-center justify-center gap-2"
+              className="glass-btn-yellow w-full py-3.5 rounded-2xl text-black font-black text-sm flex items-center justify-center gap-2 active:scale-98"
             >
               <span>Book {vehicleFares[selectedVehicle]?.label.toUpperCase()} · ₹{vehicleFares[selectedVehicle]?.fare}</span>
               <ChevronRight className="w-4 h-4 stroke-[3]" />
@@ -428,218 +412,127 @@ export const RideBooking = ({ onNavigate, onBack }) => {
           <div className="bg-white border border-gray-200 p-4 rounded-3xl shadow-sm space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-yellow-400 text-black font-black flex items-center justify-center text-base shadow-xs">
+                <div className="w-12 h-12 rounded-full bg-yellow-400 flex items-center justify-center font-bold text-black text-base">
                   RK
                 </div>
                 <div>
                   <h4 className="font-extrabold text-sm text-gray-900">Ramesh K</h4>
-                  <div className="flex items-center gap-1 text-xs text-gray-500">
-                    <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
-                    <span className="font-bold text-gray-800">4.8</span>
-                    <span>(2,341 trips)</span>
+                  <div className="flex items-center gap-1 text-[11px] text-gray-500">
+                    <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                    <span className="font-bold text-gray-900">4.8</span>
+                    <span>· 1,420 rides</span>
                   </div>
                 </div>
               </div>
 
-              {/* Call and Chat Buttons */}
-              <div className="flex items-center gap-2">
-                <a
-                  href="tel:+919848012345"
-                  className="w-10 h-10 rounded-full bg-yellow-100 text-yellow-800 flex items-center justify-center hover:bg-yellow-200 transition"
-                  title="Call Driver"
-                >
-                  <Phone className="w-4 h-4" />
-                </a>
-                <button
-                  onClick={() => alert('Driver: "Reaching Miyapur Metro pillar 1120 in 2 minutes!"')}
-                  className="w-10 h-10 rounded-full bg-yellow-100 text-yellow-800 flex items-center justify-center hover:bg-yellow-200 transition"
-                  title="Chat with Driver"
-                >
-                  <MessageSquare className="w-4 h-4" />
-                </button>
+              <div className="text-right">
+                <span className="text-xs font-black text-black block">TS 08 EA 4521</span>
+                <span className="text-[10px] text-gray-500 block">Yellow Pulsar 150</span>
               </div>
             </div>
 
-            {/* Vehicle Details */}
-            <div className="bg-gray-50 p-3 rounded-2xl flex items-center justify-between text-xs">
-              <span className="font-semibold text-gray-700">
-                {selectedVehicle === 'bike' ? 'Bajaj Pulsar 150 (Yellow)' : 'Auto Rickshaw'}
-              </span>
-              <span className="font-black text-gray-900 tracking-wider">TS 08 EA 4521</span>
-            </div>
-
-            {/* Route summary */}
-            <div className="text-xs text-gray-500 space-y-1 pt-1">
-              <div className="flex items-center gap-1.5 truncate">
-                <span className="w-2 h-2 rounded-full bg-green-500"></span>
-                <span className="truncate">{pickup}</span>
-              </div>
-              <div className="flex items-center gap-1.5 truncate">
-                <span className="w-2 h-2 rounded-full bg-red-500"></span>
-                <span className="truncate">{drop || 'Kukatpally, Hyderabad'}</span>
-              </div>
-            </div>
-
-            {/* SOS & Cancel */}
-            <div className="flex items-center gap-2 pt-2">
-              <button
-                onClick={() => setShowSosModal(true)}
-                className="flex-1 py-3 rounded-2xl bg-rose-50 text-rose-600 border border-rose-200 font-extrabold text-xs flex items-center justify-center gap-1.5 hover:bg-rose-100 transition"
+            <div className="grid grid-cols-2 gap-2 pt-1">
+              <a
+                href="tel:+919848012345"
+                className="glass-btn-dark py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5"
               >
-                <AlertTriangle className="w-3.5 h-3.5" />
-                <span>Emergency SOS</span>
-              </button>
-
+                <Phone className="w-3.5 h-3.5" />
+                <span>Call Driver</span>
+              </a>
               <button
-                onClick={() => {
-                  if (confirm('Cancel this ride?')) {
-                    setBookingStep('select');
-                    setActiveRide(null);
-                  }
-                }}
-                className="flex-1 py-3 rounded-2xl bg-gray-100 text-gray-700 font-bold text-xs hover:bg-gray-200 transition"
+                onClick={() => alert('Chat with Ramesh: Driver says "I am at the main gate in 2 mins."')}
+                className="glass-btn py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 text-gray-900"
               >
-                Cancel Ride
+                <MessageSquare className="w-3.5 h-3.5" />
+                <span>Message</span>
               </button>
             </div>
           </div>
 
-          {/* Test Action */}
-          <div className="text-center pt-2">
+          {/* Action to complete or cancel */}
+          <div className="pt-2 flex gap-2">
             <button
               onClick={() => {
-                alert('Trip Simulation: Ride completed! Fare ₹68 deducted.');
+                alert('Ride completed! Thank you for choosing V RIDE.');
                 setBookingStep('select');
-                setActiveRide(null);
-                onNavigate && onNavigate('home');
               }}
-              className="text-xs text-blue-600 font-bold hover:underline"
+              className="glass-btn-yellow flex-1 py-3 rounded-2xl text-black font-black text-xs"
             >
-              Simulate Complete Trip & Pay →
+              Complete Ride
+            </button>
+            <button
+              onClick={() => setBookingStep('select')}
+              className="glass-btn flex-1 py-3 rounded-2xl text-gray-700 font-bold text-xs"
+            >
+              Cancel Ride
             </button>
           </div>
         </div>
       )}
 
-      {/* 7. ALL SERVICES MODAL (image copy 17.png) */}
-      {showAllServicesModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 animate-fadeIn">
-          <div className="bg-white w-full max-w-sm rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl max-h-[85vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-3 border-b border-gray-100">
-              <h3 className="font-black text-base text-gray-900">All Services</h3>
-              <button
-                onClick={() => setShowAllServicesModal(false)}
-                className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 font-bold text-xs"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="grid grid-cols-3 gap-3 py-4">
-              {[
-                { id: 'shared_auto', name: 'Shared Auto', icon: '🛺', fare: '₹35' },
-                { id: 'bike', name: 'Bike', icon: '🛵', fare: '₹56' },
-                { id: 'auto', name: 'Auto', icon: '🛺', fare: '₹85' },
-                { id: 'parcel_bike', name: 'Parcel on Bike', icon: '📦', fare: '₹40' },
-                { id: 'cab_economy', name: 'Cab Economy', icon: '🚗', fare: '₹120' },
-                { id: 'bike_lite', name: 'Bike Lite', icon: '⚡', fare: '₹45' },
-                { id: 'cab_premium', name: 'Cab Premium', icon: '✨', fare: '₹190' },
-                { id: 'travel', name: 'Travel', icon: '🧳', fare: 'Outstation' }
-              ].map((s) => (
-                <button
-                  key={s.id}
-                  onClick={() => {
-                    if (s.id === 'travel') {
-                      setShowAllServicesModal(false);
-                      onNavigate && onNavigate('travel');
-                    } else {
-                      setSelectedVehicle(s.id);
-                      setShowAllServicesModal(false);
-                    }
-                  }}
-                  className={`p-3 rounded-2xl border text-center transition flex flex-col items-center justify-center ${
-                    selectedVehicle === s.id
-                      ? 'border-black bg-yellow-50 text-black font-extrabold shadow-sm ring-1 ring-black'
-                      : 'border-gray-100 bg-[#F9FAFB] text-gray-700 hover:bg-gray-100'
-                  }`}
-                >
-                  <span className="text-2xl mb-1">{s.icon}</span>
-                  <span className="text-xs font-bold block leading-tight">{s.name}</span>
-                  <span className="text-[10px] text-gray-500 mt-0.5">{s.fare}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 8. MAP LOCATION PICKER MODAL (Opened ONLY when user explicitly clicks Map Picker) */}
+      {/* MAP PICKER MODAL */}
       {showMapModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div className="bg-white w-full max-w-sm rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl space-y-4">
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex flex-col justify-end animate-fadeIn">
+          <div className="bg-white rounded-t-3xl max-w-md w-full mx-auto p-4 space-y-3 h-[75vh] flex flex-col">
             <div className="flex items-center justify-between pb-2 border-b border-gray-100">
-              <h3 className="font-black text-sm text-gray-900">Map Location Picker</h3>
+              <h3 className="font-black text-sm text-gray-900">Pick Location on Hyderabad Map</h3>
               <button
                 onClick={() => setShowMapModal(false)}
-                className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 font-bold text-xs"
+                className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 font-bold text-xs"
               >
                 ✕
               </button>
             </div>
-
-            <div className="rounded-2xl overflow-hidden border border-gray-200">
-              <MapComponent
-                pickupCoords={[17.4948, 78.3578]}
-                dropCoords={[17.4842, 78.3986]}
-                pickupName={pickup}
-                dropName={drop || 'Select Drop on Map'}
-                vehicleType={selectedVehicle}
-                height="220px"
-              />
+            <div className="flex-1 rounded-2xl overflow-hidden border border-gray-200">
+              <MapComponent height="100%" interactive={true} />
             </div>
-
             <button
               onClick={() => {
-                if (!drop) setDrop('Kukatpally Metro Station, Hyderabad');
+                setDrop('Selected Map Point, Hitec City, Hyderabad');
                 setShowMapModal(false);
               }}
-              className="w-full py-3 rounded-2xl bg-[#FFD600] text-black font-extrabold text-xs shadow-md"
+              className="glass-btn-yellow w-full py-3 rounded-2xl text-black font-black text-xs"
             >
-              Confirm Location on Map
+              Confirm Selected Pin
             </button>
           </div>
         </div>
       )}
 
-      {/* 9. SOS MODAL */}
-      {showSosModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-xs rounded-3xl p-5 text-center space-y-3 shadow-2xl">
-            <div className="w-14 h-14 rounded-full bg-red-100 text-red-600 flex items-center justify-center mx-auto">
-              <AlertTriangle className="w-7 h-7" />
-            </div>
-            <h3 className="font-black text-base text-gray-900">Emergency SOS</h3>
-            <p className="text-xs text-gray-500">
-              Immediate live GPS coordinates and driver info will be broadcast to local police (112) and emergency contacts.
-            </p>
-            {sosAlertSent ? (
-              <div className="p-3 bg-red-600 text-white rounded-xl text-xs font-bold">
-                ✓ SOS Alert Dispatched to Emergency Helpline & Police!
-              </div>
-            ) : (
+      {/* ALL SERVICES MODAL */}
+      {showAllServicesModal && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex flex-col justify-end animate-fadeIn">
+          <div className="bg-white rounded-t-3xl max-w-md w-full mx-auto p-5 space-y-3">
+            <div className="flex items-center justify-between pb-2 border-b border-gray-100">
+              <h3 className="font-black text-sm text-gray-900">All V RIDE Mobility Services</h3>
               <button
-                onClick={() => setSosAlertSent(true)}
-                className="w-full py-3 rounded-xl bg-red-600 text-white font-extrabold text-xs shadow-lg hover:bg-red-700 transition"
+                onClick={() => setShowAllServicesModal(false)}
+                className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 font-bold text-xs"
               >
-                Trigger SOS Alert Now
+                ✕
               </button>
-            )}
-            <button
-              onClick={() => { setShowSosModal(false); setSosAlertSent(false); }}
-              className="w-full py-2 text-xs font-bold text-gray-500 hover:text-gray-800"
-            >
-              Dismiss
-            </button>
+            </div>
+            <div className="space-y-2 max-h-72 overflow-y-auto">
+              {Object.entries(vehicleFares).map(([key, val]) => (
+                <div
+                  key={key}
+                  onClick={() => {
+                    setSelectedVehicle(key);
+                    setShowAllServicesModal(false);
+                  }}
+                  className="p-3 rounded-2xl border border-gray-200 hover:border-yellow-400 hover:bg-yellow-50/50 cursor-pointer flex items-center justify-between transition"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">{val.icon}</span>
+                    <div>
+                      <h4 className="font-black text-xs text-gray-900">{val.label}</h4>
+                      <p className="text-[10px] text-gray-500">{val.desc} · {val.time}</p>
+                    </div>
+                  </div>
+                  <span className="font-black text-xs text-black">{val.fareRange}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       )}
