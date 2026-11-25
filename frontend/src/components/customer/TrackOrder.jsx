@@ -26,28 +26,30 @@ export const TrackOrder = ({ onBack, onNavigateHome }) => {
   };
 
   return (
-    <div className="flex flex-col min-h-full bg-white pb-8 select-none">
-      {/* Header matching Screen 8 in image.png */}
-      <div className="flex items-center justify-between px-4 py-3.5 border-b border-gray-100 bg-white sticky top-0 z-20">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={onBack}
-            className="p-1 rounded-full hover:bg-gray-100 text-gray-800 transition active:scale-95"
-            aria-label="Go back"
-          >
-            <ArrowLeft className="w-5 h-5 stroke-[2.2]" />
-          </button>
-          <h1 className="text-base font-bold text-gray-900">Track Order</h1>
-        </div>
+    <div className="flex flex-col bg-white pb-2 select-none">
+      {/* Dark Hero Header with Yellow Wave */}
+      <div className="relative bg-[#0b0e14] text-white pt-3 pb-4 px-4 overflow-hidden sticky top-0 z-20">
+        <div className="flex items-center justify-between relative z-10">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={onBack}
+              className="p-1.5 rounded-full glass-btn-dark hover:bg-white/10 text-white transition active:scale-95"
+              aria-label="Go back"
+            >
+              <ArrowLeft className="w-5 h-5 stroke-[2.2]" />
+            </button>
+            <h1 className="text-base font-black text-white">Track Order</h1>
+          </div>
 
-        {/* Headset support icon matching screenshot */}
-        <button
-          onClick={() => alert('V RIDE 24x7 Priority Support: Connected with agent Pooja. Helpline: 1800-200-8743')}
-          className="p-1.5 rounded-full hover:bg-gray-100 text-gray-800 transition"
-          aria-label="Support"
-        >
-          <Headphones className="w-5 h-5" />
-        </button>
+          <button
+            onClick={() => alert('V RIDE 24x7 Priority Support: Connected with agent Pooja. Helpline: 1800-200-8743')}
+            className="p-1.5 rounded-full glass-btn-dark hover:bg-white/10 text-[#FFD600] transition active:scale-95"
+            aria-label="Support"
+          >
+            <Headphones className="w-5 h-5" />
+          </button>
+        </div>
+        <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-[#FFD600]"></div>
       </div>
 
       {/* Map View matching reference screenshot */}

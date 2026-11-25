@@ -50,20 +50,30 @@ export const ParcelBooking = ({ onNavigate, onBack }) => {
 
   return (
     <div className="flex flex-col bg-white pb-2 select-none">
-      {/* Header matching mobile design */}
-      <div className="flex items-center px-4 py-3.5 border-b border-gray-100 bg-white sticky top-0 z-20">
-        <button
-          onClick={onBack}
-          className="p-1 rounded-full hover:bg-gray-100 text-gray-800 transition mr-3 active:scale-95"
-          aria-label="Go back"
-        >
-          <ArrowLeft className="w-5 h-5 stroke-[2.2]" />
-        </button>
-        <h1 className="text-base font-bold text-gray-900">Send Parcels</h1>
+      {/* Dark Hero Header with Yellow Wave */}
+      <div className="relative bg-[#0b0e14] text-white pt-3 pb-4 px-4 overflow-hidden">
+        <div className="absolute -top-12 -right-12 w-40 h-40 bg-[#FFD600]/15 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="flex items-center justify-between relative z-10">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={onBack}
+              className="p-1.5 rounded-full glass-btn-dark hover:bg-white/10 text-white transition active:scale-95"
+              aria-label="Go back"
+            >
+              <ArrowLeft className="w-5 h-5 stroke-[2.2]" />
+            </button>
+            <div>
+              <h1 className="text-base font-black text-white leading-tight">Send Parcels</h1>
+              <p className="text-[10px] text-gray-300 font-medium">Doorstep pickup & fast delivery in Hyderabad</p>
+            </div>
+          </div>
+          <span className="text-2xl">📦</span>
+        </div>
+        <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-[#FFD600]"></div>
       </div>
 
       {!isBooked ? (
-        <div className="px-5 pt-4 space-y-4">
+        <div className="px-4 pt-3.5 space-y-3.5">
           {/* Top banner removed per user instruction image copy 7.png */}
 
           {/* Locations Card matching reference screenshot */}
@@ -196,12 +206,12 @@ export const ParcelBooking = ({ onNavigate, onBack }) => {
             <span className="font-black text-gray-900 text-sm">₹{fareMap[parcelSize]}</span>
           </div>
 
-          {/* Continue Button matching reference screenshot */}
+          {/* Continue Button with Glassy Yellow Style */}
           <button
             onClick={handleContinue}
-            className="w-full py-3.5 rounded-2xl bg-vride-yellow text-black font-extrabold text-sm shadow-yellow-glow hover:bg-yellow-400 transition active:scale-98"
+            className="glass-btn-yellow w-full py-3.5 rounded-2xl text-black font-black text-sm transition active:scale-98"
           >
-            Continue
+            Continue · ₹{fareMap[parcelSize]}
           </button>
         </div>
       ) : (

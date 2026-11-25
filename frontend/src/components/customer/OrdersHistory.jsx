@@ -52,25 +52,28 @@ export const OrdersHistory = ({ onTrackFood, onNavigate }) => {
 
   return (
     <div className="flex flex-col bg-[#f8f9fa] pb-2 select-none">
-      <div className="px-5 py-4 bg-white border-b border-gray-100">
-        <h1 className="text-base font-bold text-gray-900">Orders & Rides History</h1>
-        {/* Filters */}
-        <div className="flex gap-2 mt-3 overflow-x-auto no-scrollbar">
+      {/* Dark Hero Header with Yellow Wave */}
+      <div className="relative bg-[#0b0e14] text-white pt-4 pb-5 px-4 overflow-hidden">
+        <div className="absolute -top-12 -right-12 w-40 h-40 bg-[#FFD600]/15 rounded-full blur-3xl pointer-events-none"></div>
+        <h1 className="text-base font-black text-white relative z-10">Orders & Rides History</h1>
+        {/* Glassy Filter Pills */}
+        <div className="flex gap-2 mt-3 overflow-x-auto no-scrollbar relative z-10">
           {['all', 'food', 'ride', 'parcel', 'pickdrop'].map(tab => (
             <button
               key={tab}
               onClick={() => setFilter(tab)}
-              className={`px-3 py-1.5 rounded-full text-xs font-bold capitalize transition whitespace-nowrap ${
-                filter === tab ? 'bg-black text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              className={`px-3.5 py-1.5 rounded-full text-xs font-extrabold capitalize transition whitespace-nowrap active:scale-95 ${
+                filter === tab ? 'glass-btn-yellow text-black' : 'glass-pill-dark text-gray-200 hover:text-white'
               }`}
             >
               {tab === 'all' ? 'All Orders' : tab}
             </button>
           ))}
         </div>
+        <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-[#FFD600]"></div>
       </div>
 
-      <div className="p-4 space-y-3">
+      <div className="p-4 space-y-2.5">
         {filtered.map(order => (
           <div
             key={order.id}

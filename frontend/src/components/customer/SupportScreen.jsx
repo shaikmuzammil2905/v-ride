@@ -41,22 +41,26 @@ export const SupportScreen = () => {
 
   return (
     <div className="flex flex-col bg-[#f8f9fa] pb-2 select-none">
-      <div className="px-5 py-4 bg-white border-b border-gray-100">
-        <h1 className="text-base font-bold text-gray-900">24/7 Help & Support</h1>
+      {/* Dark Hero Header with Yellow Wave */}
+      <div className="relative bg-[#0b0e14] text-white pt-4 pb-5 px-4 overflow-hidden">
+        <div className="absolute -top-12 -right-12 w-40 h-40 bg-[#FFD600]/15 rounded-full blur-3xl pointer-events-none"></div>
+        <h1 className="text-base font-black text-white relative z-10">24/7 Help & Support</h1>
+        <p className="text-[11px] text-gray-300 mt-0.5 relative z-10">Instant assistance for Rides, Food & Parcels</p>
+        <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-[#FFD600]"></div>
       </div>
 
-      <div className="p-5 space-y-5">
+      <div className="p-4 space-y-4">
         {/* Quick Contact Card */}
-        <div className="rounded-2xl bg-yellow-50 border border-yellow-200 p-4 flex items-center justify-between">
+        <div className="rounded-2xl bg-[#FFFBE6] border border-yellow-300 p-4 flex items-center justify-between">
           <div>
             <h3 className="font-bold text-xs text-gray-900">Need Immediate Help?</h3>
             <p className="text-[11px] text-gray-600">Call our Hyderabad 24/7 helpline</p>
           </div>
           <a
             href="tel:+9118002008743"
-            className="px-3 py-2 rounded-xl bg-black text-white font-bold text-xs flex items-center gap-1.5"
+            className="glass-btn-dark px-3 py-2 rounded-xl text-white font-bold text-xs flex items-center gap-1.5 active:scale-95"
           >
-            <Phone className="w-3.5 h-3.5" />
+            <Phone className="w-3.5 h-3.5 text-[#FFD600]" />
             <span>1800-200-8743</span>
           </a>
         </div>
@@ -130,7 +134,7 @@ export const SupportScreen = () => {
             <button
               type="submit"
               disabled={ticketSent}
-              className="w-full py-3 rounded-xl bg-vride-yellow text-black font-extrabold text-xs shadow-xs hover:bg-yellow-400 transition"
+              className="glass-btn-yellow w-full py-3 rounded-xl text-black font-black text-xs transition active:scale-98"
             >
               {ticketSent ? 'Submitting Ticket...' : 'Submit Support Ticket'}
             </button>
