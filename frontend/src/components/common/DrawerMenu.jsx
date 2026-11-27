@@ -170,11 +170,11 @@ export const DrawerMenu = ({ isOpen, onClose, onNavigate }) => {
               </div>
             </div>
 
-            {/* --- SECTION 3: SUPPORT & PORTALS --- */}
+            {/* --- SECTION 3: SUPPORT & INFO --- */}
             <div>
               <div className="flex items-center gap-1.5 text-[11px] uppercase font-black text-gray-900 px-2 mb-1.5">
                 <span className="w-1 h-3.5 bg-[#FFD600] rounded-full inline-block"></span>
-                <span>SUPPORT & PORTALS</span>
+                <span>SUPPORT & INFO</span>
               </div>
 
               <div className="space-y-0.5">
@@ -198,40 +198,6 @@ export const DrawerMenu = ({ isOpen, onClose, onNavigate }) => {
                     <span>About V RIDE</span>
                   </div>
                   <span className="text-[10px] text-gray-400 font-bold">v2.5.0</span>
-                </button>
-              </div>
-            </div>
-
-            {/* --- SECTION 4: SWITCH PORTALS (image copy 33.png) --- */}
-            <div>
-              <div className="flex items-center gap-1.5 text-[11px] uppercase font-black text-gray-900 px-2 mb-1.5">
-                <span className="w-1 h-3.5 bg-[#FFD600] rounded-full inline-block"></span>
-                <span>SWITCH PORTALS</span>
-              </div>
-
-              <div className="grid grid-cols-3 gap-1.5 pt-1">
-                <button
-                  onClick={() => { onClose(); setCurrentPortal('partner'); }}
-                  className="p-2 rounded-xl border border-gray-200 bg-white text-center hover:border-yellow-400 active:scale-95 transition"
-                >
-                  <span className="text-lg block">🛵</span>
-                  <span className="text-[9px] font-black text-gray-800 block leading-tight mt-0.5">Partner Panel</span>
-                </button>
-
-                <button
-                  onClick={() => { onClose(); setCurrentPortal('admin'); }}
-                  className="p-2 rounded-xl border border-yellow-400 bg-yellow-50 text-center active:scale-95 transition"
-                >
-                  <span className="text-lg block">🛡️</span>
-                  <span className="text-[9px] font-black text-black block leading-tight mt-0.5">Admin Panel</span>
-                </button>
-
-                <button
-                  onClick={() => { onClose(); onNavigate('support'); }}
-                  className="p-2 rounded-xl border border-gray-200 bg-white text-center hover:border-yellow-400 active:scale-95 transition"
-                >
-                  <span className="text-lg block">💬</span>
-                  <span className="text-[9px] font-black text-gray-800 block leading-tight mt-0.5">Support Panel</span>
                 </button>
               </div>
             </div>
