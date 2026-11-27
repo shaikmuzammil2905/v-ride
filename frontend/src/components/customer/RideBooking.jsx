@@ -494,11 +494,15 @@ export const RideBooking = ({ onNavigate, onBack }) => {
               </button>
             </div>
             <div className="flex-1 rounded-2xl overflow-hidden border border-gray-200">
-              <MapComponent height="100%" interactive={true} />
+              <MapComponent
+                height="100%"
+                interactive={true}
+                onSelectLocation={(placeName) => setDrop(placeName)}
+              />
             </div>
             <button
               onClick={() => {
-                setDrop('Selected Map Point, Hitec City, Hyderabad');
+                if (!drop) setDrop('Selected Map Point, Hitec City, Hyderabad');
                 setShowMapModal(false);
               }}
               className="glass-btn-yellow w-full py-3 rounded-2xl text-black font-black text-xs"
