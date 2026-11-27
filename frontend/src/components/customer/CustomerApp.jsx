@@ -15,6 +15,7 @@ import OrdersHistory from './OrdersHistory';
 import SupportScreen from './SupportScreen';
 import ProfileScreen from './ProfileScreen';
 import TravelScreen from './TravelScreen';
+import WalletScreen from './WalletScreen';
 
 export const CustomerApp = () => {
   // Splash Screen State
@@ -105,6 +106,8 @@ export const CustomerApp = () => {
         return <SupportScreen onBack={() => setCurrentScreen('home')} />;
       case 'travel':
         return <TravelScreen onBack={() => setCurrentScreen('ride')} onNavigate={setCurrentScreen} />;
+      case 'wallet':
+        return <WalletScreen />;
       case 'profile':
         return <ProfileScreen onNavigate={setCurrentScreen} />;
       default:
@@ -120,8 +123,8 @@ export const CustomerApp = () => {
       {/* Standalone Native Mobile Container */}
       <div className="w-full min-h-screen min-h-[100dvh] bg-[#f8f9fa] flex flex-col items-center justify-start relative overflow-x-hidden">
         <div className="w-full max-w-md min-h-screen min-h-[100dvh] bg-white flex flex-col relative shadow-md">
-          {/* Scrollable Screen Content with exact clearance for fixed bottom navigation */}
-          <main className="flex-1 overflow-y-auto no-scrollbar relative pb-[68px]">
+          {/* Scrollable Screen Content with bottom clearance for fixed navigation */}
+          <main className="flex-1 overflow-y-auto no-scrollbar relative pb-20">
             {renderScreen()}
           </main>
 

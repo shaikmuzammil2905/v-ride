@@ -77,7 +77,7 @@ export const FoodOrdering = ({ onNavigate, onBack, onSelectRestaurant }) => {
   ];
 
   return (
-    <div className="flex flex-col bg-[#f8f9fa] pb-2 select-none">
+    <div className="flex flex-col min-h-full bg-[#f8f9fa] pb-28 select-none">
       {/* ============================================================ */}
       {/* 1. DARK HERO SECTION WITH BIRYANI ILLUSTRATION & YELLOW WAVE */}
       {/* EXACT MATCH TO image copy 30.png                             */}
@@ -120,8 +120,12 @@ export const FoodOrdering = ({ onNavigate, onBack, onSelectRestaurant }) => {
               From Your Favorite Restaurants in Hyderabad
             </p>
           </div>
-          <div className="text-3xl shrink-0">
-            🍲
+          <div className="w-16 h-14 shrink-0 flex items-center justify-center">
+            <img
+              src="/images/food-biryani.jpg"
+              alt="Hyderabadi Biryani"
+              className="w-full h-full object-contain rounded-xl mix-blend-lighten"
+            />
           </div>
         </div>
 

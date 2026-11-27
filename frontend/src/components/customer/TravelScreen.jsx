@@ -11,7 +11,7 @@ export const TravelScreen = ({ onBack, onNavigate }) => {
   };
 
   return (
-    <div className="flex flex-col bg-[#f8f9fa] pb-2 select-none">
+    <div className="flex flex-col min-h-full bg-[#f8f9fa] pb-28 select-none">
       {/* Header */}
       <div className="px-4 py-3.5 bg-white border-b border-gray-100 flex items-center justify-between sticky top-0 z-20">
         <div className="flex items-center gap-3">

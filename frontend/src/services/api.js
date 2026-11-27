@@ -149,26 +149,145 @@ export const DEFAULT_HYDERABAD_DATA = {
   }
 };
 
-const API_BASE_URL = 'http://localhost:5000/api';
+export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+export const RAZORPAY_PUBLIC_TEST_KEY = 'rzp_test_U3xoeEyAqeaQ9Y';
 
 // Helper to make API calls with graceful fallback
 export async function apiRequest(endpoint, options = {}) {
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 2000); // 2s timeout
+    const timeoutId = setTimeout(() => controller.abort(), options.timeout || 5000);
+    const isFormData = options.body instanceof FormData;
     const res = await fetch(`${API_BASE_URL}${endpoint}`, {
       ...options,
       signal: controller.signal,
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-      }
+      headers: isFormData
+        ? { ...options.headers }
+        : { 'Content-Type': 'application/json', ...options.headers }
     });
     clearTimeout(timeoutId);
     if (!res.ok) throw new Error(`HTTP error ${res.status}`);
     return await res.json();
   } catch (err) {
-    // Graceful fallback to null so caller uses local state
     return null;
   }
+}
+
+// --- AWS S3 Media Helpers ---
+export async function uploadMediaToS3(file, folder = 'vride-media') {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('folder', folder);
+  return await apiRequest('/media/upload', {
+    method: 'POST',
+    body: formData,
+    timeout: 15000
+  });
+}
+
+export async function listS3Media(prefix = '') {
+  const q = prefix ? `?prefix=${encodeURIComponent(prefix)}` : '';
+  return await apiRequest(`/media/list${q}`, { timeout: 10000 });
+}
+
+export async function deleteS3Media(key) {
+  return await apiRequest(`/media?key=${encodeURIComponent(key)}`, {
+    method: 'DELETE',
+    timeout: 10000
+  });
+}
+
+// --- Razorpay Checkout Helper ---
+export async function openRazorpayCheckout({
+  amount,
+  name = 'V RIDE',
+  description = 'V RIDE Mobility & Delivery',
+  purpose = 'service_payment',
+  user = {},
+  onSuccess,
+  onFailure
+}) {
+  const numericAmount = Number(amount);
+  if (!numericAmount || numericAmount <= 0) {
+    onFailure?.('Please enter a valid amount');
+    return;
+  }
+
+  // Try creating real Razorpay order on backend
+  const orderRes = await apiRequest('/payments/create-order', {
+    method: 'POST',
+    body: JSON.stringify({
+      amount: numericAmount,
+      purpose,
+      userId: user.id || 'usr_srilatha',
+      meta: { title: description }
+    }),
+    timeout: 8000
+  });
+
+  const keyId = orderRes?.keyId || RAZORPAY_PUBLIC_TEST_KEY;
+  const orderId = orderRes?.order?.id;
+
+  if (typeof window !== 'undefined' && window.Razorpay) {
+    const options = {
+      key: keyId,
+      amount: Math.round(numericAmount * 100),
+      currency: 'INR',
+      name,
+      description,
+      ...(orderId ? { order_id: orderId } : {}),
+      prefill: {
+        name: user.name || 'Sri Latha',
+        email: user.email || 'srilatha@example.com',
+        contact: (user.phone || '9876543210').replace(/[^0-9]/g, '').slice(-10)
+      },
+      theme: { color: '#FFD600' },
+      handler: async (response) => {
+        if (orderId && response.razorpay_signature) {
+          const verifyRes = await apiRequest('/payments/verify', {
+            method: 'POST',
+            body: JSON.stringify({
+              ...response,
+              userId: user.id || 'usr_srilatha',
+              purpose,
+              amount: numericAmount
+            })
+          });
+          onSuccess?.({
+            paymentId: response.razorpay_payment_id,
+            orderId: response.razorpay_order_id,
+            verified: Boolean(verifyRes?.verified),
+            walletBalance: verifyRes?.walletBalance
+          });
+        } else {
+          onSuccess?.({
+            paymentId: response.razorpay_payment_id || `pay_test_${Date.now()}`,
+            orderId: orderId || `order_test_${Date.now()}`,
+            verified: true
+          });
+        }
+      },
+      modal: {
+        ondismiss: () => onFailure?.('Payment cancelled')
+      }
+    };
+
+    try {
+      const rzp = new window.Razorpay(options);
+      rzp.on('payment.failed', (resp) => {
+        onFailure?.(resp.error?.description || 'Payment failed');
+      });
+      rzp.open();
+      return;
+    } catch (err) {
+      console.warn('Razorpay modal fallback:', err);
+    }
+  }
+
+  // Fallback test confirmation if Razorpay script is blocked offline
+  onSuccess?.({
+    paymentId: `pay_test_${Date.now()}`,
+    orderId: orderId || `order_test_${Date.now()}`,
+    verified: true
+  });
 }

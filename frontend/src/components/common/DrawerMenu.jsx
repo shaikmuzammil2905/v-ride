@@ -145,12 +145,12 @@ export const DrawerMenu = ({ isOpen, onClose, onNavigate }) => {
                 </button>
 
                 <button
-                  onClick={() => setShowPaymentsModal(true)}
+                  onClick={() => { onClose(); onNavigate('wallet'); }}
                   className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-yellow-50 hover:text-black transition"
                 >
                   <div className="flex items-center gap-3">
                     <CreditCard className="w-4 h-4 text-green-600 stroke-[2.2]" />
-                    <span>Payments & UPI</span>
+                    <span>Wallet & Razorpay</span>
                   </div>
                   <ChevronRight className="w-4 h-4 text-gray-400" />
                 </button>
@@ -211,27 +211,27 @@ export const DrawerMenu = ({ isOpen, onClose, onNavigate }) => {
 
               <div className="grid grid-cols-3 gap-1.5 pt-1">
                 <button
-                  onClick={() => { onClose(); onNavigate('rides'); }}
-                  className="p-2 rounded-xl border border-yellow-400 bg-yellow-50 text-center active:scale-95 transition"
+                  onClick={() => { onClose(); setCurrentPortal('partner'); }}
+                  className="p-2 rounded-xl border border-gray-200 bg-white text-center hover:border-yellow-400 active:scale-95 transition"
                 >
                   <span className="text-lg block">🛵</span>
-                  <span className="text-[9px] font-black text-black block leading-tight mt-0.5">Ride Portal</span>
+                  <span className="text-[9px] font-black text-gray-800 block leading-tight mt-0.5">Partner Panel</span>
                 </button>
 
                 <button
-                  onClick={() => { onClose(); onNavigate('food'); }}
-                  className="p-2 rounded-xl border border-gray-200 bg-white text-center hover:bg-gray-50 active:scale-95 transition"
+                  onClick={() => { onClose(); setCurrentPortal('admin'); }}
+                  className="p-2 rounded-xl border border-yellow-400 bg-yellow-50 text-center active:scale-95 transition"
                 >
-                  <span className="text-lg block">🍔</span>
-                  <span className="text-[9px] font-bold text-gray-800 block leading-tight mt-0.5">Food Portal</span>
+                  <span className="text-lg block">🛡️</span>
+                  <span className="text-[9px] font-black text-black block leading-tight mt-0.5">Admin Panel</span>
                 </button>
 
                 <button
-                  onClick={() => { onClose(); onNavigate('parcel'); }}
-                  className="p-2 rounded-xl border border-gray-200 bg-white text-center hover:bg-gray-50 active:scale-95 transition"
+                  onClick={() => { onClose(); onNavigate('support'); }}
+                  className="p-2 rounded-xl border border-gray-200 bg-white text-center hover:border-yellow-400 active:scale-95 transition"
                 >
-                  <span className="text-lg block">📦</span>
-                  <span className="text-[9px] font-bold text-gray-800 block leading-tight mt-0.5">Parcel Portal</span>
+                  <span className="text-lg block">💬</span>
+                  <span className="text-[9px] font-black text-gray-800 block leading-tight mt-0.5">Support Panel</span>
                 </button>
               </div>
             </div>

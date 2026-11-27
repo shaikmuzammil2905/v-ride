@@ -24,7 +24,7 @@ export const CustomerHome = ({ onNavigate }) => {
   ];
 
   return (
-    <div className="flex flex-col bg-[#f8f9fa] pb-2 text-gray-900 select-none">
+    <div className="flex flex-col min-h-full bg-[#f8f9fa] pb-24 text-gray-900 select-none">
       {/* ============================================================ */}
       {/* 1. DARK HERO SECTION WITH YELLOW WAVE & GLASSY LOCATION PILL */}
       {/* EXACT MATCH TO image copy 32.png                             */}
@@ -88,10 +88,12 @@ export const CustomerHome = ({ onNavigate }) => {
           </div>
 
           {/* 3D Delivery Rider Illustration */}
-          <div className="shrink-0 w-20 h-20 -mr-1 relative pointer-events-none">
-            <div className="w-full h-full rounded-2xl bg-gradient-to-br from-[#FFD600]/20 to-transparent flex items-center justify-center text-4xl transform hover:scale-105 transition">
-              🛵
-            </div>
+          <div className="shrink-0 w-24 h-20 -mr-1 relative pointer-events-none flex items-center justify-center">
+            <img
+              src="/images/hero-rider.jpg"
+              alt="V RIDE Rider"
+              className="w-full h-full object-contain rounded-2xl mix-blend-lighten"
+            />
           </div>
         </div>
 
@@ -110,13 +112,13 @@ export const CustomerHome = ({ onNavigate }) => {
             onClick={() => onNavigate('rides')}
             className="flex flex-col items-center justify-between p-3 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-yellow-400 transition group active:scale-95 relative overflow-hidden"
           >
-            <span className="absolute top-1.5 right-1.5 bg-[#FFD600] text-black text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider">
+            <span className="absolute top-1.5 right-1.5 bg-[#FFD600] text-black text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider z-10">
               Fast
             </span>
-            <div className="w-12 h-12 rounded-2xl bg-yellow-50 flex items-center justify-center text-2xl group-hover:scale-110 transition mt-1 shadow-2xs">
-              🛵
+            <div className="w-16 h-14 flex items-center justify-center group-hover:scale-105 transition mt-2">
+              <img src="/images/service-rides.jpg" alt="V RIDE Rides" className="w-full h-full object-contain" />
             </div>
-            <div className="text-center mt-2 w-full">
+            <div className="text-center mt-1.5 w-full">
               <span className="font-black text-xs text-gray-900 block">Rides</span>
               <span className="text-[9px] text-gray-500 font-semibold block leading-tight">Bike · Auto · Cab</span>
             </div>
@@ -130,13 +132,13 @@ export const CustomerHome = ({ onNavigate }) => {
             onClick={() => onNavigate('food')}
             className="flex flex-col items-center justify-between p-3 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-red-400 transition group active:scale-95 relative overflow-hidden"
           >
-            <span className="absolute top-1.5 right-1.5 bg-red-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider">
+            <span className="absolute top-1.5 right-1.5 bg-red-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider z-10">
               50% OFF
             </span>
-            <div className="w-12 h-12 rounded-2xl bg-red-50 flex items-center justify-center text-2xl group-hover:scale-110 transition mt-1 shadow-2xs">
-              🍔
+            <div className="w-16 h-14 flex items-center justify-center group-hover:scale-105 transition mt-2">
+              <img src="/images/service-food.jpg" alt="V RIDE Food" className="w-full h-full object-contain" />
             </div>
-            <div className="text-center mt-2 w-full">
+            <div className="text-center mt-1.5 w-full">
               <span className="font-black text-xs text-gray-900 block">Food</span>
               <span className="text-[9px] text-gray-500 font-semibold block leading-tight">Order Online</span>
             </div>
@@ -150,13 +152,13 @@ export const CustomerHome = ({ onNavigate }) => {
             onClick={() => onNavigate('parcel')}
             className="flex flex-col items-center justify-between p-3 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:border-purple-400 transition group active:scale-95 relative overflow-hidden"
           >
-            <span className="absolute top-1.5 right-1.5 bg-purple-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider">
+            <span className="absolute top-1.5 right-1.5 bg-purple-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider z-10">
               Doorstep
             </span>
-            <div className="w-12 h-12 rounded-2xl bg-purple-50 flex items-center justify-center text-2xl group-hover:scale-110 transition mt-1 shadow-2xs">
-              📦
+            <div className="w-16 h-14 flex items-center justify-center group-hover:scale-105 transition mt-2">
+              <img src="/images/service-parcel.jpg" alt="V RIDE Parcel" className="w-full h-full object-contain" />
             </div>
-            <div className="text-center mt-2 w-full">
+            <div className="text-center mt-1.5 w-full">
               <span className="font-black text-xs text-gray-900 block">Parcel</span>
               <span className="text-[9px] text-gray-500 font-semibold block leading-tight">Send Anywhere</span>
             </div>

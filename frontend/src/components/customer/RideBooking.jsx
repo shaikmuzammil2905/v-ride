@@ -104,7 +104,7 @@ export const RideBooking = ({ onNavigate, onBack }) => {
   };
 
   return (
-    <div className="flex flex-col bg-white pb-2 select-none">
+    <div className="flex flex-col min-h-full bg-white pb-28 select-none">
       {/* ============================================================ */}
       {/* 1. DARK HEADER WITH YELLOW WAVE & 3D RIDER SILHOUETTE        */}
       {/* EXACT MATCH TO image copy 29.png                             */}
@@ -165,8 +165,12 @@ export const RideBooking = ({ onNavigate, onBack }) => {
               Doorstep pickup in 2 to 5 minutes across Hyderabad
             </p>
           </div>
-          <div className="shrink-0 text-3xl -mr-1">
-            🛵
+          <div className="shrink-0 w-20 h-16 -mr-1 flex items-center justify-center">
+            <img
+              src="/images/hero-rider.jpg"
+              alt="V RIDE Bike"
+              className="w-full h-full object-contain rounded-xl mix-blend-lighten"
+            />
           </div>
         </div>
 
@@ -260,9 +264,9 @@ export const RideBooking = ({ onNavigate, onBack }) => {
 
             <div className="grid grid-cols-3 gap-2">
               {[
-                { id: 'bike', label: 'Bike', icon: '🛵', fare: '₹56 - ₹72' },
-                { id: 'auto', label: 'Auto', icon: '🛺', fare: '₹85 - ₹105' },
-                { id: 'shared_auto', label: 'Shared Auto', icon: '🛺', fare: '₹35 - ₹45' },
+                { id: 'bike', label: 'Bike', icon: '🛵', image: '/images/service-rides.jpg', fare: '₹56 - ₹72' },
+                { id: 'auto', label: 'Auto', icon: '🛺', image: '/images/vehicle-auto.jpg', fare: '₹85 - ₹105' },
+                { id: 'shared_auto', label: 'Shared Auto', icon: '🛺', image: '/images/vehicle-auto.jpg', fare: '₹35 - ₹45' },
                 { id: 'cab_economy', label: 'Cab Economy', icon: '🚗', fare: '₹120 - ₹150' },
                 { id: 'cab_premium', label: 'Cab Premium', icon: '✨', fare: '₹190 - ₹240' }
               ].map((v) => {
@@ -278,11 +282,17 @@ export const RideBooking = ({ onNavigate, onBack }) => {
                     }`}
                   >
                     {isSelected && (
-                      <span className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-black text-white text-[9px] flex items-center justify-center font-black">
+                      <span className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-black text-white text-[9px] flex items-center justify-center font-black z-10">
                         ✓
                       </span>
                     )}
-                    <span className="text-xl mb-1">{v.icon}</span>
+                    {v.image ? (
+                      <div className="w-12 h-9 mb-1 flex items-center justify-start">
+                        <img src={v.image} alt={v.label} className="w-full h-full object-contain mix-blend-multiply" />
+                      </div>
+                    ) : (
+                      <span className="text-xl mb-1">{v.icon}</span>
+                    )}
                     <span className="text-xs font-black block leading-tight">{v.label}</span>
                     <span className="text-[10px] text-gray-500 font-bold block mt-0.5">{v.fare}</span>
                   </button>

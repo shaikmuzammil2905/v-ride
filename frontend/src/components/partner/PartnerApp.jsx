@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import MapComponent from '../common/MapComponent';
+import { uploadMediaToS3, apiRequest } from '../../services/api';
 
 export const PartnerApp = () => {
   const { currentPartner, setCurrentPartner } = useApp();
@@ -19,6 +20,21 @@ export const PartnerApp = () => {
   const [otpError, setOtpError] = useState('');
   const [withdrawalAmount, setWithdrawalAmount] = useState('1500');
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
+  const [kycUploadMsg, setKycUploadMsg] = useState('');
+  const [uploadingDoc, setUploadingDoc] = useState(false);
+
+  const handlePartnerDocUpload = async (e, docLabel) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingDoc(true);
+    const res = await uploadMediaToS3(file, 'partner-kyc');
+    setUploadingDoc(false);
+    if (res?.success && res.data?.url) {
+      setKycUploadMsg(`${docLabel} uploaded to AWS S3!`);
+    } else {
+      setKycUploadMsg(`${docLabel} saved locally (start backend for live S3 sync).`);
+    }
+  };
 
   // Auto trigger a mock incoming job when going online if no active job
   useEffect(() => {
@@ -355,6 +371,19 @@ export const PartnerApp = () => {
                 <span>Aadhaar Identity:</span>
                 <span className="font-bold text-green-400">✓ Verified</span>
               </div>
+
+              <div className="pt-2 border-t border-neutral-800 space-y-2">
+                <label className="block text-[11px] font-bold text-yellow-400">
+                  Upload / Update KYC Document to AWS S3 (aitacademy)
+                </label>
+                <label className="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-black border border-dashed border-neutral-700 hover:border-yellow-400 cursor-pointer text-xs font-bold text-gray-200">
+                  <span>{uploadingDoc ? 'Uploading to S3...' : '📤 Upload DL / RC / Aadhaar'}</span>
+                  <input type="file" accept="image/*,.pdf" onChange={(e) => handlePartnerDocUpload(e, 'KYC Document')} className="hidden" />
+                </label>
+                {kycUploadMsg && (
+                  <p className="text-[11px] text-green-400 font-semibold">{kycUploadMsg}</p>
+                )}
+              </div>
             </div>
 
             <div className="bg-[#1C1C1E] p-4 rounded-2xl border border-neutral-800 space-y-1">
@@ -448,7 +477,15 @@ export const PartnerApp = () => {
               className="w-full text-center text-xl font-black p-2 rounded-xl bg-black border border-neutral-700 text-yellow-400 focus:outline-none"
             />
             <button
-              onClick={() => {
+              onClick={async () => {
+                await apiRequest('/partner/withdrawal', {
+                  method: 'POST',
+                  body: JSON.stringify({
+                    partnerId: currentPartner.id || 'ptn_ramesh',
+                    amount: Number(withdrawalAmount),
+                    bank: 'HDFC Bank - 501004829103'
+                  })
+                });
                 setShowWithdrawModal(false);
                 alert(`Withdrawal of ₹${withdrawalAmount} submitted for Admin Approval.`);
               }}

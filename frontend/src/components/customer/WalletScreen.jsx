@@ -1,42 +1,96 @@
-import React, { useState } from 'react';
-import { Wallet, Plus, ArrowUpRight, ArrowDownLeft, ShieldCheck, CheckCircle2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Wallet, Plus, ArrowUpRight, ArrowDownLeft, ShieldCheck, CheckCircle2, CreditCard } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { openRazorpayCheckout, apiRequest } from '../../services/api';
 
 export const WalletScreen = () => {
   const { currentUser, addMoneyToWallet } = useApp();
   const [showAddModal, setShowAddModal] = useState(false);
   const [topupAmount, setTopupAmount] = useState('500');
+  const [isPaying, setIsPaying] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState('');
 
-  const transactions = [
-    { id: 'tx_1', type: 'credit', title: 'Wallet Top Up via UPI', date: '18 Nov 2026', amount: 1000 },
-    { id: 'tx_2', type: 'debit', title: 'Bike Ride to Kukatpally', date: '21 Nov 2026', amount: 68 },
-    { id: 'tx_3', type: 'debit', title: 'Parcel to Gachibowli', date: '20 Nov 2026', amount: 85 },
-    { id: 'tx_4', type: 'debit', title: 'Pick & Drop to Banjara Hills', date: '19 Nov 2026', amount: 75 }
-  ];
+  const [transactions, setTransactions] = useState([
+    { id: 'tx_1', type: 'credit', title: 'Wallet Top Up via Razorpay UPI', date: '18 Nov 2026', amount: 1000, status: 'paid' },
+    { id: 'tx_2', type: 'debit', title: 'Bike Ride to Kukatpally', date: '21 Nov 2026', amount: 68, status: 'paid' },
+    { id: 'tx_3', type: 'debit', title: 'Parcel to Gachibowli', date: '20 Nov 2026', amount: 85, status: 'paid' },
+    { id: 'tx_4', type: 'debit', title: 'Pick & Drop to Banjara Hills', date: '19 Nov 2026', amount: 75, status: 'paid' }
+  ]);
 
-  const handleAdd = () => {
-    addMoneyToWallet(Number(topupAmount));
-    setShowAddModal(false);
-    alert(`₹${topupAmount} added to your V RIDE Wallet successfully!`);
+  useEffect(() => {
+    apiRequest('/payments/transactions').then((res) => {
+      if (res?.success && Array.isArray(res.data) && res.data.length > 0) {
+        setTransactions(res.data);
+      }
+    });
+  }, []);
+
+  const handleRazorpayTopup = () => {
+    const amt = Number(topupAmount);
+    if (!amt || amt <= 0) return;
+    setIsPaying(true);
+    setPaymentStatus('');
+
+    openRazorpayCheckout({
+      amount: amt,
+      name: 'V RIDE Wallet',
+      description: `Add ₹${amt} to V RIDE Wallet`,
+      purpose: 'wallet_topup',
+      user: currentUser,
+      onSuccess: (res) => {
+        setIsPaying(false);
+        addMoneyToWallet(amt);
+        setTransactions((prev) => [
+          {
+            id: res.paymentId || `tx_${Date.now()}`,
+            type: 'credit',
+            title: `Wallet Top Up (Razorpay ${res.paymentId?.slice(0, 12) || 'Test'})`,
+            date: new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }),
+            amount: amt,
+            status: 'paid'
+          },
+          ...prev
+        ]);
+        setShowAddModal(false);
+        setPaymentStatus(`₹${amt} added via Razorpay (${res.paymentId})!`);
+      },
+      onFailure: (errMsg) => {
+        setIsPaying(false);
+        setPaymentStatus(errMsg || 'Payment cancelled');
+      }
+    });
   };
 
   return (
     <div className="flex flex-col bg-[#f8f9fa] pb-2 select-none">
-      <div className="px-5 py-4 bg-white border-b border-gray-100">
-        <h1 className="text-base font-bold text-gray-900">V RIDE Wallet</h1>
+      <div className="bg-[#0b0e14] text-white px-5 py-4 border-b-4 border-[#FFD600] flex items-center justify-between">
+        <div>
+          <h1 className="text-base font-black text-white">V RIDE Wallet & Payments</h1>
+          <p className="text-[10px] text-gray-300">Powered by Razorpay Secure Checkout</p>
+        </div>
+        <span className="text-[10px] font-black bg-[#FFD600] text-black px-2.5 py-0.5 rounded-full">
+          RAZORPAY TEST
+        </span>
       </div>
 
-      <div className="p-5 space-y-4">
+      <div className="p-4 space-y-4">
+        {paymentStatus && (
+          <div className="p-3 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 shrink-0" />
+            <span>{paymentStatus}</span>
+          </div>
+        )}
+
         {/* Balance Card */}
         <div className="rounded-3xl bg-black text-white p-5 shadow-xl relative overflow-hidden">
           <div className="flex justify-between items-start relative z-10">
             <div>
               <span className="text-xs text-gray-400 font-semibold block">Available Balance</span>
-              <p className="text-3xl font-black mt-1 text-vride-yellow">
+              <p className="text-3xl font-black mt-1 text-[#FFD600]">
                 ₹{currentUser.walletBalance || 850}
               </p>
             </div>
-            <div className="w-10 h-10 rounded-2xl bg-vride-yellow text-black flex items-center justify-center font-black">
+            <div className="w-10 h-10 rounded-2xl bg-[#FFD600] text-black flex items-center justify-center font-black">
               V
             </div>
           </div>
@@ -44,10 +98,10 @@ export const WalletScreen = () => {
           <div className="mt-5 flex gap-2 relative z-10">
             <button
               onClick={() => setShowAddModal(true)}
-              className="flex-1 py-2.5 rounded-xl bg-vride-yellow text-black font-extrabold text-xs flex items-center justify-center gap-1.5 shadow hover:bg-yellow-400 transition"
+              className="glass-btn-yellow flex-1 py-2.5 rounded-xl text-black font-extrabold text-xs flex items-center justify-center gap-1.5"
             >
               <Plus className="w-4 h-4 stroke-[3]" />
-              <span>Add Money</span>
+              <span>Add Money (Razorpay)</span>
             </button>
             <button
               onClick={() => alert('V RIDE Cash Auto-Pay enabled for Instant 1-click booking.')}
@@ -57,7 +111,6 @@ export const WalletScreen = () => {
             </button>
           </div>
 
-          {/* Background decoration */}
           <div className="absolute -right-6 -bottom-6 w-32 h-32 bg-yellow-400/10 rounded-full blur-xl pointer-events-none"></div>
         </div>
 
@@ -70,18 +123,18 @@ export const WalletScreen = () => {
                 key={tx.id}
                 className="p-3.5 rounded-2xl bg-white border border-gray-100 shadow-xs flex items-center justify-between"
               >
-                <div className="flex items-center gap-3">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                <div className="flex items-center gap-3 min-w-0 pr-2">
+                  <div className={`w-8 h-8 rounded-full shrink-0 flex items-center justify-center ${
                     tx.type === 'credit' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
                   }`}>
                     {tx.type === 'credit' ? <ArrowDownLeft className="w-4 h-4" /> : <ArrowUpRight className="w-4 h-4" />}
                   </div>
-                  <div>
-                    <h4 className="font-bold text-xs text-gray-900">{tx.title}</h4>
+                  <div className="min-w-0">
+                    <h4 className="font-bold text-xs text-gray-900 truncate">{tx.title}</h4>
                     <span className="text-[10px] text-gray-400">{tx.date}</span>
                   </div>
                 </div>
-                <span className={`text-xs font-black ${tx.type === 'credit' ? 'text-green-600' : 'text-gray-900'}`}>
+                <span className={`text-xs font-black shrink-0 ${tx.type === 'credit' ? 'text-green-600' : 'text-gray-900'}`}>
                   {tx.type === 'credit' ? `+₹${tx.amount}` : `-₹${tx.amount}`}
                 </span>
               </div>
@@ -90,12 +143,15 @@ export const WalletScreen = () => {
         </div>
       </div>
 
-      {/* Add Money Modal */}
+      {/* Add Money Razorpay Modal */}
       {showAddModal && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
           <div className="bg-white w-full max-w-sm rounded-t-3xl sm:rounded-2xl p-5 shadow-2xl space-y-4">
             <div className="flex justify-between items-center pb-2 border-b border-gray-100">
-              <h3 className="font-extrabold text-sm text-gray-900">Add Money to Wallet</h3>
+              <h3 className="font-extrabold text-sm text-gray-900 flex items-center gap-2">
+                <CreditCard className="w-4 h-4 text-[#FFD600]" />
+                <span>Add Money via Razorpay</span>
+              </h3>
               <button onClick={() => setShowAddModal(false)} className="text-gray-400 font-bold">✕</button>
             </div>
 
@@ -112,7 +168,7 @@ export const WalletScreen = () => {
                   <button
                     key={amt}
                     onClick={() => setTopupAmount(amt)}
-                    className="flex-1 py-1 rounded-lg bg-gray-100 hover:bg-gray-200 text-xs font-bold text-gray-700"
+                    className="flex-1 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-xs font-bold text-gray-700"
                   >
                     +₹{amt}
                   </button>
@@ -120,11 +176,17 @@ export const WalletScreen = () => {
               </div>
             </div>
 
+            <div className="p-2.5 rounded-xl bg-yellow-50 border border-yellow-200 text-[10px] text-gray-700 flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>UPI, Cards, NetBanking & Wallets supported via Razorpay Test Mode.</span>
+            </div>
+
             <button
-              onClick={handleAdd}
-              className="w-full py-3.5 rounded-2xl bg-vride-yellow text-black font-extrabold text-xs shadow-yellow-glow"
+              onClick={handleRazorpayTopup}
+              disabled={isPaying}
+              className="glass-btn-yellow w-full py-3 rounded-2xl text-black font-black text-xs disabled:opacity-60"
             >
-              Proceed to Pay ₹{topupAmount} (UPI / Cards)
+              {isPaying ? 'Opening Razorpay...' : `Pay ₹${topupAmount} with Razorpay`}
             </button>
           </div>
         </div>
@@ -132,4 +194,5 @@ export const WalletScreen = () => {
     </div>
   );
 };
+
 export default WalletScreen;

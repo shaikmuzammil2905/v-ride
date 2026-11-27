@@ -74,7 +74,7 @@ export const ProfileScreen = ({ onNavigate }) => {
   ];
 
   return (
-    <div className="flex flex-col bg-[#f8f9fa] pb-2 select-none">
+    <div className="flex flex-col min-h-full bg-[#f8f9fa] pb-28 select-none">
       {/* ============================================================ */}
       {/* 1. DARK HEADER WITH YELLOW WAVE                             */}
       {/* EXACT MATCH TO image copy 31.png                             */}
