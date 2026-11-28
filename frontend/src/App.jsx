@@ -1,33 +1,68 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useApp } from './context/AppContext';
 import CustomerApp from './components/customer/CustomerApp';
-import PartnerApp from './components/partner/PartnerApp';
+import RiderPanel from './components/rider/RiderPanel';
+import VendorPanel from './components/vendor/VendorPanel';
 import AdminDashboard from './components/admin/AdminDashboard';
 import WebsiteHome from './components/website/WebsiteHome';
 import SupportPortal from './components/support/SupportPortal';
-import PortalLoginGate from './components/common/PortalLoginGate';
+import UnifiedPartnerLogin from './components/common/UnifiedPartnerLogin';
 import { ArrowLeft } from 'lucide-react';
 
 export const App = () => {
   const { currentPortal, setCurrentPortal } = useApp();
+  const [partnerSession, setPartnerSession] = useState(() => {
+    try {
+      const saved = localStorage.getItem('vride_partner_session');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
 
-  // Check URL query param e.g. ?portal=partner, ?portal=admin, or ?portal=support on initial load
+  // Sync URL query param (?portal=...) or path (/partner/rider, /partner/vendor, /admin)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const portal = params.get('portal');
-    if (portal && ['customer', 'partner', 'admin', 'support', 'website'].includes(portal)) {
+    const path = window.location.pathname.toLowerCase();
+
+    if (portal && ['customer', 'partner', 'rider', 'vendor', 'admin', 'support', 'website'].includes(portal)) {
       setCurrentPortal(portal);
+    } else if (path.startsWith('/partner/rider')) {
+      setCurrentPortal('rider');
+    } else if (path.startsWith('/partner/vendor')) {
+      setCurrentPortal('vendor');
+    } else if (path.startsWith('/partner')) {
+      setCurrentPortal('partner');
+    } else if (path.startsWith('/admin')) {
+      setCurrentPortal('admin');
     }
   }, [setCurrentPortal]);
 
+  const handleLogout = (roleKey) => {
+    localStorage.removeItem(`vride_auth_${roleKey}`);
+    localStorage.removeItem('vride_partner_session');
+    setPartnerSession(null);
+  };
+
+  const handleAuthenticated = (role, user) => {
+    setPartnerSession({ role, user });
+    setCurrentPortal(role);
+  };
+
+  const isRoleAuthorized = (expectedRole) => {
+    if (localStorage.getItem(`vride_auth_${expectedRole}`) === 'true') return true;
+    return partnerSession?.role === expectedRole;
+  };
+
   return (
     <div className="min-h-screen bg-[#f8f9fa] flex flex-col font-sans select-none overflow-x-hidden">
-      {/* Return bar when viewing Partner, Admin, Support, or Website */}
+      {/* Return bar when viewing Partner/Vendor/Rider/Admin/Support */}
       {currentPortal !== 'customer' && (
         <div className="bg-black text-white px-4 py-2 flex items-center justify-between text-xs border-b border-neutral-800 z-50">
           <button
             onClick={() => {
-              window.history.replaceState({}, '', window.location.pathname);
+              window.history.replaceState({}, '', '/');
               setCurrentPortal('customer');
             }}
             className="flex items-center gap-1.5 font-bold text-vride-yellow hover:underline"
@@ -36,8 +71,10 @@ export const App = () => {
             <span>Return to Customer Mobile App</span>
           </button>
           <span className="text-gray-400 font-semibold uppercase text-[10px]">
-            {currentPortal === 'partner'
-              ? '🛵 Partner Panel'
+            {currentPortal === 'vendor'
+              ? '🍽️ Vendor Panel'
+              : currentPortal === 'rider' || currentPortal === 'partner'
+              ? '🛵 Rider Partner Panel'
               : currentPortal === 'admin'
               ? '💼 Admin Panel'
               : currentPortal === 'support'
@@ -50,43 +87,56 @@ export const App = () => {
       {/* Main App Container */}
       <div className="flex-1 flex flex-col justify-start">
         {currentPortal === 'customer' && <CustomerApp />}
+
+        {/* Unified Partner Login (?portal=partner or /partner/login) */}
         {currentPortal === 'partner' && (
-          <PortalLoginGate
-            portalKey="partner"
-            title="Partner Panel"
-            subtitle="V RIDE Driver & Delivery Fleet"
-            badgeText="Partner Auth"
-            validId="partner@vride.in"
-            validAltId="+91 98480 12345"
-            validPassword="Partner@2026"
-          >
-            <PartnerApp />
-          </PortalLoginGate>
+          isRoleAuthorized('rider') ? (
+            <RiderPanel onLogout={() => handleLogout('rider')} />
+          ) : isRoleAuthorized('vendor') ? (
+            <VendorPanel onLogout={() => handleLogout('vendor')} />
+          ) : isRoleAuthorized('admin') ? (
+            <AdminDashboard onLogout={() => handleLogout('admin')} />
+          ) : (
+            <UnifiedPartnerLogin initialRole="rider" onAuthenticated={handleAuthenticated} />
+          )
         )}
+
+        {/* Rider Panel (?portal=rider or /partner/rider) */}
+        {currentPortal === 'rider' && (
+          isRoleAuthorized('rider') ? (
+            <RiderPanel onLogout={() => handleLogout('rider')} />
+          ) : (
+            <UnifiedPartnerLogin initialRole="rider" onAuthenticated={handleAuthenticated} />
+          )
+        )}
+
+        {/* Restaurant Vendor Panel (?portal=vendor or /partner/vendor) */}
+        {currentPortal === 'vendor' && (
+          isRoleAuthorized('vendor') ? (
+            <VendorPanel onLogout={() => handleLogout('vendor')} />
+          ) : (
+            <UnifiedPartnerLogin initialRole="vendor" onAuthenticated={handleAuthenticated} />
+          )
+        )}
+
+        {/* Admin Panel (?portal=admin or /admin) */}
         {currentPortal === 'admin' && (
-          <PortalLoginGate
-            portalKey="admin"
-            title="Admin Panel"
-            subtitle="V RIDE Super Admin & AWS S3 Management"
-            badgeText="Admin Auth"
-            validId="admin@vride.in"
-            validPassword="VRideAdmin@2026"
-          >
-            <AdminDashboard />
-          </PortalLoginGate>
+          isRoleAuthorized('admin') ? (
+            <AdminDashboard onLogout={() => handleLogout('admin')} />
+          ) : (
+            <UnifiedPartnerLogin initialRole="admin" onAuthenticated={handleAuthenticated} />
+          )
         )}
+
+        {/* Support Panel (?portal=support) */}
         {currentPortal === 'support' && (
-          <PortalLoginGate
-            portalKey="support"
-            title="Support Panel"
-            subtitle="V RIDE 24/7 Operations Desk"
-            badgeText="Support Auth"
-            validId="support@vride.in"
-            validPassword="Support@2026"
-          >
+          isRoleAuthorized('support') ? (
             <SupportPortal />
-          </PortalLoginGate>
+          ) : (
+            <UnifiedPartnerLogin initialRole="support" onAuthenticated={handleAuthenticated} />
+          )
         )}
+
         {currentPortal === 'website' && <WebsiteHome />}
       </div>
     </div>

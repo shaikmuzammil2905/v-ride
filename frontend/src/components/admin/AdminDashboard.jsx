@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Users, Bike, TrendingUp, Package, Utensils, ShieldCheck,
-  Sliders, Tag, Bell, Plus, Edit3, Trash2, Upload, Image as ImageIcon,
-  MessageSquare, CreditCard, Check, X, RefreshCw, Copy, ExternalLink
+  LayoutDashboard, Radio, Users, Utensils, Bike, ShoppingBag, Package, Car,
+  Wallet, FileBarChart, MessageSquare, ShieldCheck, Settings, History,
+  Image as ImageIcon, Search, Bell, Menu, X, Plus, Edit3, Trash2, Upload,
+  CheckCircle2, Download, Phone, RefreshCw, Copy, ExternalLink, LogOut
 } from 'lucide-react';
+import MapComponent from '../common/MapComponent';
 import {
   apiRequest,
   uploadMediaToS3,
@@ -12,8 +14,11 @@ import {
   openRazorpayCheckout
 } from '../../services/api';
 
-export const AdminDashboard = () => {
-  const [activeTab, setActiveTab] = useState('overview');
+export const AdminDashboard = ({ onLogout }) => {
+  const [activeNav, setActiveNav] = useState('dashboard');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [cityFilter, setCityFilter] = useState('Hyderabad');
+  const [globalSearch, setGlobalSearch] = useState('');
   const [toast, setToast] = useState('');
 
   const showToast = (msg) => {
@@ -21,274 +26,189 @@ export const AdminDashboard = () => {
     setTimeout(() => setToast(''), 3000);
   };
 
-  // --- STATE FOR ALL SECTIONS ---
-  const [partnersList, setPartnersList] = useState([
-    { id: 'ptn_ramesh', name: 'Ramesh K', phone: '+91 98480 12345', vehicle: 'Bike (TS 08 EA 4521)', status: 'approved', trips: 2341, rating: 4.8, docs: 'Aadhaar, DL, RC, Bank' },
-    { id: 'ptn_suresh', name: 'Suresh Reddy', phone: '+91 97000 54321', vehicle: 'Auto (TS 07 UA 8899)', status: 'approved', trips: 1820, rating: 4.7, docs: 'Aadhaar, DL, RC, Bank' },
-    { id: 'ptn_praveen', name: 'Praveen Kumar', phone: '+91 91234 56789', vehicle: 'Bike (TS 08 FC 3321)', status: 'pending', trips: 940, rating: 4.6, docs: 'Aadhaar (Review), DL' }
+  // --- DATA STATES ---
+  const [customers, setCustomers] = useState([
+    { id: 'CUS101', name: 'Sri Latha', phone: '+91 98765 43210', email: 'srilatha@example.com', city: 'Hyderabad', orders: 43, rides: 128, spent: 18450, status: 'active' },
+    { id: 'CUS102', name: 'Anil Kumar', phone: '+91 99887 65432', email: 'anil.k@example.com', city: 'Hyderabad', orders: 19, rides: 34, spent: 6920, status: 'active' },
+    { id: 'CUS103', name: 'Kavya R.', phone: '+91 97654 32109', email: 'kavya@example.com', city: 'Hyderabad', orders: 12, rides: 18, spent: 4210, status: 'active' }
   ]);
 
-  const [usersList, setUsersList] = useState([
-    { id: 'usr_srilatha', name: 'Sri Latha', phone: '+91 98765 43210', email: 'srilatha@example.com', rides: 42, walletBalance: 850, status: 'active' },
-    { id: 'usr_anil', name: 'Anil Kumar', phone: '+91 99887 65432', email: 'anil.k@example.com', rides: 18, walletBalance: 320, status: 'active' }
+  const [restaurants, setRestaurants] = useState([
+    { id: 'RST101', name: 'Spicy Hub', owner: 'Raghavendra', area: 'Kukatpally', city: 'Hyderabad', cuisine: 'Multi Cuisine', appliedOn: '27 Nov 2026', status: 'pending', docs: ['Food Licence', 'FSSAI', 'GST', 'Bank'] },
+    { id: 'RST102', name: 'Green Leaf Kitchen', owner: 'Meena S', area: 'Miyapur', city: 'Hyderabad', cuisine: 'South Indian', appliedOn: '27 Nov 2026', status: 'pending', docs: ['Food Licence', 'FSSAI', 'Bank'] },
+    { id: 'RST103', name: 'Paradise Biryani', owner: 'Ali Khan', area: 'Miyapur', city: 'Hyderabad', cuisine: 'Biryani', appliedOn: '20 Nov 2026', status: 'approved', docs: ['Food Licence', 'FSSAI', 'GST', 'Bank'] }
+  ]);
+  const [restTab, setRestTab] = useState('pending');
+  const [selectedRest, setSelectedRest] = useState(null);
+
+  const [riders, setRiders] = useState([
+    { id: 'RDR1024', name: 'Raju Kumar', city: 'Hyderabad', phone: '+91 97034 56789', vehicle: 'Bike', vehicleNo: 'TS 09 AB 4321', appliedOn: '27 Nov 2026', services: ['Food', 'Parcel', 'Rides'], status: 'pending', online: true },
+    { id: 'RDR1036', name: 'Ramesh K', city: 'Miyapur', phone: '+91 98480 12345', vehicle: 'Bike', vehicleNo: 'TS 08 EA 4521', appliedOn: '27 Nov 2026', services: ['Food', 'Parcel', 'Rides'], status: 'approved', online: true },
+    { id: 'RDR1048', name: 'Suresh Reddy', city: 'Kukatpally', phone: '+91 97000 54321', vehicle: 'Auto', vehicleNo: 'TS 07 UA 8899', appliedOn: '26 Nov 2026', services: ['Parcel', 'Rides'], status: 'approved', online: false }
+  ]);
+  const [riderTab, setRiderTab] = useState('pending');
+  const [selectedRider, setSelectedRider] = useState(riders[0]);
+
+  const [foodOrders, setFoodOrders] = useState([
+    { id: 'FOD8921', restaurant: 'Paradise Biryani', customer: 'Kavin R.', pickup: 'Madhapur', drop: 'Kukatpally', rider: 'RDR1036', fare: 328, payment: 'Online', status: 'In Progress' },
+    { id: 'FOD8920', restaurant: 'Spice Kitchen', customer: 'Anil K.', pickup: 'Miyapur', drop: 'Hitech City', rider: 'RDR1024', fare: 276, payment: 'UPI', status: 'Picked Up' },
+    { id: 'FOD8917', restaurant: 'Biryani Stop', customer: 'Sneha M.', pickup: 'Hitech City', drop: 'Gachibowli', rider: '-', fare: 356, payment: 'Online', status: 'Unassigned' }
+  ]);
+  const [selectedFoodOrder, setSelectedFoodOrder] = useState(foodOrders[0]);
+
+  const [parcels, setParcels] = useState([
+    { id: 'PRC7736', sender: 'Sri Latha', receiver: 'Anil Kumar', pickup: 'Miyapur', drop: 'Gachibowli', rider: 'RDR1036', type: 'Documents', amount: 85, payment: 'UPI', status: 'In Transit' },
+    { id: 'PRC7720', sender: 'Priya S', receiver: 'Rohit V', pickup: 'Kukatpally', drop: 'Madhapur', rider: '-', type: 'Box (2kg)', amount: 120, payment: 'COD', status: 'Pending' }
   ]);
 
-  const [restaurantsList, setRestaurantsList] = useState([
-    { id: 'rest_paradise', name: 'Paradise Biryani', cuisines: 'Biryani, Hyderabadi', rating: 4.5, deliveryTime: '30-40 min', image: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=400&auto=format&fit=crop&q=80', isOpen: true },
-    { id: 'rest_dominos', name: "Domino's Pizza", cuisines: 'Pizza, Italian', rating: 4.3, deliveryTime: '25-35 min', image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400&auto=format&fit=crop&q=80', isOpen: true }
+  const [rides, setRides] = useState([
+    { id: 'RDE6642', customer: 'Sri Latha', pickup: 'Miyapur Metro', drop: 'Kukatpally', rider: 'RDR1036', vehicle: 'Bike', fare: 156, payment: 'UPI', status: 'Active' },
+    { id: 'RDE6639', customer: 'Kavya R.', pickup: 'Hitech City', drop: 'Jubilee Hills', rider: 'RDR1048', vehicle: 'Auto', fare: 195, payment: 'Cash', status: 'Completed' }
   ]);
 
-  const [ordersList, setOrdersList] = useState([
-    { id: 'ord_98412', type: 'food', customer: 'Sri Latha', title: 'Paradise Biryani (2 items)', amount: 598, status: 'arriving' },
-    { id: 'ride_77101', type: 'ride', customer: 'Anil Kumar', title: 'Miyapur → Hitec City (Bike)', amount: 68, status: 'completed' },
-    { id: 'pcl_55410', type: 'parcel', customer: 'Priya Sharma', title: 'Gachibowli → Madhapur (2kg)', amount: 85, status: 'in_transit' }
+  const [financeTab, setFinanceTab] = useState('overview');
+  const [payouts, setPayouts] = useState([
+    { id: 'WDR101', riderId: 'RDR1036', rider: 'Ramesh K', amount: 1500, method: 'Bank (HDFC)', date: '27 Nov 2026', status: 'Pending' },
+    { id: 'WDR102', riderId: 'RDR1048', rider: 'Suresh Reddy', amount: 1200, method: 'UPI', date: '26 Nov 2026', status: 'Approved' }
+  ]);
+  const [settlements, setSettlements] = useState([
+    { id: 'SET901', restaurant: 'Paradise Biryani', period: '20-27 Nov', orders: 142, gross: 68400, commission: 10260, net: 58140, status: 'Pending' }
+  ]);
+  const [refunds, setRefunds] = useState([
+    { id: 'REF401', orderId: 'FOD8914', customer: 'South Food User', amount: 210, reason: 'Restaurant cancelled', method: 'Razorpay UPI', status: 'Pending' }
   ]);
 
-  const [pricingRules, setPricingRules] = useState([
-    { id: 'bike', name: 'Bike Ride', baseFare: 25, perKm: 8, surge: 1.0, commission: 15 },
-    { id: 'auto', name: 'Auto Rickshaw', baseFare: 35, perKm: 12, surge: 1.0, commission: 15 },
-    { id: 'cab', name: 'Cab / Sedan', baseFare: 60, perKm: 16, surge: 1.0, commission: 18 },
-    { id: 'parcel', name: 'Parcel Small (≤ 1kg)', baseFare: 40, perKm: 9, surge: 1.0, commission: 15 }
+  const [tickets, setTickets] = useState([
+    { id: 'ST7482', userType: 'Customer', userName: 'Sri Latha', category: 'Food Orders', subject: 'Order not delivered', priority: 'High', status: 'Open', adminReply: '' },
+    { id: 'ST7481', userType: 'Rider', userName: 'Raju Kumar', category: 'Payment', subject: 'Payment not received', priority: 'Medium', status: 'Open', adminReply: '' }
   ]);
 
-  const [couponsList, setCouponsList] = useState([
-    { id: 'cpn_1', code: 'VRIDE20', discount: '20% OFF', category: 'Food', active: true },
-    { id: 'cpn_2', code: 'FIRST50', discount: 'Flat ₹50 OFF', category: 'Rides', active: true }
+  const [adminAccounts, setAdminAccounts] = useState([
+    { id: 'ADM1', name: 'Operations Lead', email: 'admin@vride.in', role: 'Super Admin', city: 'All Cities', active: true },
+    { id: 'ADM2', name: 'Anand Kumar', email: 'anand.admin@vride.com', role: 'Support Admin', city: 'All Cities', active: true }
+  ]);
+  const [newAdmin, setNewAdmin] = useState({ name: '', email: '', role: 'Support Admin', city: 'All Cities' });
+
+  const [auditLogs, setAuditLogs] = useState([
+    { id: 'AUD1', admin: 'Operations Lead', action: 'Approved Restaurant', module: 'Restaurants', record: 'RST103', time: '27 Nov, 11:20 AM' }
   ]);
 
-  const [bannersList, setBannersList] = useState([
-    { id: 'bnr_1', title: 'Flat 20% OFF on Food', code: 'VRIDE20', image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&auto=format&fit=crop&q=80', active: true }
-  ]);
+  const [settings, setSettings] = useState({
+    platformName: 'V RIDE',
+    supportPhone: '1800-200-8743',
+    restaurantCommission: 15,
+    riderCommission: 15,
+    baseFareBike: 25,
+    perKmBike: 8,
+    cities: 'Hyderabad, Vijayawada, Guntur'
+  });
 
-  const [ticketsList, setTicketsList] = useState([
-    { id: 'tkt_1', userName: 'Sri Latha', category: 'Food Order', subject: 'Extra raita request', message: 'Please confirm order note.', status: 'open', adminReply: '' }
-  ]);
-
-  const [payoutsList, setPayoutsList] = useState([
-    { id: 'pay_1', partner: 'Ramesh K', amount: 1500, bank: 'HDFC - 501004829103', date: '26 Nov 2026', status: 'approved' },
-    { id: 'pay_2', partner: 'Suresh Reddy', amount: 1200, bank: 'SBI - 20391827461', date: '27 Nov 2026', status: 'pending' }
-  ]);
-
-  const [transactionsList, setTransactionsList] = useState([
-    { id: 'tx_1', title: 'Wallet Top Up via Razorpay', amount: 1000, status: 'paid', date: '27 Nov 2026' }
-  ]);
-
-  // AWS S3 Media State
+  // S3 Media Manager
   const [s3Media, setS3Media] = useState([]);
   const [s3Loading, setS3Loading] = useState(false);
-  const [s3Folder, setS3Folder] = useState('vride-media');
 
-  // Broadcast
-  const [broadcastMessage, setBroadcastMessage] = useState('');
-  const [broadcastTarget, setBroadcastTarget] = useState('all');
+  // Generic Add/Edit Modal
+  const [modal, setModal] = useState({ open: false, type: '', data: {} });
 
-  // Generic Modal for Add / Edit
-  const [modalState, setModalState] = useState({ open: false, section: '', mode: 'add', data: {} });
-  const [uploadingModalImg, setUploadingModalImg] = useState(false);
-
-  // Sync with backend on mount
-  const fetchBackendData = async () => {
-    const [allRes, ordersRes, ticketsRes, txRes] = await Promise.all([
-      apiRequest('/admin/all-data'),
-      apiRequest('/admin/orders'),
+  const syncAll = async () => {
+    const [ticketsRes, adminsRes, auditRes, s3Res] = await Promise.all([
       apiRequest('/support/tickets'),
-      apiRequest('/payments/transactions')
+      apiRequest('/admin/accounts'),
+      apiRequest('/admin/audit-logs'),
+      listS3Media()
     ]);
-    if (allRes?.success && allRes.data) {
-      if (allRes.data.partners?.length) setPartnersList(allRes.data.partners);
-      if (allRes.data.users?.length) setUsersList(allRes.data.users);
-      if (allRes.data.restaurants?.length) setRestaurantsList(allRes.data.restaurants);
-      if (allRes.data.pricingRules?.length) setPricingRules(allRes.data.pricingRules);
-      if (allRes.data.coupons?.length) setCouponsList(allRes.data.coupons);
-      if (allRes.data.banners?.length) setBannersList(allRes.data.banners);
-      if (allRes.data.payouts?.length) setPayoutsList(allRes.data.payouts);
-    }
-    if (ordersRes?.success && ordersRes.data) {
-      const combined = [
-        ...(ordersRes.data.rides || []).map((r) => ({ id: r.id, type: 'ride', customer: 'Customer', title: `${r.pickup} → ${r.drop}`, amount: r.fare || 68, status: r.status || 'completed' })),
-        ...(ordersRes.data.foodOrders || []).map((f) => ({ id: f.id, type: 'food', customer: 'Customer', title: f.restaurantName || 'Food Order', amount: f.total || 299, status: f.status || 'placed' })),
-        ...(ordersRes.data.parcels || []).map((p) => ({ id: p.id, type: 'parcel', customer: 'Customer', title: `${p.pickup} → ${p.drop}`, amount: p.fare || 85, status: p.status || 'booked' }))
-      ];
-      if (combined.length) setOrdersList(combined);
-    }
-    if (ticketsRes?.success && ticketsRes.data?.length) setTicketsList(ticketsRes.data);
-    if (txRes?.success && txRes.data?.length) setTransactionsList(txRes.data);
-  };
-
-  const fetchS3Media = async () => {
-    setS3Loading(true);
-    const res = await listS3Media();
-    setS3Loading(false);
-    if (res?.success && res.data?.items) {
-      setS3Media(res.data.items);
-    }
+    if (ticketsRes?.success && ticketsRes.data?.length) setTickets(ticketsRes.data);
+    if (adminsRes?.success && adminsRes.data?.length) setAdminAccounts(adminsRes.data);
+    if (auditRes?.success && auditRes.data?.length) setAuditLogs(auditRes.data);
+    if (s3Res?.success && s3Res.data?.items) setS3Media(s3Res.data.items);
   };
 
   useEffect(() => {
-    fetchBackendData();
-    fetchS3Media();
+    syncAll();
   }, []);
 
-  // --- AWS S3 DIRECT UPLOAD HANDLER ---
-  const handleS3FileUpload = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setS3Loading(true);
-    const res = await uploadMediaToS3(file, s3Folder);
-    setS3Loading(false);
-    if (res?.success && res.data) {
-      setS3Media((prev) => [res.data, ...prev]);
-      showToast(`Uploaded "${file.name}" to AWS S3 (aitacademy)!`);
-    } else {
-      showToast('Start backend (port 5000) for live AWS S3 upload.');
-    }
+  const addAudit = (action, moduleName, record) => {
+    setAuditLogs((p) => [
+      { id: 'AUD_' + Date.now(), admin: 'Operations Lead', action, module: moduleName, record, time: 'Just now' },
+      ...p
+    ]);
   };
 
-  const handleS3Delete = async (key) => {
-    const res = await deleteS3Media(key);
-    if (res?.success) {
-      setS3Media((prev) => prev.filter((item) => item.key !== key));
-      showToast(`Deleted "${key}" from AWS S3`);
-    } else {
-      showToast('Failed to delete from S3 (ensure backend is running).');
-    }
+  const handleDownloadCsv = (name, rows) => {
+    const csv = rows.map((r) => r.join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${name}.csv`;
+    a.click();
+    showToast(`Exported ${name}.csv`);
   };
 
-  // --- MODAL IMAGE UPLOAD TO S3 ---
-  const handleModalImageUpload = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploadingModalImg(true);
-    const res = await uploadMediaToS3(file, `admin-${modalState.section}`);
-    setUploadingModalImg(false);
-    const url = res?.success ? res.data.url : URL.createObjectURL(file);
-    setModalState((prev) => ({
-      ...prev,
-      data: { ...prev.data, image: url }
-    }));
-    showToast(res?.success ? 'Image uploaded to AWS S3!' : 'Preview image attached');
-  };
-
-  // --- SAVE ADD/EDIT MODAL ---
-  const handleSaveModal = async (e) => {
-    e.preventDefault();
-    const { section, mode, data } = modalState;
-
-    const endpointMap = {
-      partners: '/admin/partners',
-      users: '/admin/users',
-      restaurants: '/admin/restaurants',
-      pricing: '/admin/pricing-rules',
-      coupons: '/admin/coupons',
-      banners: '/admin/banners'
-    };
-
-    const ep = endpointMap[section];
-    let savedItem = { ...data, id: data.id || `${section.slice(0, 3)}_${Date.now()}` };
-
-    if (ep) {
-      const res = await apiRequest(mode === 'add' ? ep : `${ep}/${data.id}`, {
-        method: mode === 'add' ? 'POST' : 'PUT',
-        body: JSON.stringify(savedItem)
-      });
-      if (res?.success && res.data) savedItem = res.data;
-    }
-
-    const updateStateList = (setter) => {
-      if (mode === 'add') setter((prev) => [savedItem, ...prev]);
-      else setter((prev) => prev.map((item) => (item.id === savedItem.id ? savedItem : item)));
-    };
-
-    if (section === 'partners') updateStateList(setPartnersList);
-    if (section === 'users') updateStateList(setUsersList);
-    if (section === 'restaurants') updateStateList(setRestaurantsList);
-    if (section === 'pricing') updateStateList(setPricingRules);
-    if (section === 'coupons') updateStateList(setCouponsList);
-    if (section === 'banners') updateStateList(setBannersList);
-
-    setModalState({ open: false, section: '', mode: 'add', data: {} });
-    showToast(`${mode === 'add' ? 'Added' : 'Updated'} successfully!`);
-  };
-
-  // --- DELETE HANDLER FOR ANY SECTION ---
-  const handleDelete = async (section, id, setter, endpoint) => {
-    if (!window.confirm('Delete this item?')) return;
-    await apiRequest(`${endpoint}/${id}`, { method: 'DELETE' });
-    setter((prev) => prev.filter((item) => item.id !== id));
-    showToast('Deleted successfully');
-  };
-
-  // --- SUPPORT TICKET REPLY / STATUS ---
-  const handleUpdateTicket = async (id, status, adminReply) => {
-    await apiRequest(`/support/tickets/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify({ status, adminReply })
-    });
-    setTicketsList((prev) => prev.map((t) => (t.id === id ? { ...t, status, adminReply } : t)));
-    showToast(`Ticket marked ${status}`);
-  };
-
-  const navItems = [
-    { id: 'overview', label: 'Overview & Management', icon: TrendingUp },
-    { id: 'media', label: 'AWS S3 Media Manager', icon: ImageIcon },
-    { id: 'partners', label: 'Partners & KYC', icon: Bike },
-    { id: 'users', label: 'Customer Users', icon: Users },
-    { id: 'restaurants', label: 'Restaurants & Menu', icon: Utensils },
-    { id: 'orders', label: 'Orders Management', icon: Package },
-    { id: 'pricing', label: 'Pricing & Surge', icon: Sliders },
-    { id: 'cms', label: 'Coupons & Banners', icon: Tag },
-    { id: 'support', label: 'Support Panel', icon: MessageSquare },
-    { id: 'payouts', label: 'Payouts & Razorpay', icon: CreditCard },
-    { id: 'broadcast', label: 'Broadcast Push', icon: Bell }
+  const sidebarMenu = [
+    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'live', label: 'Live Operations', icon: Radio },
+    { id: 'customers', label: 'Customers', icon: Users },
+    { id: 'restaurants', label: 'Restaurants', icon: Utensils },
+    { id: 'riders', label: 'Riders', icon: Bike },
+    { id: 'food_orders', label: 'Food Orders', icon: ShoppingBag },
+    { id: 'parcels', label: 'Parcels', icon: Package },
+    { id: 'passenger_rides', label: 'Passenger Rides', icon: Car },
+    { id: 'finance', label: 'Finance', icon: Wallet },
+    { id: 'reports', label: 'Reports', icon: FileBarChart },
+    { id: 'support', label: 'Support', icon: MessageSquare },
+    { id: 'admin_roles', label: 'Admin & Roles', icon: ShieldCheck },
+    { id: 'settings', label: 'Settings', icon: Settings },
+    { id: 'audit', label: 'Audit Logs', icon: History },
+    { id: 'media', label: 'AWS S3 Media', icon: ImageIcon }
   ];
 
+  const currentNavLabel = sidebarMenu.find((m) => m.id === activeNav)?.label || 'Dashboard';
+
   return (
-    <div className="w-full min-h-screen bg-[#f3f4f6] text-gray-900 flex flex-col select-none">
-      {/* Toast Notification */}
+    <div className="min-h-screen bg-[#F5F6F8] text-gray-900 flex flex-col md:flex-row select-none">
       {toast && (
-        <div className="fixed bottom-5 right-5 z-50 bg-black text-[#FFD600] px-4 py-2.5 rounded-2xl shadow-xl text-xs font-black border border-[#FFD600]/40 animate-fadeIn">
+        <div className="fixed bottom-5 right-5 z-50 bg-[#10151F] text-[#FFD000] px-4 py-2.5 rounded-2xl shadow-xl text-xs font-black border border-[#FFD000]/40">
           {toast}
         </div>
       )}
 
-      {/* Top Navbar */}
-      <div className="bg-[#0b0e14] text-white px-5 py-3 flex items-center justify-between border-b-2 border-[#FFD600] sticky top-0 z-20">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-[#FFD600] text-black flex items-center justify-center font-black">
-            V
+      {/* MOBILE SIDEBAR BACKDROP */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 z-40 bg-black/60 md:hidden" onClick={() => setMobileMenuOpen(false)} />
+      )}
+
+      {/* FIXED DARK SIDEBAR (#10151F) */}
+      <aside
+        className={`fixed md:sticky top-0 left-0 z-50 h-screen w-64 bg-[#10151F] text-white flex flex-col transition-transform duration-200 ${
+          mobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+        }`}
+      >
+        <div className="px-4 py-4 border-b border-white/10 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-[#FFD000] text-[#10151F] flex items-center justify-center font-black text-base">
+              V
+            </div>
+            <div>
+              <span className="font-black text-sm tracking-wider block leading-none">V RIDE</span>
+              <span className="text-[10px] text-gray-400 font-bold">Admin Panel</span>
+            </div>
           </div>
-          <div>
-            <h1 className="text-sm font-black tracking-wider flex items-center gap-2">
-              <span>SUPER ADMIN & MANAGEMENT PANEL</span>
-              <span className="text-[10px] bg-[#FFD600] text-black px-1.5 py-0.5 rounded font-black">
-                AWS S3 + RAZORPAY
-              </span>
-            </h1>
-            <p className="text-[11px] text-gray-400">Bucket: aitacademy (ap-south-2) · Full CRUD Operations</p>
-          </div>
+          <button onClick={() => setMobileMenuOpen(false)} className="md:hidden text-gray-400">
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
-        <button
-          onClick={() => { fetchBackendData(); fetchS3Media(); showToast('Synced with backend & AWS S3'); }}
-          className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold flex items-center gap-1.5"
-        >
-          <RefreshCw className="w-3.5 h-3.5 text-[#FFD600]" />
-          <span className="hidden sm:inline">Sync All</span>
-        </button>
-      </div>
-
-      <div className="flex-1 flex flex-col md:flex-row">
-        {/* Sidebar */}
-        <aside className="w-full md:w-64 bg-white border-r border-gray-200 p-3 flex md:flex-col gap-1 overflow-x-auto md:overflow-visible">
-          {navItems.map((item) => {
+        <nav className="flex-1 overflow-y-auto p-3 space-y-1">
+          {sidebarMenu.map((item) => {
             const Icon = item.icon;
-            const active = activeTab === item.id;
+            const active = activeNav === item.id;
             return (
               <button
                 key={item.id}
-                onClick={() => setActiveTab(item.id)}
-                className={`whitespace-nowrap text-left px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2.5 transition ${
-                  active ? 'bg-[#FFD600] text-black shadow-xs' : 'text-gray-600 hover:bg-gray-100'
+                onClick={() => { setActiveNav(item.id); setMobileMenuOpen(false); }}
+                className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-3 transition ${
+                  active ? 'bg-[#FFD000] text-black font-black shadow-xs' : 'text-gray-300 hover:bg-white/10'
                 }`}
               >
                 <Icon className="w-4 h-4 shrink-0" />
@@ -296,138 +216,687 @@ export const AdminDashboard = () => {
               </button>
             );
           })}
-        </aside>
+        </nav>
+      </aside>
 
-        {/* Main Content */}
-        <main className="flex-1 p-4 md:p-6 space-y-5 overflow-y-auto">
-          {/* 1. OVERVIEW */}
-          {activeTab === 'overview' && (
+      {/* MAIN CONTENT SHELL */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* CONSISTENT COMMON HEADER */}
+        <header className="bg-white border-b border-gray-200 px-4 md:px-6 h-16 flex items-center justify-between sticky top-0 z-30 gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <button onClick={() => setMobileMenuOpen(true)} className="md:hidden p-2 rounded-xl bg-gray-100">
+              <Menu className="w-5 h-5" />
+            </button>
+            <div className="min-w-0">
+              <h1 className="font-black text-sm md:text-base text-gray-900 truncate">{currentNavLabel}</h1>
+              <p className="text-[10px] text-gray-500 font-semibold hidden sm:block">
+                V RIDE Admin / {currentNavLabel}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 md:gap-3">
+            <div className="hidden lg:flex relative">
+              <Search className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                value={globalSearch}
+                onChange={(e) => setGlobalSearch(e.target.value)}
+                placeholder="Global search..."
+                className="pl-8 pr-3 py-1.5 rounded-xl border border-gray-200 bg-gray-50 text-xs w-52"
+              />
+            </div>
+
+            <select
+              value={cityFilter}
+              onChange={(e) => setCityFilter(e.target.value)}
+              className="px-2.5 py-1.5 rounded-xl border border-gray-200 bg-white text-xs font-bold"
+            >
+              <option>Hyderabad</option>
+              <option>Vijayawada</option>
+              <option>Guntur</option>
+              <option>All Cities</option>
+            </select>
+
+            <button
+              onClick={() => { syncAll(); showToast('Refreshed live operations data'); }}
+              className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200"
+              title="Sync"
+            >
+              <RefreshCw className="w-4 h-4 text-gray-700" />
+            </button>
+
+            <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-xl bg-[#10151F] text-white text-xs font-bold">
+              <span className="w-5 h-5 rounded-full bg-[#FFD000] text-black flex items-center justify-center font-black text-[10px]">A</span>
+              <span>Admin</span>
+            </div>
+
+            {onLogout && (
+              <button onClick={onLogout} className="p-2 rounded-xl bg-red-50 text-red-600 hover:bg-red-100" title="Logout">
+                <LogOut className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+        </header>
+
+        {/* PAGE BODY */}
+        <main className="flex-1 p-4 md:p-6 space-y-5 overflow-x-hidden">
+          {/* 1. DASHBOARD */}
+          {activeNav === 'dashboard' && (
             <div className="space-y-5">
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-xs">
-                  <span className="text-[10px] font-bold text-gray-400 uppercase">Total Orders</span>
-                  <p className="text-2xl font-black mt-1">{ordersList.length + 240}</p>
-                  <span className="text-[10px] text-emerald-600 font-bold">Rides · Food · Parcel</span>
+              {/* 6 Top KPI Cards matching image copy 36.png */}
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                {[
+                  { label: 'Total Users', val: '2,48,732', diff: '+5.8%', nav: 'customers' },
+                  { label: 'Total Restaurants', val: '1,862', diff: '+4.2%', nav: 'restaurants' },
+                  { label: 'Total Riders', val: '9,460', diff: '+6.1%', nav: 'riders' },
+                  { label: 'Orders & Bookings', val: '56,328', diff: '+7.3%', nav: 'food_orders' },
+                  { label: 'Total Revenue', val: '₹42,63,410', diff: '+8.9%', nav: 'finance' },
+                  { label: 'Pending Approvals', val: String(restaurants.filter((r) => r.status === 'pending').length + riders.filter((r) => r.status === 'pending').length), diff: 'View →', nav: 'restaurants' }
+                ].map((c) => (
+                  <div
+                    key={c.label}
+                    onClick={() => setActiveNav(c.nav)}
+                    className="bg-white p-3.5 rounded-2xl border border-gray-200 shadow-xs cursor-pointer hover:border-[#FFD000] transition"
+                  >
+                    <span className="text-[11px] font-bold text-gray-500 block">{c.label}</span>
+                    <span className="text-lg font-black text-gray-900 mt-1 block">{c.val}</span>
+                    <span className="text-[10px] font-bold text-emerald-600">{c.diff}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Services Overview + Revenue Trend */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs space-y-3">
+                  <h3 className="font-black text-sm text-gray-900">Services Overview (Today)</h3>
+                  {[
+                    { label: 'Food Orders', count: '24,862', rev: '₹18,76,540', nav: 'food_orders' },
+                    { label: 'Parcel Deliveries', count: '8,436', rev: '₹6,49,210', nav: 'parcels' },
+                    { label: 'Passenger Rides', count: '23,030', rev: '₹17,37,660', nav: 'passenger_rides' }
+                  ].map((s) => (
+                    <div
+                      key={s.label}
+                      onClick={() => setActiveNav(s.nav)}
+                      className="p-3 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-between cursor-pointer hover:border-[#FFD000]"
+                    >
+                      <span className="font-bold text-xs">{s.label}</span>
+                      <div className="text-right">
+                        <span className="font-black text-xs mr-3">{s.count}</span>
+                        <span className="font-black text-xs text-emerald-700">{s.rev}</span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-xs">
-                  <span className="text-[10px] font-bold text-gray-400 uppercase">Active Partners</span>
-                  <p className="text-2xl font-black mt-1">{partnersList.length}</p>
-                  <span className="text-[10px] text-blue-600 font-bold">Verified Fleet</span>
-                </div>
-                <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-xs">
-                  <span className="text-[10px] font-bold text-gray-400 uppercase">S3 Media Files</span>
-                  <p className="text-2xl font-black mt-1">{s3Media.length}</p>
-                  <span className="text-[10px] text-amber-600 font-bold">aitacademy (ap-south-2)</span>
-                </div>
-                <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-xs">
-                  <span className="text-[10px] font-bold text-gray-400 uppercase">Open Tickets</span>
-                  <p className="text-2xl font-black mt-1">{ticketsList.filter((t) => t.status !== 'resolved').length}</p>
-                  <span className="text-[10px] text-purple-600 font-bold">Support Panel</span>
+
+                <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs space-y-2">
+                  <div className="flex justify-between items-center">
+                    <h3 className="font-black text-sm">Revenue Trend (Last 7 Days)</h3>
+                    <span className="text-xs font-black text-emerald-600">+8.9%</span>
+                  </div>
+                  <svg viewBox="0 0 320 90" className="w-full h-28">
+                    <polyline fill="none" stroke="#FFD000" strokeWidth="4" points="10,75 60,68 110,55 160,48 210,36 260,28 310,15" />
+                    {[[10, 75], [60, 68], [110, 55], [160, 48], [210, 36], [260, 28], [310, 15]].map(([x, y], i) => (
+                      <circle key={i} cx={x} cy={y} r="4.5" fill="#10151F" stroke="#FFD000" strokeWidth="2" />
+                    ))}
+                  </svg>
+                  <div className="flex justify-between text-[10px] text-gray-400 font-bold">
+                    <span>21 Nov</span><span>22 Nov</span><span>23 Nov</span><span>24 Nov</span><span>25 Nov</span><span>26 Nov</span><span>27 Nov</span>
+                  </div>
                 </div>
               </div>
 
-              <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <h3 className="font-black text-sm text-gray-900">Quick Actions</h3>
-                  <p className="text-xs text-gray-500">Upload media to AWS S3 or test Razorpay checkout directly.</p>
+              {/* Live Operations Map + Unassigned Jobs + Live Activity */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs space-y-2">
+                  <div className="flex justify-between items-center">
+                    <h3 className="font-black text-xs">Live Operations – {cityFilter}</h3>
+                    <button onClick={() => setActiveNav('live')} className="text-[11px] font-bold text-blue-600">Full Map →</button>
+                  </div>
+                  <MapComponent height="180px" />
                 </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setActiveTab('media')}
-                    className="px-3.5 py-2 rounded-xl bg-black text-white text-xs font-bold flex items-center gap-1.5"
-                  >
-                    <Upload className="w-3.5 h-3.5 text-[#FFD600]" />
-                    <span>Upload to S3</span>
-                  </button>
-                  <button
-                    onClick={() => openRazorpayCheckout({
-                      amount: 100,
-                      name: 'V RIDE Admin Test',
-                      description: 'Razorpay Gateway Verification',
-                      onSuccess: (r) => showToast(`Razorpay Verified: ${r.paymentId}`),
-                      onFailure: (err) => showToast(err)
-                    })}
-                    className="px-3.5 py-2 rounded-xl bg-[#FFD600] text-black text-xs font-black flex items-center gap-1.5"
-                  >
-                    <CreditCard className="w-3.5 h-3.5" />
-                    <span>Test Razorpay (₹100)</span>
-                  </button>
+
+                <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs space-y-2.5">
+                  <h3 className="font-black text-xs">Unassigned Jobs</h3>
+                  {[
+                    { id: 'FOD8917', type: 'FOOD', area: 'Hitech City → Gachibowli' },
+                    { id: 'PRC7720', type: 'PARCEL', area: 'Kukatpally → Madhapur' },
+                    { id: 'RDE6645', type: 'RIDE', area: 'Miyapur → Ameerpet' }
+                  ].map((j) => (
+                    <div key={j.id} className="p-2.5 rounded-xl bg-gray-50 border flex items-center justify-between text-xs">
+                      <div>
+                        <span className="font-black block">{j.type} #{j.id}</span>
+                        <span className="text-[10px] text-gray-500">{j.area}</span>
+                      </div>
+                      <button
+                        onClick={() => { showToast(`Assigned ${j.id} to nearest online rider`); addAudit('Assigned Rider', 'Live Ops', j.id); }}
+                        className="px-3 py-1 rounded-lg bg-[#FFD000] text-black font-black text-[11px]"
+                      >
+                        Assign
+                      </button>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs space-y-2">
+                  <h3 className="font-black text-xs">Live Activity</h3>
+                  {auditLogs.slice(0, 4).map((a) => (
+                    <div key={a.id} className="text-[11px] py-1.5 border-b border-gray-100 last:border-0">
+                      <span className="font-bold text-gray-900">{a.action}</span> · <span className="text-gray-500">{a.record}</span>
+                      <span className="block text-[10px] text-gray-400">{a.time}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
           )}
 
-          {/* 2. AWS S3 MEDIA MANAGER */}
-          {activeTab === 'media' && (
-            <div className="space-y-4">
-              <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-xs flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <h2 className="font-black text-sm text-gray-900">AWS S3 Media Manager (`aitacademy`)</h2>
-                  <p className="text-xs text-gray-500">Upload, preview, copy public URLs, or delete files directly in S3.</p>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <select
-                    value={s3Folder}
-                    onChange={(e) => setS3Folder(e.target.value)}
-                    className="px-3 py-2 rounded-xl border border-gray-200 text-xs font-bold bg-gray-50"
-                  >
-                    <option value="vride-media">vride-media/</option>
-                    <option value="restaurants">restaurants/</option>
-                    <option value="banners">banners/</option>
-                    <option value="partner-kyc">partner-kyc/</option>
-                  </select>
-
-                  <label className="px-4 py-2 rounded-xl bg-[#FFD600] text-black font-black text-xs cursor-pointer flex items-center gap-1.5 hover:bg-yellow-400">
-                    <Upload className="w-3.5 h-3.5" />
-                    <span>{s3Loading ? 'Uploading...' : 'Upload New Media'}</span>
-                    <input type="file" onChange={handleS3FileUpload} className="hidden" />
-                  </label>
-                </div>
+          {/* 2. LIVE OPERATIONS */}
+          {activeNav === 'live' && (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              <div className="lg:col-span-2 bg-white p-4 rounded-2xl border border-gray-200 shadow-xs space-y-3">
+                <h2 className="font-black text-sm">Real-Time Fleet & Delivery Map ({cityFilter})</h2>
+                <MapComponent height="360px" />
               </div>
+              <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs space-y-3">
+                <h3 className="font-black text-sm">Online Riders</h3>
+                {riders.map((r) => (
+                  <div key={r.id} className="p-3 rounded-xl bg-gray-50 border flex items-center justify-between text-xs">
+                    <div>
+                      <span className="font-black block">{r.name} ({r.id})</span>
+                      <span className="text-[10px] text-gray-500">{r.vehicle} · {r.city}</span>
+                    </div>
+                    <span className={`px-2 py-0.5 rounded-full text-[9px] font-black ${r.online ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-200 text-gray-600'}`}>
+                      {r.online ? 'ONLINE' : 'OFFLINE'}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
-              {s3Media.length === 0 ? (
-                <div className="bg-white p-8 rounded-2xl border border-dashed border-gray-300 text-center space-y-2">
-                  <ImageIcon className="w-8 h-8 text-gray-400 mx-auto" />
-                  <p className="text-xs font-bold text-gray-700">No files loaded from S3 yet</p>
-                  <p className="text-[11px] text-gray-400">Make sure the backend (`npm start` in `backend/`) is running and upload your first image above.</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {s3Media.map((file) => (
-                    <div key={file.key} className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-xs flex flex-col">
-                      <div className="h-36 bg-gray-100 flex items-center justify-center overflow-hidden">
-                        <img src={file.url} alt={file.key} className="w-full h-full object-cover" onError={(e) => { e.target.style.display = 'none'; }} />
-                      </div>
-                      <div className="p-3 space-y-2 flex-1 flex flex-col justify-between">
-                        <div>
-                          <p className="text-xs font-bold text-gray-900 truncate">{file.key}</p>
-                          <p className="text-[10px] text-gray-400">{file.size ? `${Math.round(file.size / 1024)} KB` : 'S3 Object'}</p>
-                        </div>
-                        <div className="flex items-center gap-1.5 pt-1">
+          {/* 3. CUSTOMERS */}
+          {activeNav === 'customers' && (
+            <div className="bg-white rounded-2xl border border-gray-200 shadow-xs overflow-hidden">
+              <div className="p-4 border-b flex flex-wrap justify-between items-center gap-2">
+                <h2 className="font-black text-sm">Customer Management ({customers.length})</h2>
+                <button
+                  onClick={() => handleDownloadCsv('customers', [['ID', 'Name', 'Phone', 'City', 'Spent'], ...customers.map((c) => [c.id, c.name, c.phone, c.city, c.spent])])}
+                  className="px-3 py-1.5 rounded-xl bg-[#FFD000] text-black font-black text-xs flex items-center gap-1"
+                >
+                  <Download className="w-3.5 h-3.5" /> Export CSV
+                </button>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-gray-50 text-gray-500 uppercase text-[10px]">
+                    <tr>
+                      <th className="p-3">ID</th><th className="p-3">Name</th><th className="p-3">Phone</th>
+                      <th className="p-3">Orders / Rides</th><th className="p-3">Spent</th><th className="p-3">Status</th><th className="p-3">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {customers.map((c) => (
+                      <tr key={c.id} className="hover:bg-gray-50">
+                        <td className="p-3 font-bold">{c.id}</td>
+                        <td className="p-3 font-black">{c.name}</td>
+                        <td className="p-3">{c.phone}</td>
+                        <td className="p-3">{c.orders} / {c.rides}</td>
+                        <td className="p-3 font-bold">₹{c.spent}</td>
+                        <td className="p-3">
+                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${c.status === 'blocked' ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}`}>
+                            {c.status}
+                          </span>
+                        </td>
+                        <td className="p-3 flex gap-1.5">
                           <button
-                            onClick={() => { navigator.clipboard?.writeText(file.url); showToast('Copied S3 URL!'); }}
-                            className="flex-1 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-[11px] font-bold flex items-center justify-center gap-1"
+                            onClick={() => setCustomers((p) => p.map((x) => (x.id === c.id ? { ...x, status: x.status === 'blocked' ? 'active' : 'blocked' } : x)))}
+                            className="px-2 py-1 rounded bg-gray-100 font-bold text-[10px]"
                           >
-                            <Copy className="w-3 h-3" />
-                            <span>Copy URL</span>
+                            {c.status === 'blocked' ? 'Unblock' : 'Block'}
                           </button>
-                          <a
-                            href={file.url}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="p-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700"
-                          >
-                            <ExternalLink className="w-3.5 h-3.5" />
-                          </a>
                           <button
-                            onClick={() => handleS3Delete(file.key)}
-                            className="p-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-600"
+                            onClick={() => setCustomers((p) => p.filter((x) => x.id !== c.id))}
+                            className="p-1 rounded bg-red-50 text-red-600"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* 4. RESTAURANTS */}
+          {activeNav === 'restaurants' && (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-200 shadow-xs overflow-hidden">
+                <div className="p-4 border-b flex flex-wrap justify-between items-center gap-2">
+                  <div className="flex gap-1.5">
+                    {['all', 'pending', 'approved', 'rejected'].map((t) => (
+                      <button
+                        key={t}
+                        onClick={() => setRestTab(t)}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-black capitalize ${restTab === t ? 'bg-[#FFD000] text-black' : 'bg-gray-100 text-gray-600'}`}
+                      >
+                        {t}
+                      </button>
+                    ))}
+                  </div>
+                  <button
+                    onClick={() => setModal({ open: true, type: 'restaurant', data: { name: '', owner: '', area: '', city: 'Hyderabad', cuisine: '' } })}
+                    className="px-3 py-1.5 rounded-xl bg-[#FFD000] text-black font-black text-xs flex items-center gap-1"
+                  >
+                    <Plus className="w-3.5 h-3.5" /> Add Restaurant
+                  </button>
+                </div>
+
+                <div className="divide-y divide-gray-100">
+                  {restaurants
+                    .filter((r) => restTab === 'all' || r.status === restTab)
+                    .map((r) => (
+                      <div key={r.id} className="p-4 flex items-center justify-between gap-3">
+                        <div>
+                          <span className="font-black text-xs text-gray-900">{r.name}</span>
+                          <p className="text-[11px] text-gray-500">{r.area}, {r.city} · {r.cuisine} · Applied: {r.appliedOn}</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${r.status === 'approved' ? 'bg-emerald-100 text-emerald-700' : r.status === 'rejected' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-800'}`}>
+                            {r.status}
+                          </span>
+                          <button onClick={() => setSelectedRest(r)} className="px-3 py-1 rounded-lg bg-[#FFD000] text-black font-black text-xs">
+                            Review
+                          </button>
                         </div>
                       </div>
+                    ))}
+                </div>
+              </div>
+
+              {/* Verification Panel */}
+              <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs space-y-3">
+                <h3 className="font-black text-sm">Restaurant Verification</h3>
+                {selectedRest ? (
+                  <div className="space-y-3 text-xs">
+                    <p><strong>Name:</strong> {selectedRest.name} ({selectedRest.id})</p>
+                    <p><strong>Owner:</strong> {selectedRest.owner}</p>
+                    <div className="space-y-1">
+                      <span className="font-bold block">Documents:</span>
+                      {(selectedRest.docs || ['FSSAI', 'GST', 'Bank']).map((d) => (
+                        <div key={d} className="flex justify-between p-2 rounded-lg bg-gray-50">
+                          <span>{d}</span><span className="text-emerald-600 font-bold">✓ Verified</span>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        onClick={() => {
+                          setRestaurants((p) => p.map((x) => (x.id === selectedRest.id ? { ...x, status: 'approved' } : x)));
+                          setSelectedRest((p) => ({ ...p, status: 'approved' }));
+                          addAudit('Approved Restaurant', 'Restaurants', selectedRest.id);
+                          showToast(`${selectedRest.name} approved!`);
+                        }}
+                        className="py-2 rounded-xl bg-emerald-600 text-white font-black"
+                      >
+                        Approve
+                      </button>
+                      <button
+                        onClick={() => {
+                          setRestaurants((p) => p.map((x) => (x.id === selectedRest.id ? { ...x, status: 'rejected' } : x)));
+                          setSelectedRest((p) => ({ ...p, status: 'rejected' }));
+                          addAudit('Rejected Restaurant', 'Restaurants', selectedRest.id);
+                          showToast(`${selectedRest.name} rejected`);
+                        }}
+                        className="py-2 rounded-xl bg-red-600 text-white font-black"
+                      >
+                        Reject
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-xs text-gray-500">Click Review on any restaurant to inspect documents and approve/reject.</p>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* 5. RIDERS */}
+          {activeNav === 'riders' && (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-200 shadow-xs overflow-hidden">
+                <div className="p-4 border-b flex flex-wrap justify-between items-center gap-2">
+                  <div className="flex gap-1.5">
+                    {['all', 'pending', 'approved', 'rejected'].map((t) => (
+                      <button
+                        key={t}
+                        onClick={() => setRiderTab(t)}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-black capitalize ${riderTab === t ? 'bg-[#FFD000] text-black' : 'bg-gray-100 text-gray-600'}`}
+                      >
+                        {t}
+                      </button>
+                    ))}
+                  </div>
+                  <button
+                    onClick={() => setModal({ open: true, type: 'rider', data: { name: '', city: 'Hyderabad', phone: '', vehicle: 'Bike', vehicleNo: '' } })}
+                    className="px-3 py-1.5 rounded-xl bg-[#FFD000] text-black font-black text-xs flex items-center gap-1"
+                  >
+                    <Plus className="w-3.5 h-3.5" /> Add Rider
+                  </button>
+                </div>
+
+                <div className="divide-y divide-gray-100">
+                  {riders
+                    .filter((r) => riderTab === 'all' || r.status === riderTab)
+                    .map((r) => (
+                      <div key={r.id} className="p-4 flex items-center justify-between gap-3">
+                        <div>
+                          <span className="font-black text-xs text-gray-900">{r.name} ({r.id})</span>
+                          <p className="text-[11px] text-gray-500">{r.city} · {r.vehicle} ({r.vehicleNo}) · {r.services.join(', ')}</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${r.status === 'approved' ? 'bg-emerald-100 text-emerald-700' : r.status === 'rejected' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-800'}`}>
+                            {r.status}
+                          </span>
+                          <button onClick={() => setSelectedRider(r)} className="px-3 py-1 rounded-lg bg-[#FFD000] text-black font-black text-xs">
+                            Review
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </div>
+
+              {/* Right-side Verification Panel matching image copy 36.png */}
+              <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs space-y-3">
+                <h3 className="font-black text-sm">Verification – {selectedRider?.id}</h3>
+                {selectedRider && (
+                  <div className="space-y-3 text-xs">
+                    <div className="flex items-center gap-3 p-2.5 rounded-xl bg-gray-50">
+                      <div className="w-10 h-10 rounded-full bg-[#FFD000] text-black flex items-center justify-center font-black">R</div>
+                      <div>
+                        <span className="font-black block">{selectedRider.name}</span>
+                        <span className="text-[11px] text-gray-500">Applied: {selectedRider.appliedOn}</span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <span className="font-bold block">Documents</span>
+                      {['Driving Licence', 'Vehicle RC', 'Insurance', 'ID Proof'].map((doc) => (
+                        <div key={doc} className="flex justify-between p-2 rounded-lg bg-gray-50">
+                          <span>{doc}</span><span className="text-emerald-600 font-bold">✓</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        onClick={() => {
+                          setRiders((p) => p.map((x) => (x.id === selectedRider.id ? { ...x, status: 'approved' } : x)));
+                          setSelectedRider((p) => ({ ...p, status: 'approved' }));
+                          addAudit('Approved Rider', 'Riders', selectedRider.id);
+                          showToast(`${selectedRider.name} approved!`);
+                        }}
+                        className="py-2 rounded-xl bg-emerald-600 text-white font-black"
+                      >
+                        Approve
+                      </button>
+                      <button
+                        onClick={() => {
+                          setRiders((p) => p.map((x) => (x.id === selectedRider.id ? { ...x, status: 'rejected' } : x)));
+                          setSelectedRider((p) => ({ ...p, status: 'rejected' }));
+                          addAudit('Rejected Rider', 'Riders', selectedRider.id);
+                          showToast(`${selectedRider.name} rejected`);
+                        }}
+                        className="py-2 rounded-xl bg-red-600 text-white font-black"
+                      >
+                        Reject
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* 6. FOOD ORDERS */}
+          {activeNav === 'food_orders' && (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-200 shadow-xs overflow-hidden">
+                <div className="p-4 border-b flex justify-between items-center">
+                  <h2 className="font-black text-sm">Food Delivery Orders</h2>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-gray-50 text-gray-500 text-[10px] uppercase">
+                      <tr>
+                        <th className="p-3">Order ID</th><th className="p-3">Restaurant</th><th className="p-3">Route</th>
+                        <th className="p-3">Rider</th><th className="p-3">Fare</th><th className="p-3">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {foodOrders.map((o) => (
+                        <tr key={o.id} onClick={() => setSelectedFoodOrder(o)} className="hover:bg-yellow-50/50 cursor-pointer">
+                          <td className="p-3 font-black">{o.id}</td>
+                          <td className="p-3">{o.restaurant}</td>
+                          <td className="p-3">{o.pickup} → {o.drop}</td>
+                          <td className="p-3 font-bold">{o.rider}</td>
+                          <td className="p-3 font-bold">₹{o.fare}</td>
+                          <td className="p-3"><span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 font-black text-[10px]">{o.status}</span></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Right-side Order Timeline & Reassign Panel */}
+              <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs space-y-3">
+                <div className="flex justify-between items-center">
+                  <h3 className="font-black text-sm">Order #{selectedFoodOrder?.id}</h3>
+                  <span className="text-[10px] font-black bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">{selectedFoodOrder?.status}</span>
+                </div>
+                <div className="space-y-2 text-xs">
+                  {['Order Placed', 'Accepted by Rider', 'Reached Restaurant', 'Order Picked Up', 'On the Way to Customer'].map((step, i) => (
+                    <div key={step} className="flex items-center gap-2">
+                      <span className={`w-2.5 h-2.5 rounded-full ${i < 4 ? 'bg-emerald-500' : 'bg-amber-400'}`}></span>
+                      <span className="font-semibold">{step}</span>
+                    </div>
+                  ))}
+                </div>
+                <button
+                  onClick={() => {
+                    const nextRider = window.prompt('Assign Rider ID:', 'RDR1036');
+                    if (!nextRider) return;
+                    setFoodOrders((p) => p.map((x) => (x.id === selectedFoodOrder.id ? { ...x, rider: nextRider, status: 'In Progress' } : x)));
+                    setSelectedFoodOrder((p) => ({ ...p, rider: nextRider, status: 'In Progress' }));
+                    showToast(`Dispatched ${nextRider} to #${selectedFoodOrder.id}`);
+                  }}
+                  className="w-full py-2.5 rounded-xl bg-[#FFD000] text-black font-black text-xs"
+                >
+                  🛵 Reassign / Dispatch Rider
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* 7. PARCELS */}
+          {activeNav === 'parcels' && (
+            <div className="bg-white rounded-2xl border border-gray-200 shadow-xs overflow-hidden">
+              <div className="p-4 border-b"><h2 className="font-black text-sm">Parcel Deliveries</h2></div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-gray-50 text-gray-500 text-[10px] uppercase">
+                    <tr><th className="p-3">ID</th><th className="p-3">Sender → Receiver</th><th className="p-3">Route</th><th className="p-3">Type</th><th className="p-3">Amount</th><th className="p-3">Status</th><th className="p-3">Action</th></tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {parcels.map((p) => (
+                      <tr key={p.id}>
+                        <td className="p-3 font-black">{p.id}</td>
+                        <td className="p-3">{p.sender} → {p.receiver}</td>
+                        <td className="p-3">{p.pickup} → {p.drop}</td>
+                        <td className="p-3">{p.type}</td>
+                        <td className="p-3 font-bold">₹{p.amount}</td>
+                        <td className="p-3 font-bold">{p.status}</td>
+                        <td className="p-3">
+                          <button
+                            onClick={() => {
+                              setParcels((prev) => prev.map((x) => (x.id === p.id ? { ...x, rider: 'RDR1036', status: 'In Transit' } : x)));
+                              showToast(`Rider assigned to ${p.id}`);
+                            }}
+                            className="px-2.5 py-1 rounded bg-[#FFD000] text-black font-black text-[10px]"
+                          >
+                            Assign Rider
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* 8. PASSENGER RIDES */}
+          {activeNav === 'passenger_rides' && (
+            <div className="bg-white rounded-2xl border border-gray-200 shadow-xs overflow-hidden">
+              <div className="p-4 border-b"><h2 className="font-black text-sm">Passenger Rides</h2></div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-gray-50 text-gray-500 text-[10px] uppercase">
+                    <tr><th className="p-3">Ride ID</th><th className="p-3">Customer</th><th className="p-3">Route</th><th className="p-3">Rider</th><th className="p-3">Vehicle</th><th className="p-3">Fare</th><th className="p-3">Status</th></tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {rides.map((r) => (
+                      <tr key={r.id}>
+                        <td className="p-3 font-black">{r.id}</td>
+                        <td className="p-3">{r.customer}</td>
+                        <td className="p-3">{r.pickup} → {r.drop}</td>
+                        <td className="p-3 font-bold">{r.rider}</td>
+                        <td className="p-3">{r.vehicle}</td>
+                        <td className="p-3 font-bold">₹{r.fare}</td>
+                        <td className="p-3 font-bold text-emerald-700">{r.status}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* 9. FINANCE */}
+          {activeNav === 'finance' && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+                {[
+                  { label: 'Platform Revenue', val: '₹42,63,410' },
+                  { label: 'Commission Earnings', val: '₹7,86,520' },
+                  { label: 'Rider Payouts', val: '₹28,40,950' },
+                  { label: 'Restaurant Settlements', val: '₹5,96,240' },
+                  { label: 'Refunds', val: '₹86,700' }
+                ].map((k) => (
+                  <div key={k.label} className="bg-white p-4 rounded-2xl border border-gray-200 shadow-xs">
+                    <span className="text-[10px] font-bold text-gray-500 uppercase block">{k.label}</span>
+                    <span className="text-lg font-black text-gray-900 mt-1 block">{k.val}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex gap-2">
+                {['overview', 'settlements', 'withdrawals', 'refunds'].map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => setFinanceTab(t)}
+                    className={`px-3.5 py-2 rounded-xl text-xs font-black capitalize ${financeTab === t ? 'bg-[#FFD000] text-black' : 'bg-white border border-gray-200'}`}
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
+
+              {financeTab === 'settlements' && (
+                <div className="bg-white rounded-2xl border border-gray-200 p-4 space-y-2">
+                  <h3 className="font-black text-sm">Restaurant Settlements</h3>
+                  {settlements.map((s) => (
+                    <div key={s.id} className="p-3 rounded-xl bg-gray-50 border flex justify-between items-center text-xs">
+                      <div>
+                        <span className="font-black block">{s.restaurant} ({s.period})</span>
+                        <span className="text-gray-500">Gross: ₹{s.gross} · Comm: ₹{s.commission} · Net: ₹{s.net}</span>
+                      </div>
+                      <button
+                        onClick={() => {
+                          setSettlements((p) => p.map((x) => (x.id === s.id ? { ...x, status: 'Paid' } : x)));
+                          showToast(`Settlement ${s.id} marked Paid`);
+                        }}
+                        className="px-3 py-1.5 rounded-xl bg-emerald-600 text-white font-black text-xs"
+                      >
+                        {s.status === 'Paid' ? 'Paid ✓' : 'Process Settlement'}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {(financeTab === 'overview' || financeTab === 'withdrawals') && (
+                <div className="bg-white rounded-2xl border border-gray-200 p-4 space-y-2">
+                  <div className="flex justify-between items-center">
+                    <h3 className="font-black text-sm">Rider Withdrawals</h3>
+                    <button
+                      onClick={() => openRazorpayCheckout({
+                        amount: 500,
+                        name: 'V RIDE Settlement Test',
+                        description: 'Razorpay Payout Test',
+                        onSuccess: (r) => showToast(`Razorpay Verified: ${r.paymentId}`),
+                        onFailure: (err) => showToast(err)
+                      })}
+                      className="px-3 py-1.5 rounded-xl bg-[#FFD000] text-black font-black text-xs"
+                    >
+                      Test Razorpay Checkout
+                    </button>
+                  </div>
+                  {payouts.map((w) => (
+                    <div key={w.id} className="p-3 rounded-xl bg-gray-50 border flex justify-between items-center text-xs">
+                      <div>
+                        <span className="font-black block">{w.rider} · ₹{w.amount}</span>
+                        <span className="text-gray-500">{w.method} · {w.date}</span>
+                      </div>
+                      {w.status === 'Pending' ? (
+                        <button
+                          onClick={() => {
+                            setPayouts((p) => p.map((x) => (x.id === w.id ? { ...x, status: 'Approved' } : x)));
+                            showToast(`Withdrawal ${w.id} approved`);
+                          }}
+                          className="px-3 py-1 rounded-lg bg-emerald-600 text-white font-black text-xs"
+                        >
+                          Approve
+                        </button>
+                      ) : (
+                        <span className="font-black text-emerald-700">{w.status}</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {financeTab === 'refunds' && (
+                <div className="bg-white rounded-2xl border border-gray-200 p-4 space-y-2">
+                  <h3 className="font-black text-sm">Refund Management</h3>
+                  {refunds.map((rf) => (
+                    <div key={rf.id} className="p-3 rounded-xl bg-gray-50 border flex justify-between items-center text-xs">
+                      <div>
+                        <span className="font-black block">{rf.id} · Order #{rf.orderId} · ₹{rf.amount}</span>
+                        <span className="text-gray-500">{rf.reason} · {rf.method}</span>
+                      </div>
+                      <button
+                        onClick={() => {
+                          setRefunds((p) => p.map((x) => (x.id === rf.id ? { ...x, status: 'Processed' } : x)));
+                          showToast(`Refund ${rf.id} processed`);
+                        }}
+                        className="px-3 py-1 rounded-lg bg-emerald-600 text-white font-black text-xs"
+                      >
+                        {rf.status === 'Processed' ? 'Processed ✓' : 'Process Refund'}
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -435,510 +904,229 @@ export const AdminDashboard = () => {
             </div>
           )}
 
-          {/* 3. PARTNERS & KYC (ADD / EDIT / APPROVE / DELETE) */}
-          {activeTab === 'partners' && (
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-xs overflow-hidden">
-              <div className="p-4 border-b border-gray-100 flex items-center justify-between">
-                <h2 className="font-black text-sm">Driver Partners & KYC Management</h2>
-                <button
-                  onClick={() => setModalState({ open: true, section: 'partners', mode: 'add', data: { name: '', phone: '', vehicle: '', status: 'approved', docs: 'Aadhaar, DL' } })}
-                  className="px-3 py-1.5 rounded-xl bg-[#FFD600] text-black font-black text-xs flex items-center gap-1"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  <span>Add Partner</span>
-                </button>
-              </div>
-              <div className="divide-y divide-gray-100">
-                {partnersList.map((p) => (
-                  <div key={p.id} className="p-4 flex flex-wrap items-center justify-between gap-3">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-black text-xs text-gray-900">{p.name}</span>
-                        <span className={`text-[9px] font-black px-2 py-0.5 rounded-full uppercase ${p.status === 'approved' ? 'bg-emerald-100 text-emerald-700' : 'bg-yellow-100 text-yellow-800'}`}>
-                          {p.status}
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-gray-500">{p.phone} · {p.vehicle} · Docs: {p.docs}</p>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      {p.status !== 'approved' && (
-                        <button
-                          onClick={async () => {
-                            await apiRequest(`/admin/partners/${p.id}`, { method: 'PUT', body: JSON.stringify({ status: 'approved' }) });
-                            setPartnersList((prev) => prev.map((x) => (x.id === p.id ? { ...x, status: 'approved' } : x)));
-                            showToast(`${p.name} approved`);
-                          }}
-                          className="px-2.5 py-1 rounded-lg bg-emerald-600 text-white text-[11px] font-bold"
-                        >
-                          Approve
-                        </button>
-                      )}
-                      <button
-                        onClick={() => setModalState({ open: true, section: 'partners', mode: 'edit', data: p })}
-                        className="p-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700"
-                      >
-                        <Edit3 className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete('partners', p.id, setPartnersList, '/admin/partners')}
-                        className="p-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-600"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
+          {/* 10. REPORTS */}
+          {activeNav === 'reports' && (
+            <div className="bg-white rounded-2xl border border-gray-200 p-5 space-y-3">
+              <h2 className="font-black text-sm">Generate & Download Reports</h2>
+              {[
+                'Orders & Bookings Report',
+                'Revenue & Commission Report',
+                'Rider Earnings & Payouts Report',
+                'Restaurant Settlements Report',
+                'Customer Growth Report'
+              ].map((rep) => (
+                <div key={rep} className="p-3 rounded-xl bg-gray-50 border flex flex-wrap justify-between items-center gap-2 text-xs">
+                  <span className="font-bold">{rep}</span>
+                  <div className="flex gap-1.5">
+                    <button onClick={() => handleDownloadCsv(rep, [['Metric', 'Value'], [rep, 'Exported']])} className="px-2.5 py-1 rounded bg-emerald-100 text-emerald-800 font-black">CSV</button>
+                    <button onClick={() => handleDownloadCsv(rep, [['Metric', 'Value'], [rep, 'Exported']])} className="px-2.5 py-1 rounded bg-blue-100 text-blue-800 font-black">Excel</button>
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
           )}
 
-          {/* 4. CUSTOMER USERS (ADD / EDIT / BLOCK / DELETE) */}
-          {activeTab === 'users' && (
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-xs overflow-hidden">
-              <div className="p-4 border-b border-gray-100 flex items-center justify-between">
-                <h2 className="font-black text-sm">Customer Users Management</h2>
-                <button
-                  onClick={() => setModalState({ open: true, section: 'users', mode: 'add', data: { name: '', phone: '', email: '', walletBalance: 0, status: 'active' } })}
-                  className="px-3 py-1.5 rounded-xl bg-[#FFD600] text-black font-black text-xs flex items-center gap-1"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  <span>Add User</span>
-                </button>
-              </div>
-              <div className="divide-y divide-gray-100">
-                {usersList.map((u) => (
-                  <div key={u.id} className="p-4 flex flex-wrap items-center justify-between gap-3">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-black text-xs">{u.name}</span>
-                        <span className={`text-[9px] font-black px-2 py-0.5 rounded-full uppercase ${u.status === 'blocked' ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}`}>
-                          {u.status || 'active'}
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-gray-500">{u.phone} · {u.email} · Wallet: ₹{u.walletBalance || 0}</p>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <button
-                        onClick={async () => {
-                          const next = u.status === 'blocked' ? 'active' : 'blocked';
-                          await apiRequest(`/admin/users/${u.id}`, { method: 'PUT', body: JSON.stringify({ status: next }) });
-                          setUsersList((prev) => prev.map((x) => (x.id === u.id ? { ...x, status: next } : x)));
-                        }}
-                        className="px-2.5 py-1 rounded-lg bg-gray-100 hover:bg-gray-200 text-[11px] font-bold"
-                      >
-                        {u.status === 'blocked' ? 'Unblock' : 'Block'}
-                      </button>
-                      <button
-                        onClick={() => setModalState({ open: true, section: 'users', mode: 'edit', data: u })}
-                        className="p-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700"
-                      >
-                        <Edit3 className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete('users', u.id, setUsersList, '/admin/users')}
-                        className="p-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-600"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
+          {/* 11. SUPPORT */}
+          {activeNav === 'support' && (
+            <div className="bg-white rounded-2xl border border-gray-200 p-5 space-y-3">
+              <h2 className="font-black text-sm">Support Ticket Management ({tickets.length})</h2>
+              {tickets.map((t) => (
+                <div key={t.id} className="p-3.5 rounded-xl bg-gray-50 border space-y-2 text-xs">
+                  <div className="flex justify-between items-center">
+                    <span className="font-black">#{t.id} · {t.subject}</span>
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${t.status === 'resolved' ? 'bg-emerald-100 text-emerald-700' : 'bg-yellow-100 text-yellow-800'}`}>
+                      {t.status}
+                    </span>
                   </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* 5. RESTAURANTS & MENU (ADD / EDIT / UPLOAD S3 IMAGE / DELETE) */}
-          {activeTab === 'restaurants' && (
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-xs overflow-hidden">
-              <div className="p-4 border-b border-gray-100 flex items-center justify-between">
-                <h2 className="font-black text-sm">Restaurants & Menu Management</h2>
-                <button
-                  onClick={() => setModalState({ open: true, section: 'restaurants', mode: 'add', data: { name: '', cuisines: '', rating: 4.5, deliveryTime: '30 min', image: '', isOpen: true } })}
-                  className="px-3 py-1.5 rounded-xl bg-[#FFD600] text-black font-black text-xs flex items-center gap-1"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  <span>Add Restaurant</span>
-                </button>
-              </div>
-              <div className="divide-y divide-gray-100">
-                {restaurantsList.map((r) => (
-                  <div key={r.id} className="p-4 flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      <img src={r.image || '/images/food-biryani.jpg'} alt={r.name} className="w-12 h-12 rounded-xl object-cover bg-gray-100" />
-                      <div>
-                        <h4 className="font-black text-xs text-gray-900">{r.name}</h4>
-                        <p className="text-[11px] text-gray-500">{Array.isArray(r.cuisines) ? r.cuisines.join(', ') : r.cuisines} · ★ {r.rating} · {r.deliveryTime}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <button
-                        onClick={() => setModalState({ open: true, section: 'restaurants', mode: 'edit', data: { ...r, cuisines: Array.isArray(r.cuisines) ? r.cuisines.join(', ') : r.cuisines } })}
-                        className="p-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700"
-                      >
-                        <Edit3 className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete('restaurants', r.id, setRestaurantsList, '/admin/restaurants')}
-                        className="p-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-600"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* 6. ORDERS MANAGEMENT (UPDATE STATUS / DELETE) */}
-          {activeTab === 'orders' && (
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-xs overflow-hidden">
-              <div className="p-4 border-b border-gray-100">
-                <h2 className="font-black text-sm">All Rides, Food & Parcel Orders</h2>
-              </div>
-              <div className="divide-y divide-gray-100">
-                {ordersList.map((o) => (
-                  <div key={o.id} className="p-4 flex flex-wrap items-center justify-between gap-3">
-                    <div>
-                      <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded bg-yellow-100 text-yellow-900 mr-2">{o.type}</span>
-                      <span className="font-black text-xs text-gray-900">{o.title}</span>
-                      <p className="text-[11px] text-gray-500 mt-0.5">ID: {o.id} · ₹{o.amount}</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <select
-                        value={o.status}
-                        onChange={async (e) => {
-                          const status = e.target.value;
-                          await apiRequest(`/admin/orders/${o.type}/${o.id}`, { method: 'PUT', body: JSON.stringify({ status }) });
-                          setOrdersList((prev) => prev.map((x) => (x.id === o.id ? { ...x, status } : x)));
-                          showToast('Order status updated');
-                        }}
-                        className="px-2.5 py-1 rounded-lg border border-gray-200 text-xs font-bold bg-gray-50"
-                      >
-                        <option value="placed">Placed</option>
-                        <option value="arriving">Arriving</option>
-                        <option value="in_transit">In Transit</option>
-                        <option value="completed">Completed</option>
-                        <option value="cancelled">Cancelled</option>
-                      </select>
-                      <button
-                        onClick={async () => {
-                          await apiRequest(`/admin/orders/${o.type}/${o.id}`, { method: 'DELETE' });
-                          setOrdersList((prev) => prev.filter((x) => x.id !== o.id));
-                          showToast('Order deleted');
-                        }}
-                        className="p-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-600"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* 7. PRICING & SURGE (ADD / EDIT / DELETE) */}
-          {activeTab === 'pricing' && (
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-xs overflow-hidden">
-              <div className="p-4 border-b border-gray-100 flex items-center justify-between">
-                <h2 className="font-black text-sm">Pricing & Surge Rules</h2>
-                <button
-                  onClick={() => setModalState({ open: true, section: 'pricing', mode: 'add', data: { name: '', baseFare: 30, perKm: 10, surge: 1.0, commission: 15 } })}
-                  className="px-3 py-1.5 rounded-xl bg-[#FFD600] text-black font-black text-xs flex items-center gap-1"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  <span>Add Rule</span>
-                </button>
-              </div>
-              <div className="divide-y divide-gray-100">
-                {pricingRules.map((rule) => (
-                  <div key={rule.id} className="p-4 flex items-center justify-between gap-3">
-                    <div>
-                      <h4 className="font-black text-xs text-gray-900">{rule.name}</h4>
-                      <p className="text-[11px] text-gray-500">Base: ₹{rule.baseFare} · Per Km: ₹{rule.perKm} · Surge: {rule.surge}x · Comm: {rule.commission}%</p>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <button
-                        onClick={() => setModalState({ open: true, section: 'pricing', mode: 'edit', data: rule })}
-                        className="p-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700"
-                      >
-                        <Edit3 className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete('pricing', rule.id, setPricingRules, '/admin/pricing-rules')}
-                        className="p-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-600"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* 8. COUPONS & BANNERS (ADD / EDIT / S3 BANNER UPLOAD / DELETE) */}
-          {activeTab === 'cms' && (
-            <div className="space-y-4">
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-xs overflow-hidden">
-                <div className="p-4 border-b border-gray-100 flex items-center justify-between">
-                  <h2 className="font-black text-sm">Promo Coupons</h2>
+                  <p className="text-gray-600">{t.message || `${t.userName} (${t.category})`}</p>
                   <button
-                    onClick={() => setModalState({ open: true, section: 'coupons', mode: 'add', data: { code: '', discount: '20% OFF', category: 'All', active: true } })}
-                    className="px-3 py-1.5 rounded-xl bg-[#FFD600] text-black font-black text-xs flex items-center gap-1"
+                    onClick={async () => {
+                      const reply = window.prompt('Enter Admin Support Reply:', t.adminReply || 'Resolved by Support');
+                      if (reply === null) return;
+                      await apiRequest(`/support/tickets/${t.id}`, { method: 'PUT', body: JSON.stringify({ status: 'resolved', adminReply: reply }) });
+                      setTickets((p) => p.map((x) => (x.id === t.id ? { ...x, status: 'resolved', adminReply: reply } : x)));
+                      showToast(`Ticket #${t.id} resolved`);
+                    }}
+                    className="px-3 py-1 rounded-lg bg-emerald-600 text-white font-black text-[11px]"
                   >
-                    <Plus className="w-3.5 h-3.5" />
-                    <span>Add Coupon</span>
+                    Reply & Resolve
                   </button>
                 </div>
-                <div className="divide-y divide-gray-100">
-                  {couponsList.map((c) => (
-                    <div key={c.id} className="p-4 flex items-center justify-between">
-                      <div>
-                        <span className="font-black text-xs text-black bg-yellow-100 px-2 py-0.5 rounded">{c.code}</span>
-                        <span className="text-xs font-bold text-gray-700 ml-2">{c.discount} ({c.category})</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <button onClick={() => setModalState({ open: true, section: 'coupons', mode: 'edit', data: c })} className="p-1.5 rounded-lg bg-gray-100 hover:bg-gray-200"><Edit3 className="w-3.5 h-3.5" /></button>
-                        <button onClick={() => handleDelete('coupons', c.id, setCouponsList, '/admin/coupons')} className="p-1.5 rounded-lg bg-red-50 text-red-600"><Trash2 className="w-3.5 h-3.5" /></button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-xs overflow-hidden">
-                <div className="p-4 border-b border-gray-100 flex items-center justify-between">
-                  <h2 className="font-black text-sm">Promo Banners (S3 Hosted)</h2>
-                  <button
-                    onClick={() => setModalState({ open: true, section: 'banners', mode: 'add', data: { title: '', code: '', image: '', active: true } })}
-                    className="px-3 py-1.5 rounded-xl bg-[#FFD600] text-black font-black text-xs flex items-center gap-1"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    <span>Upload Banner</span>
-                  </button>
-                </div>
-                <div className="divide-y divide-gray-100">
-                  {bannersList.map((b) => (
-                    <div key={b.id} className="p-4 flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-3">
-                        <img src={b.image || '/images/service-food.jpg'} alt={b.title} className="w-16 h-10 rounded-lg object-cover bg-gray-100" />
-                        <div>
-                          <h4 className="font-black text-xs">{b.title}</h4>
-                          <p className="text-[11px] text-gray-500">Code: {b.code}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <button onClick={() => setModalState({ open: true, section: 'banners', mode: 'edit', data: b })} className="p-1.5 rounded-lg bg-gray-100 hover:bg-gray-200"><Edit3 className="w-3.5 h-3.5" /></button>
-                        <button onClick={() => handleDelete('banners', b.id, setBannersList, '/admin/banners')} className="p-1.5 rounded-lg bg-red-50 text-red-600"><Trash2 className="w-3.5 h-3.5" /></button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              ))}
             </div>
           )}
 
-          {/* 9. SUPPORT PANEL (REPLY / RESOLVE / DELETE) */}
-          {activeTab === 'support' && (
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-xs overflow-hidden">
-              <div className="p-4 border-b border-gray-100">
-                <h2 className="font-black text-sm">Support Panel — Live Customer & Partner Tickets</h2>
-              </div>
-              <div className="divide-y divide-gray-100">
-                {ticketsList.map((t) => (
-                  <div key={t.id} className="p-4 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <span className="font-black text-xs text-gray-900">{t.subject}</span>
-                        <span className="text-[10px] text-gray-500 ml-2">by {t.userName || 'Customer'} ({t.category})</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <span className={`text-[9px] font-black px-2 py-0.5 rounded-full uppercase ${t.status === 'resolved' ? 'bg-emerald-100 text-emerald-700' : 'bg-yellow-100 text-yellow-800'}`}>
-                          {t.status}
-                        </span>
-                        <button
-                          onClick={() => handleDelete('tickets', t.id, setTicketsList, '/support/tickets')}
-                          className="p-1 rounded-lg bg-red-50 text-red-600"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </div>
-                    <p className="text-xs text-gray-600">{t.message}</p>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => {
-                          const reply = window.prompt('Enter support reply:', t.adminReply || 'Issue resolved, wallet credited.');
-                          if (reply !== null) handleUpdateTicket(t.id, 'resolved', reply);
-                        }}
-                        className="px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-[11px] font-bold"
-                      >
-                        Reply & Resolve
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* 10. PAYOUTS & RAZORPAY TRANSACTIONS */}
-          {activeTab === 'payouts' && (
-            <div className="space-y-4">
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-xs overflow-hidden">
-                <div className="p-4 border-b border-gray-100 flex items-center justify-between">
-                  <h2 className="font-black text-sm">Partner Payout Requests</h2>
-                </div>
-                <div className="divide-y divide-gray-100">
-                  {payoutsList.map((p) => (
-                    <div key={p.id} className="p-4 flex items-center justify-between">
-                      <div>
-                        <span className="font-black text-xs">{p.partner} · ₹{p.amount}</span>
-                        <p className="text-[11px] text-gray-500">{p.bank} · {p.date}</p>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        {p.status === 'pending' && (
-                          <button
-                            onClick={async () => {
-                              await apiRequest(`/admin/payouts/${p.id}`, { method: 'PUT', body: JSON.stringify({ status: 'approved' }) });
-                              setPayoutsList((prev) => prev.map((x) => (x.id === p.id ? { ...x, status: 'approved' } : x)));
-                              showToast('Payout approved');
-                            }}
-                            className="px-2.5 py-1 rounded-lg bg-emerald-600 text-white text-[11px] font-bold"
-                          >
-                            Approve
-                          </button>
-                        )}
-                        <span className={`text-[9px] font-black px-2 py-0.5 rounded-full uppercase ${p.status === 'approved' ? 'bg-emerald-100 text-emerald-700' : 'bg-yellow-100 text-yellow-800'}`}>
-                          {p.status}
-                        </span>
-                        <button onClick={() => handleDelete('payouts', p.id, setPayoutsList, '/admin/payouts')} className="p-1.5 rounded-lg bg-red-50 text-red-600">
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-xs overflow-hidden">
-                <div className="p-4 border-b border-gray-100">
-                  <h2 className="font-black text-sm">Razorpay Payment Transactions</h2>
-                </div>
-                <div className="divide-y divide-gray-100">
-                  {transactionsList.map((tx) => (
-                    <div key={tx.id} className="p-4 flex items-center justify-between">
-                      <div>
-                        <span className="font-black text-xs">{tx.title}</span>
-                        <p className="text-[11px] text-gray-500">{tx.date} · {tx.razorpayPaymentId || tx.id}</p>
-                      </div>
-                      <span className="font-black text-xs text-emerald-700">₹{tx.amount} ({tx.status || 'paid'})</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* 11. BROADCAST PUSH */}
-          {activeTab === 'broadcast' && (
-            <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs space-y-3 max-w-lg">
-              <h2 className="font-black text-sm">Send System Broadcast</h2>
-              <select
-                value={broadcastTarget}
-                onChange={(e) => setBroadcastTarget(e.target.value)}
-                className="w-full p-2.5 rounded-xl border border-gray-200 text-xs font-bold"
+          {/* 12. ADMIN & ROLES */}
+          {activeNav === 'admin_roles' && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  const res = await apiRequest('/admin/accounts', { method: 'POST', body: JSON.stringify(newAdmin) });
+                  const created = res?.data || { id: 'ADM_' + Date.now(), ...newAdmin, active: true };
+                  setAdminAccounts((p) => [created, ...p]);
+                  setNewAdmin({ name: '', email: '', role: 'Support Admin', city: 'All Cities' });
+                  addAudit('Created Admin Account', 'Admin & Roles', created.email);
+                  showToast('Admin account created!');
+                }}
+                className="bg-white p-5 rounded-2xl border border-gray-200 space-y-3"
               >
-                <option value="all">All Customers & Partners</option>
-                <option value="customers">Customers Only</option>
-                <option value="partners">Partners Only</option>
-              </select>
-              <textarea
-                rows={3}
-                value={broadcastMessage}
-                onChange={(e) => setBroadcastMessage(e.target.value)}
-                placeholder="Write announcement..."
-                className="w-full p-2.5 rounded-xl border border-gray-200 text-xs"
-              />
+                <h2 className="font-black text-sm">Create Support / Operations Admin</h2>
+                <input required placeholder="Full Name" value={newAdmin.name} onChange={(e) => setNewAdmin((p) => ({ ...p, name: e.target.value }))} className="w-full p-2.5 rounded-xl border text-xs" />
+                <input required type="email" placeholder="Email" value={newAdmin.email} onChange={(e) => setNewAdmin((p) => ({ ...p, email: e.target.value }))} className="w-full p-2.5 rounded-xl border text-xs" />
+                <select value={newAdmin.role} onChange={(e) => setNewAdmin((p) => ({ ...p, role: e.target.value }))} className="w-full p-2.5 rounded-xl border text-xs font-bold">
+                  <option>Support Admin</option><option>Operations Admin</option><option>Finance Admin</option><option>Restaurant Admin</option><option>Rider Admin</option>
+                </select>
+                <select value={newAdmin.city} onChange={(e) => setNewAdmin((p) => ({ ...p, city: e.target.value }))} className="w-full p-2.5 rounded-xl border text-xs font-bold">
+                  <option>All Cities</option><option>Hyderabad</option><option>Vijayawada</option><option>Guntur</option>
+                </select>
+                <button type="submit" className="w-full py-2.5 rounded-xl bg-[#FFD000] text-black font-black text-xs">+ Create Admin</button>
+              </form>
+
+              <div className="bg-white p-5 rounded-2xl border border-gray-200 space-y-2.5">
+                <h3 className="font-black text-sm">Authorized Admin Accounts</h3>
+                {adminAccounts.map((a) => (
+                  <div key={a.id} className="p-3 rounded-xl bg-gray-50 border flex justify-between items-center text-xs">
+                    <div>
+                      <span className="font-black block">{a.name} ({a.role})</span>
+                      <span className="text-gray-500">{a.email} · {a.city}</span>
+                    </div>
+                    {a.role !== 'Super Admin' && (
+                      <button onClick={() => setAdminAccounts((p) => p.filter((x) => x.id !== a.id))} className="text-red-600 font-bold">Revoke</button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* 13. SETTINGS */}
+          {activeNav === 'settings' && (
+            <div className="bg-white p-5 rounded-2xl border border-gray-200 space-y-3 max-w-xl">
+              <h2 className="font-black text-sm">Platform Settings</h2>
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div>
+                  <label className="font-bold text-gray-500 block mb-1">Restaurant Commission (%)</label>
+                  <input type="number" value={settings.restaurantCommission} onChange={(e) => setSettings((p) => ({ ...p, restaurantCommission: Number(e.target.value) }))} className="w-full p-2.5 rounded-xl border font-bold" />
+                </div>
+                <div>
+                  <label className="font-bold text-gray-500 block mb-1">Rider Commission (%)</label>
+                  <input type="number" value={settings.riderCommission} onChange={(e) => setSettings((p) => ({ ...p, riderCommission: Number(e.target.value) }))} className="w-full p-2.5 rounded-xl border font-bold" />
+                </div>
+                <div>
+                  <label className="font-bold text-gray-500 block mb-1">Bike Base Fare (₹)</label>
+                  <input type="number" value={settings.baseFareBike} onChange={(e) => setSettings((p) => ({ ...p, baseFareBike: Number(e.target.value) }))} className="w-full p-2.5 rounded-xl border font-bold" />
+                </div>
+                <div>
+                  <label className="font-bold text-gray-500 block mb-1">Active Cities</label>
+                  <input value={settings.cities} onChange={(e) => setSettings((p) => ({ ...p, cities: e.target.value }))} className="w-full p-2.5 rounded-xl border font-bold" />
+                </div>
+              </div>
               <button
                 onClick={async () => {
-                  if (!broadcastMessage.trim()) return;
-                  await apiRequest('/admin/broadcast', {
-                    method: 'POST',
-                    body: JSON.stringify({ target: broadcastTarget, message: broadcastMessage })
-                  });
-                  setBroadcastMessage('');
-                  showToast('Broadcast sent!');
+                  await apiRequest('/admin/settings', { method: 'PUT', body: JSON.stringify(settings) });
+                  addAudit('Updated Platform Settings', 'Settings', 'Global');
+                  showToast('Settings saved to backend!');
                 }}
-                className="px-4 py-2.5 rounded-xl bg-[#FFD600] text-black font-black text-xs"
+                className="px-4 py-2.5 rounded-xl bg-[#FFD000] text-black font-black text-xs"
               >
-                Send Broadcast Notification
+                Save Platform Settings
               </button>
+            </div>
+          )}
+
+          {/* 14. AUDIT LOGS */}
+          {activeNav === 'audit' && (
+            <div className="bg-white rounded-2xl border border-gray-200 p-5 space-y-2.5">
+              <h2 className="font-black text-sm">System Audit Logs (Immutable)</h2>
+              {auditLogs.map((l) => (
+                <div key={l.id} className="p-3 rounded-xl bg-gray-50 border flex justify-between text-xs">
+                  <div>
+                    <span className="font-black">{l.action}</span> · <span className="text-gray-600">{l.module} ({l.record})</span>
+                    <span className="block text-[10px] text-gray-400">By {l.admin}</span>
+                  </div>
+                  <span className="text-[11px] text-gray-500">{l.time}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* 15. AWS S3 MEDIA MANAGER */}
+          {activeNav === 'media' && (
+            <div className="space-y-4">
+              <div className="bg-white p-4 rounded-2xl border border-gray-200 flex justify-between items-center">
+                <div>
+                  <h2 className="font-black text-sm">AWS S3 Media Manager (`aitacademy`)</h2>
+                  <p className="text-xs text-gray-500">Upload, copy public URLs, or delete media objects.</p>
+                </div>
+                <label className="px-4 py-2 rounded-xl bg-[#FFD000] text-black font-black text-xs cursor-pointer flex items-center gap-1.5">
+                  <Upload className="w-3.5 h-3.5" />
+                  <span>{s3Loading ? 'Uploading...' : 'Upload to S3'}</span>
+                  <input
+                    type="file"
+                    className="hidden"
+                    onChange={async (e) => {
+                      const f = e.target.files?.[0];
+                      if (!f) return;
+                      setS3Loading(true);
+                      const res = await uploadMediaToS3(f, 'vride-media');
+                      setS3Loading(false);
+                      if (res?.success && res.data) {
+                        setS3Media((p) => [res.data, ...p]);
+                        showToast(`Uploaded ${f.name} to S3!`);
+                      } else showToast('Start backend (port 5000) for live S3 upload.');
+                    }}
+                  />
+                </label>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {s3Media.map((m) => (
+                  <div key={m.key} className="bg-white rounded-2xl border p-3 space-y-2 text-xs">
+                    <img src={m.url} alt={m.key} className="w-full h-32 object-cover rounded-xl bg-gray-100" />
+                    <p className="font-bold truncate">{m.key}</p>
+                    <div className="flex gap-2">
+                      <button onClick={() => { navigator.clipboard?.writeText(m.url); showToast('Copied URL'); }} className="flex-1 py-1.5 rounded bg-gray-100 font-bold">Copy URL</button>
+                      <button onClick={async () => { await deleteS3Media(m.key); setS3Media((p) => p.filter((x) => x.key !== m.key)); showToast('Deleted from S3'); }} className="p-1.5 rounded bg-red-50 text-red-600"><Trash2 className="w-3.5 h-3.5" /></button>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </main>
       </div>
 
-      {/* GENERIC ADD / EDIT MODAL */}
-      {modalState.open && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <form onSubmit={handleSaveModal} className="bg-white rounded-3xl max-w-md w-full p-5 space-y-3 shadow-2xl">
-            <div className="flex items-center justify-between pb-2 border-b border-gray-100">
-              <h3 className="font-black text-sm uppercase">
-                {modalState.mode === 'add' ? 'Add New' : 'Edit'} {modalState.section}
-              </h3>
-              <button type="button" onClick={() => setModalState({ open: false, section: '', mode: 'add', data: {} })} className="p-1 rounded-full bg-gray-100">
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            {Object.keys(modalState.data).map((field) => {
-              if (field === 'id' || field === 'createdAt' || field === 'updatedAt' || field === 'isOpen' || field === 'active') return null;
-              if (field === 'image') {
-                return (
-                  <div key={field} className="space-y-1.5">
-                    <label className="text-[10px] font-bold uppercase text-gray-500 block">Image (AWS S3 or URL)</label>
-                    <input
-                      type="text"
-                      value={modalState.data[field] || ''}
-                      onChange={(e) => setModalState((prev) => ({ ...prev, data: { ...prev.data, image: e.target.value } }))}
-                      placeholder="https://aitacademy.s3.ap-south-2.amazonaws.com/..."
-                      className="w-full p-2 rounded-xl border border-gray-200 text-xs"
-                    />
-                    <label className="flex items-center justify-center gap-1.5 p-2 rounded-xl border border-dashed border-gray-300 bg-gray-50 text-xs font-bold cursor-pointer">
-                      <Upload className="w-3.5 h-3.5" />
-                      <span>{uploadingModalImg ? 'Uploading to S3...' : 'Upload Image to AWS S3'}</span>
-                      <input type="file" accept="image/*" onChange={handleModalImageUpload} className="hidden" />
-                    </label>
-                  </div>
-                );
+      {/* ADD MODAL FOR RESTAURANT / RIDER */}
+      {modal.open && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (modal.type === 'restaurant') {
+                setRestaurants((p) => [{ id: 'RST_' + Date.now(), ...modal.data, appliedOn: 'Today', status: 'pending', docs: ['FSSAI', 'GST'] }, ...p]);
+              } else if (modal.type === 'rider') {
+                setRiders((p) => [{ id: 'RDR_' + Date.now(), ...modal.data, appliedOn: 'Today', services: ['Food', 'Parcel', 'Rides'], status: 'pending', online: false }, ...p]);
               }
-              return (
-                <div key={field}>
-                  <label className="text-[10px] font-bold uppercase text-gray-500 block mb-0.5">{field}</label>
-                  <input
-                    type={typeof modalState.data[field] === 'number' ? 'number' : 'text'}
-                    step="any"
-                    value={modalState.data[field] ?? ''}
-                    onChange={(e) => setModalState((prev) => ({
-                      ...prev,
-                      data: {
-                        ...prev.data,
-                        [field]: typeof modalState.data[field] === 'number' ? Number(e.target.value) : e.target.value
-                      }
-                    }))}
-                    required
-                    className="w-full p-2 rounded-xl border border-gray-200 text-xs font-medium"
-                  />
-                </div>
-              );
-            })}
-
-            <button type="submit" className="w-full py-3 rounded-2xl bg-[#FFD600] text-black font-black text-xs">
-              Save Changes
-            </button>
+              setModal({ open: false, type: '', data: {} });
+              showToast('Added successfully!');
+            }}
+            className="bg-white rounded-3xl max-w-sm w-full p-5 space-y-3"
+          >
+            <div className="flex justify-between items-center pb-2 border-b">
+              <h3 className="font-black text-sm uppercase">Add {modal.type}</h3>
+              <button type="button" onClick={() => setModal({ open: false, type: '', data: {} })}><X className="w-4 h-4" /></button>
+            </div>
+            {Object.keys(modal.data).map((k) => (
+              <input
+                key={k}
+                required
+                placeholder={k}
+                value={modal.data[k]}
+                onChange={(e) => setModal((p) => ({ ...p, data: { ...p.data, [k]: e.target.value } }))}
+                className="w-full p-2.5 rounded-xl border text-xs font-semibold"
+              />
+            ))}
+            <button type="submit" className="w-full py-3 rounded-xl bg-[#FFD000] text-black font-black text-xs">Save</button>
           </form>
         </div>
       )}

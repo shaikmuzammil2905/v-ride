@@ -24,6 +24,12 @@ import {
   ticketsCrud,
   ordersManagementController
 } from '../controllers/awsPaymentAdminController.js';
+import {
+  unifiedAuthController,
+  riderPanelController,
+  vendorPanelController,
+  adminGovernanceController
+} from '../controllers/unifiedPartnerController.js';
 
 const router = express.Router();
 const upload = multer({
@@ -140,6 +146,35 @@ router.delete('/admin/orders/:type/:id', ordersManagementController.deleteOrder)
 // --- Wallet Routes ---
 router.get('/wallet', walletController.getBalance);
 router.post('/wallet/add', walletController.addMoney);
+
+// --- Unified Role Authentication ---
+router.post('/auth/portal-login', unifiedAuthController.portalLogin);
+
+// --- Rider Panel Routes ---
+router.get('/rider/:id/dashboard', riderPanelController.getDashboard);
+router.put('/rider/:id/duty', riderPanelController.toggleDuty);
+router.post('/rider/jobs/:jobId/accept', riderPanelController.acceptJob);
+router.post('/rider/jobs/:jobId/verify-otp', riderPanelController.verifyJobOtp);
+router.post('/rider/jobs/:jobId/complete', riderPanelController.completeJob);
+router.post('/rider/sos', riderPanelController.recordSos);
+
+// --- Restaurant Vendor Panel Routes ---
+router.get('/vendor/:id/dashboard', vendorPanelController.getDashboard);
+router.put('/vendor/:id/settings', vendorPanelController.updateSettings);
+router.put('/vendor/orders/:orderId/transition', vendorPanelController.transitionOrder);
+router.post('/vendor/:id/withdraw', vendorPanelController.withdrawWallet);
+router.get('/vendor/:id/staff', vendorPanelController.staffCrud.list);
+router.post('/vendor/:id/staff', vendorPanelController.staffCrud.create);
+router.put('/vendor/:id/staff/:staffId', vendorPanelController.staffCrud.update);
+router.delete('/vendor/:id/staff/:staffId', vendorPanelController.staffCrud.remove);
+
+// --- Admin Governance, Roles, Settings & Audit Logs ---
+router.get('/admin/accounts', adminGovernanceController.listAdmins);
+router.post('/admin/accounts', adminGovernanceController.createAdmin);
+router.delete('/admin/accounts/:id', adminGovernanceController.deleteAdmin);
+router.get('/admin/audit-logs', adminGovernanceController.listAuditLogs);
+router.get('/admin/settings', adminGovernanceController.getSettings);
+router.put('/admin/settings', adminGovernanceController.updateSettings);
 
 // --- CMS & Support Panel Routes ---
 router.get('/cms/banners', cmsController.getBanners);
