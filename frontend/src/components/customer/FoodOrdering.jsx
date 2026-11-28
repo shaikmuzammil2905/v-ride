@@ -127,24 +127,8 @@ export const FoodOrdering = ({ onNavigate, onSelectRestaurant }) => {
     : NINETY_NINE_MEALS;
 
   return (
-    <div className="flex flex-col bg-white pb-2 select-none">
-      <style>{`
-        @keyframes floatBowl {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-6px); }
-        }
-        @keyframes riseSteam {
-          0% { transform: translateY(6px) scale(0.92); opacity: 0; }
-          50% { opacity: 0.55; }
-          100% { transform: translateY(-18px) scale(1.12); opacity: 0; }
-        }
-        .animate-bowl-float { animation: floatBowl 4s ease-in-out infinite; }
-        .animate-steam-1 { animation: riseSteam 3.2s ease-out infinite; }
-        .animate-steam-2 { animation: riseSteam 3.8s ease-out 1.1s infinite; }
-        .animate-steam-3 { animation: riseSteam 3.5s ease-out 2s infinite; }
-      `}</style>
-
-      {/* 1. TOP NAVIGATION BAR (#11151C) - EXACT MATCH TO image copy 43.png */}
+    <div className={`flex flex-col bg-white select-none ${cartCount > 0 ? 'main-content-with-cart' : 'pb-3'}`}>
+      {/* 1. TOP NAVIGATION BAR (#11151C) */}
       <header className="sticky top-0 z-40 bg-[#11151C] px-4 py-3 md:px-6">
         <div className="mx-auto flex max-w-6xl items-center justify-between">
           <button
@@ -175,39 +159,30 @@ export const FoodOrdering = ({ onNavigate, onSelectRestaurant }) => {
         </div>
       </header>
 
-      {/* 2. DARK HERO BANNER WITH ANIMATED BIRYANI BOWL - EXACT MATCH TO image copy 43.png */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#11151C] via-[#151A22] to-[#1D242E] pt-4 pb-11">
-        <div className="pointer-events-none absolute bottom-0 right-0 h-28 w-3/5 overflow-hidden">
-          <svg viewBox="0 0 600 180" preserveAspectRatio="none" className="h-full w-full">
-            <path d="M40,180 Q280,105 600,45 L600,180 Z" fill="#FFD400" />
-          </svg>
-        </div>
+      {/* 2. DARK HERO BANNER WITH FULL-BLEED BIRYANI BACKGROUND */}
+      <section
+        className="relative overflow-hidden bg-[#11151C] pt-6 pb-14"
+        style={{
+          backgroundImage: 'url("/images/biryani-hero.png")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'right center',
+          backgroundRepeat: 'no-repeat',
+          minHeight: '205px'
+        }}
+      >
+        <div
+          className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#11151C]/95 via-[#11151C]/65 to-transparent"
+          aria-hidden="true"
+        />
 
-        <div className="relative z-10 mx-auto grid max-w-6xl grid-cols-12 items-center px-4">
-          <div className="col-span-7 pr-2">
+        <div className="relative z-10 mx-auto max-w-6xl px-4">
+          <div className="max-w-[62%]">
             <h1 className="text-2xl font-extrabold tracking-tight text-white">
               Food <span className="text-[#FFD400]">Delivery</span>
             </h1>
             <div className="mt-1.5 flex items-center gap-1.5 text-xs font-medium text-gray-200">
               <Utensils className="h-3.5 w-3.5 shrink-0 text-[#FFD400]" />
               <span>From Your Favorite Restaurants</span>
-            </div>
-          </div>
-
-          <div className="relative col-span-5 flex items-center justify-end">
-            <div className="relative flex items-center justify-center">
-              <div className="pointer-events-none absolute -top-4 left-1/4 h-10 w-10 rounded-full bg-white/25 blur-md animate-steam-1" aria-hidden="true" />
-              <div className="pointer-events-none absolute -top-6 left-1/2 h-12 w-12 rounded-full bg-white/20 blur-md animate-steam-2" aria-hidden="true" />
-              <div className="pointer-events-none absolute -top-3 right-1/4 h-9 w-9 rounded-full bg-white/25 blur-md animate-steam-3" aria-hidden="true" />
-
-              <span className="pointer-events-none absolute right-2 top-5 h-1.5 w-1.5 rounded-full bg-[#FFD400] opacity-75 animate-pulse" aria-hidden="true" />
-              <span className="pointer-events-none absolute left-1 bottom-6 h-1 w-1 rounded-full bg-emerald-400 opacity-80 animate-ping" aria-hidden="true" />
-
-              <img
-                src="/images/food-biryani.jpg"
-                alt="Hot Chicken Biryani Bowl"
-                className="animate-bowl-float relative z-10 h-24 w-auto object-contain mix-blend-lighten drop-shadow-[0_14px_18px_rgba(0,0,0,0.75)]"
-              />
             </div>
           </div>
         </div>
@@ -466,12 +441,12 @@ export const FoodOrdering = ({ onNavigate, onSelectRestaurant }) => {
           ))}
       </div>
 
-      {/* FLOATING CART PILL IF ITEMS ADDED */}
+      {/* FLOATING CART PILL IF ITEMS ADDED - PROPERLY SPACED ABOVE BOTTOM NAV */}
       {cartCount > 0 && (
-        <div className="fixed bottom-20 left-4 right-4 max-w-md mx-auto z-30 animate-slideUp">
+        <div className="floating-cart max-w-md mx-auto animate-slideUp">
           <div
             onClick={() => onNavigate('track')}
-            className="glass-btn-dark p-3.5 rounded-2xl flex items-center justify-between cursor-pointer border border-[#FFD400]/40 shadow-xl"
+            className="glass-btn-dark px-4 py-3 rounded-2xl flex items-center justify-between cursor-pointer border border-[#FFD400]/40 shadow-2xl"
           >
             <div className="flex items-center gap-2 text-white text-xs">
               <ShoppingBag className="w-4 h-4 text-[#FFD400]" />
@@ -479,7 +454,7 @@ export const FoodOrdering = ({ onNavigate, onSelectRestaurant }) => {
               <span>·</span>
               <span className="font-black text-[#FFD400]">₹{cartSubtotal}</span>
             </div>
-            <button className="rounded-xl bg-[#FFD400] px-3.5 py-1 text-black font-black text-xs">
+            <button className="rounded-xl bg-[#FFD400] px-3.5 py-1.5 text-black font-black text-xs active:scale-95">
               View Cart →
             </button>
           </div>

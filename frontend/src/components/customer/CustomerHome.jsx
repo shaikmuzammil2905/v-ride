@@ -65,38 +65,30 @@ export const CustomerHome = ({ onNavigate }) => {
         </div>
       </header>
 
-      {/* 2. DARK CURVED HERO SECTION WITH CHARMINAR SILHOUETTE & YELLOW WAVE */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#11151C] via-[#171D26] to-[#202834] pt-3 pb-12">
-        {/* Golden radial arc highlight behind rider */}
+      {/* 2. DARK CURVED HERO SECTION WITH FULL-BLEED BIKE BACKGROUND & YELLOW WAVE */}
+      <section
+        className="relative overflow-hidden bg-[#11151C] pt-5 pb-14"
+        style={{
+          backgroundImage: 'url("/images/bike-hero-bg.png")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'right center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      >
+        {/* Subtle left-side dark gradient overlay so text stays super crisp */}
         <div
-          className="pointer-events-none absolute right-2 top-2 h-44 w-44 rounded-full border-t-2 border-r-2 border-[#FFD400]/25 bg-gradient-to-bl from-[#FFD400]/15 to-transparent"
+          className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#11151C]/95 via-[#11151C]/70 to-transparent"
           aria-hidden="true"
         />
 
-        {/* Subtle Charminar silhouette on far right */}
-        <svg
-          viewBox="0 0 120 120"
-          className="pointer-events-none absolute right-1 bottom-7 h-28 w-28 text-black/35"
-          fill="currentColor"
-          aria-hidden="true"
-        >
-          <rect x="20" y="35" width="14" height="85" rx="2" />
-          <rect x="86" y="35" width="14" height="85" rx="2" />
-          <path d="M18 35 L27 12 L36 35 Z" />
-          <path d="M84 35 L93 12 L102 35 Z" />
-          <rect x="34" y="55" width="52" height="65" />
-          <path d="M46 120 L46 82 A14 14 0 0 1 74 82 L74 120 Z" fill="#171D26" />
-        </svg>
-
-        <div className="relative z-10 mx-auto grid max-w-6xl grid-cols-12 items-center px-4">
-          {/* Left Column Content */}
-          <div className="col-span-7 pr-1">
+        <div className="relative z-10 mx-auto max-w-6xl px-4">
+          <div className="max-w-[65%]">
             <h1 className="text-xl font-extrabold tracking-tight text-white sm:text-2xl">
               Hi <span className="text-[#FFD400]">{userName}</span>{' '}
               <span className="inline-block origin-bottom-right">👋</span>
             </h1>
 
-            <p className="mt-1 text-[11px] font-medium text-gray-300 leading-snug">
+            <p className="mt-1 text-[11px] font-medium text-gray-200 leading-snug">
               Where do you want to go or order today?
             </p>
 
@@ -105,22 +97,13 @@ export const CustomerHome = ({ onNavigate }) => {
               <button
                 type="button"
                 onClick={() => setShowLocationModal(true)}
-                className="flex items-center gap-1.5 rounded-full border border-white/30 bg-white/5 px-3 py-1.5 text-xs font-medium text-white backdrop-blur-sm transition hover:border-[#FFD400] active:scale-95"
+                className="flex items-center gap-1.5 rounded-full border border-white/30 bg-[#11151C]/75 px-3 py-1.5 text-xs font-medium text-white backdrop-blur-sm transition hover:border-[#FFD400] active:scale-95"
               >
                 <MapPin className="h-3.5 w-3.5 shrink-0 text-[#FFD400]" />
-                <span className="truncate max-w-[130px]">{selectedLocation}</span>
+                <span className="truncate max-w-[140px]">{selectedLocation}</span>
                 <ChevronDown className="h-3.5 w-3.5 shrink-0 text-gray-300" />
               </button>
             </div>
-          </div>
-
-          {/* Right Column 3D Rider Visual */}
-          <div className="col-span-5 flex justify-end">
-            <img
-              src="/images/hero-rider.jpg"
-              alt="V Ride Delivery Scooter Rider"
-              className="h-28 w-auto object-contain mix-blend-lighten drop-shadow-[0_10px_15px_rgba(0,0,0,0.6)] sm:h-32"
-            />
           </div>
         </div>
 

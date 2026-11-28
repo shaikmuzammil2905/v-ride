@@ -106,12 +106,19 @@ export const RideBooking = ({ onNavigate, onBack }) => {
   return (
     <div className="flex flex-col min-h-full bg-white pb-28 select-none">
       {/* ============================================================ */}
-      {/* 1. DARK HEADER WITH YELLOW WAVE & 3D RIDER SILHOUETTE        */}
-      {/* EXACT MATCH TO image copy 29.png                             */}
+      {/* 1. DARK HEADER WITH FULL-BLEED BIKE BACKGROUND & YELLOW WAVE */}
       {/* ============================================================ */}
-      <div className="relative bg-[#0b0e14] text-white pt-3 pb-5 px-4 overflow-hidden">
-        {/* Subtle glow */}
-        <div className="absolute -top-12 -right-12 w-44 h-44 bg-[#FFD600]/15 rounded-full blur-3xl pointer-events-none"></div>
+      <div
+        className="relative bg-[#0b0e14] text-white pt-3 pb-7 px-4 overflow-hidden"
+        style={{
+          backgroundImage: 'url("/images/bike-hero-bg.png")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'right center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      >
+        {/* Left gradient overlay for crisp text contrast */}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#0b0e14]/95 via-[#0b0e14]/70 to-transparent" aria-hidden="true" />
 
         {/* Top bar with back arrow and glassy dropdown */}
         <div className="flex items-center justify-between relative z-10">
@@ -155,23 +162,14 @@ export const RideBooking = ({ onNavigate, onBack }) => {
           </div>
         </div>
 
-        {/* 3D Scooter Graphic on Yellow Wave */}
-        <div className="mt-3 flex items-center justify-between relative z-10">
-          <div>
-            <span className="text-[10px] font-black uppercase text-[#FFD600] tracking-wider block">
-              V RIDE FAST MOBILITY
-            </span>
-            <p className="text-xs text-gray-300 font-medium mt-0.5">
-              Doorstep pickup in 2 to 5 minutes across Hyderabad
-            </p>
-          </div>
-          <div className="shrink-0 w-20 h-16 -mr-1 flex items-center justify-center">
-            <img
-              src="/images/hero-rider.jpg"
-              alt="V RIDE Bike"
-              className="w-full h-full object-contain rounded-xl mix-blend-lighten"
-            />
-          </div>
+        {/* Fast Mobility Banner Copy over Bike Hero */}
+        <div className="mt-4 relative z-10 max-w-[60%]">
+          <span className="text-[10px] font-black uppercase text-[#FFD600] tracking-wider block">
+            V RIDE FAST MOBILITY
+          </span>
+          <p className="text-xs text-gray-200 font-medium mt-0.5 leading-snug">
+            Doorstep pickup in 2 to 5 minutes across Hyderabad
+          </p>
         </div>
 
         {/* Yellow Wave Bottom Accent */}
@@ -182,7 +180,7 @@ export const RideBooking = ({ onNavigate, onBack }) => {
       {/* 2. PICKUP & DROP INPUT CARD                                  */}
       {/* ============================================================ */}
       {bookingStep === 'select' && (
-        <div className="p-4 space-y-4">
+        <div className="p-3.5 space-y-3">
           <div className="bg-[#f9fafb] p-3.5 rounded-3xl border border-gray-200 relative space-y-3 shadow-2xs">
             {/* Pickup Location input with green dot */}
             <div className="flex items-center gap-2.5 pb-2 border-b border-gray-200/80">

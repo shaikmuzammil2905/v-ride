@@ -90,6 +90,45 @@
   border: 1px solid rgba(255, 255, 255, 0.22);
 }
 
+:root {
+  --cart-bar-height: 66px;
+  --bottom-nav-height: 62px;
+  --layout-gap: 12px;
+}
+
+.main-content-with-cart {
+  padding-bottom: calc(
+    var(--cart-bar-height) +
+    var(--layout-gap) +
+    16px +
+    env(safe-area-inset-bottom, 0px)
+  );
+}
+
+.floating-cart {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: calc(
+    var(--bottom-nav-height) +
+    var(--layout-gap) +
+    env(safe-area-inset-bottom, 0px)
+  );
+  z-index: 1000;
+  min-height: var(--cart-bar-height);
+  border-radius: 20px;
+}
+
+.bottom-navigation {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  min-height: var(--bottom-nav-height);
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom, 0px));
+  z-index: 999;
+}
+
 .glass-pill-dark {
   background: rgba(18, 24, 38, 0.75);
   backdrop-filter: blur(12px);

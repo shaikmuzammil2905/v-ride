@@ -74,7 +74,7 @@ export const ProfileScreen = ({ onNavigate }) => {
   ];
 
   return (
-    <div className="flex flex-col min-h-full bg-[#f8f9fa] pb-28 select-none">
+    <div className="flex flex-col bg-[#f8f9fa] pb-2 select-none">
       {/* ============================================================ */}
       {/* 1. DARK HEADER WITH YELLOW WAVE                             */}
       {/* EXACT MATCH TO image copy 31.png                             */}
@@ -104,7 +104,7 @@ export const ProfileScreen = ({ onNavigate }) => {
         <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-[#FFD600]"></div>
       </div>
 
-      <div className="p-4 space-y-4">
+      <div className="p-3.5 space-y-3">
         {/* ============================================================ */}
         {/* 2. USER PROFILE HERO CARD                                    */}
         {/* ============================================================ */}

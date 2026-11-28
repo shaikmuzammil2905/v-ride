@@ -128,10 +128,10 @@ export const CustomerApp = () => {
             {renderScreen()}
           </main>
 
-          {/* PERMANENTLY FIXED BOTTOM NAVIGATION BAR - EXACT MATCH TO image copy 29, 30, 31, 32 */}
+          {/* PERMANENTLY FIXED BOTTOM NAVIGATION BAR */}
           <nav
             aria-label="Bottom Navigation"
-            className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-[#0a0d14]/95 backdrop-blur-xl border-t border-white/10 px-3 py-1.5 flex items-center justify-around z-40 shadow-[0_-8px_24px_rgba(0,0,0,0.4)] pb-[max(0.6rem,env(safe-area-inset-bottom))]"
+            className="bottom-navigation max-w-md mx-auto bg-[#0a0d14]/95 backdrop-blur-xl border-t border-white/10 px-3 py-1.5 flex items-center justify-around shadow-[0_-8px_24px_rgba(0,0,0,0.4)]"
           >
             {bottomTabs.map(tab => {
               const Icon = tab.icon;
