@@ -83,43 +83,29 @@ export const ParcelBooking = ({ onNavigate, onBack }) => {
         </div>
       </header>
 
-      {/* 2. PARCEL HERO BANNER SECTION - EXACT MATCH TO image copy 42.png */}
-      <section className="relative overflow-hidden bg-gradient-to-r from-[#11151C] via-[#171C24] to-[#1F2631] pt-5 pb-11">
-        <div className="pointer-events-none absolute -left-16 top-0 h-40 w-40 rounded-full bg-gradient-to-br from-[#FFD400]/25 to-transparent blur-xl" aria-hidden="true" />
-        <div className="pointer-events-none absolute right-6 top-2 h-44 w-56 rounded-t-full border-t-4 border-[#FFD400]/30 bg-gradient-to-b from-[#FFD400]/15 to-transparent" aria-hidden="true" />
+      {/* 2. PARCEL HERO BANNER SECTION WITH FULL-BLEED BIKE BACKGROUND */}
+      <section
+        className="relative overflow-hidden bg-[#11151C] pt-6 pb-14"
+        style={{
+          backgroundImage: 'url("/images/bike-hero-bg.png")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'right center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      >
+        <div
+          className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#11151C]/95 via-[#11151C]/65 to-transparent"
+          aria-hidden="true"
+        />
 
-        <div className="relative z-10 mx-auto grid max-w-6xl grid-cols-12 items-center px-4">
-          <div className="col-span-7 pr-2">
+        <div className="relative z-10 mx-auto max-w-6xl px-4">
+          <div className="max-w-[62%]">
             <h1 className="text-2xl font-extrabold tracking-tight text-white">
               Send <span className="text-[#FFD400]">Parcels</span>
             </h1>
-            <p className="mt-1 text-xs font-medium tracking-wide text-gray-300">
+            <p className="mt-1 text-xs font-medium tracking-wide text-gray-200">
               Fast • Safe • Reliable Delivery
             </p>
-          </div>
-
-          <div className="relative col-span-5 flex items-center justify-end">
-            <div className="relative flex items-center">
-              <div className="mr-1 hidden flex-col gap-1 sm:flex">
-                <span className="h-0.5 w-5 rounded-full bg-[#FFD400]/80" />
-                <span className="ml-1.5 h-0.5 w-4 rounded-full bg-[#FFD400]/50" />
-              </div>
-
-              <img
-                src="/images/hero-rider.jpg"
-                alt="V Ride Parcel Delivery Rider"
-                className="relative z-10 h-24 w-auto object-contain mix-blend-lighten drop-shadow-[0_10px_14px_rgba(0,0,0,0.65)]"
-              />
-
-              <div className="relative -ml-2 flex flex-col items-center">
-                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#FFD400]/15 text-[#FFD400]">
-                  <MapPin className="h-4 w-4 fill-[#FFD400] text-[#11151C]" />
-                </div>
-                <svg viewBox="0 0 80 30" className="mt-0.5 h-5 w-12 text-white/60" fill="none">
-                  <path d="M2 25 Q 35 28, 75 5" stroke="currentColor" strokeWidth="2" strokeDasharray="4 4" />
-                </svg>
-              </div>
-            </div>
           </div>
         </div>
 
