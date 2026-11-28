@@ -6,7 +6,6 @@ import CustomerApp from './components/customer/CustomerApp';
 import RiderPanel from './components/rider/RiderPanel';
 import VendorPanel from './components/vendor/VendorPanel';
 import AdminDashboard from './components/admin/AdminDashboard';
-import LoginSelectionScreen from './components/auth/LoginSelectionScreen';
 import CustomerLoginPage from './components/auth/CustomerLoginPage';
 import AdminLoginPage from './components/auth/AdminLoginPage';
 import PartnerLoginPage from './components/auth/PartnerLoginPage';
@@ -45,7 +44,7 @@ const UnauthorizedScreen = () => {
 
   const handleSwitchAccount = async () => {
     await logoutSession();
-    navigate('/login', { replace: true });
+    navigate('/', { replace: true });
   };
 
   return (
@@ -93,24 +92,15 @@ const UnauthorizedScreen = () => {
   );
 };
 
-const RootRedirect = () => {
+const RootEntry = () => {
   const location = useLocation();
-  const { authToken, authUser, authLoading } = useApp();
-
-  if (authLoading) return <AuthLoadingScreen />;
-
   const params = new URLSearchParams(location.search);
   const portal = params.get('portal');
-  if (portal === 'partner') return <Navigate to="/login/partner" replace />;
+  if (portal === 'partner') return <Navigate to="/partner" replace />;
   if (portal === 'rider') return <Navigate to="/rider" replace />;
-  if (portal === 'vendor') return <Navigate to="/vendor" replace />;
+  if (portal === 'vendor' || portal === 'restaurant') return <Navigate to="/vendor" replace />;
   if (portal === 'admin') return <Navigate to="/admin" replace />;
-  if (portal === 'customer') return <Navigate to="/customer" replace />;
-
-  if (authToken && authUser) {
-    return <Navigate to={getDashboardPathForRole(authUser.role)} replace />;
-  }
-  return <Navigate to="/login" replace />;
+  return <CustomerApp />;
 };
 
 const GuestOrRedirect = ({ expectedRoles, children }) => {
@@ -126,7 +116,7 @@ export const App = () => {
   const navigate = useNavigate();
   const { logoutSession } = useApp();
 
-  const handleLogout = async (redirectPath = '/login') => {
+  const handleLogout = async (redirectPath = '/') => {
     await logoutSession();
     navigate(redirectPath, { replace: true });
   };
@@ -134,9 +124,11 @@ export const App = () => {
   return (
     <div className="min-h-screen bg-[#f8f9fa] flex flex-col font-sans select-none overflow-x-hidden">
       <Routes>
-        <Route path="/" element={<RootRedirect />} />
-        <Route path="/login" element={<LoginSelectionScreen />} />
+        {/* Main Website / Customer App directly at / */}
+        <Route path="/" element={<RootEntry />} />
+        <Route path="/customer/*" element={<CustomerApp />} />
 
+        {/* Customer Login */}
         <Route
           path="/login/customer"
           element={
@@ -145,11 +137,14 @@ export const App = () => {
             </GuestOrRedirect>
           }
         />
+        <Route path="/login" element={<Navigate to="/login/customer" replace />} />
+
+        {/* Partner Portal (Rider & Restaurant) at /partner and /login/partner */}
         <Route
-          path="/login/admin"
+          path="/partner"
           element={
-            <GuestOrRedirect expectedRoles={['admin', 'super_admin']}>
-              <AdminLoginPage />
+            <GuestOrRedirect expectedRoles={['rider', 'vendor']}>
+              <PartnerLoginPage />
             </GuestOrRedirect>
           }
         />
@@ -161,38 +156,38 @@ export const App = () => {
             </GuestOrRedirect>
           }
         />
-
-        {/* Legacy partner path aliases */}
-        <Route path="/partner" element={<Navigate to="/login/partner" replace />} />
-        <Route path="/partner/login" element={<Navigate to="/login/partner" replace />} />
+        <Route path="/partner/login" element={<Navigate to="/partner" replace />} />
         <Route path="/partner/rider" element={<Navigate to="/rider" replace />} />
         <Route path="/partner/vendor" element={<Navigate to="/vendor" replace />} />
 
-        {/* Role-Protected Dashboards */}
+        {/* Admin Portal at /admin (shows AdminLoginPage if not signed in) & /login/admin */}
         <Route
-          path="/customer/*"
+          path="/login/admin"
           element={
-            <ProtectedRoute allowedRoles={['customer']} loginPath="/login/customer">
-              <CustomerApp />
-            </ProtectedRoute>
+            <GuestOrRedirect expectedRoles={['admin', 'super_admin']}>
+              <AdminLoginPage />
+            </GuestOrRedirect>
           }
         />
+
+        {/* Role-Protected Dashboards */}
         <Route
           path="/rider/*"
           element={
-            <ProtectedRoute allowedRoles={['rider']} loginPath="/login/partner">
-              <RiderPanel onLogout={() => handleLogout('/login/partner')} />
+            <ProtectedRoute allowedRoles={['rider']} loginPath="/partner">
+              <RiderPanel onLogout={() => handleLogout('/partner')} />
             </ProtectedRoute>
           }
         />
         <Route
           path="/vendor/*"
           element={
-            <ProtectedRoute allowedRoles={['vendor']} loginPath="/login/partner">
-              <VendorPanel onLogout={() => handleLogout('/login/partner')} />
+            <ProtectedRoute allowedRoles={['vendor']} loginPath="/partner">
+              <VendorPanel onLogout={() => handleLogout('/partner')} />
             </ProtectedRoute>
           }
         />
+        <Route path="/restaurant/*" element={<Navigate to="/vendor" replace />} />
         <Route
           path="/admin/*"
           element={

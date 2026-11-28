@@ -6,7 +6,7 @@ import { authApiRequest } from '../../services/api';
 export const getDashboardPathForRole = (role) => {
   switch (role) {
     case 'customer':
-      return '/customer';
+      return '/';
     case 'admin':
     case 'super_admin':
       return '/admin';
@@ -15,7 +15,7 @@ export const getDashboardPathForRole = (role) => {
     case 'vendor':
       return '/vendor';
     default:
-      return '/login';
+      return '/';
   }
 };
 
@@ -24,11 +24,11 @@ export const AuthLayoutShell = ({ title, subtitle, badge, showBack = true, child
     <div className="w-full max-w-md">
       {showBack && (
         <Link
-          to="/login"
+          to="/"
           className="inline-flex items-center gap-1.5 text-xs font-bold text-[#FFD000] hover:underline mb-3"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>All V RIDE Login Options</span>
+          <span>Back to V RIDE</span>
         </Link>
       )}
 
