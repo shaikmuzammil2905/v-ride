@@ -13,6 +13,9 @@ export const ProfileScreen = ({ onNavigate }) => {
   const [userPhone] = useState(currentUser?.phone || '+91 98765 43210');
   const [showReferModal, setShowReferModal] = useState(false);
   const [showPassModal, setShowPassModal] = useState(false);
+  const [activeInfoModal, setActiveInfoModal] = useState(null); // 'safety' | 'rewards' | 'settings'
+  const [notifEnabled, setNotifEnabled] = useState(true);
+  const [language, setLanguage] = useState('English');
 
   // V RIDE Profile Menu Items matching image copy 31.png
   const profileMenuItems = [
@@ -20,13 +23,13 @@ export const ProfileScreen = ({ onNavigate }) => {
       id: 'help',
       title: 'Help & Support',
       icon: HelpCircle,
-      action: () => alert('24/7 V RIDE Support: Call 1800-200-8743 or email support@vride.in')
+      action: () => onNavigate && onNavigate('support')
     },
     {
       id: 'payment',
       title: 'Payments & UPI',
       icon: CreditCard,
-      action: () => alert('V RIDE Payments: UPI, Credit/Debit Cards, NetBanking and Cash on Delivery enabled.')
+      action: () => onNavigate && onNavigate('wallet')
     },
     {
       id: 'my_rides',
@@ -44,7 +47,7 @@ export const ProfileScreen = ({ onNavigate }) => {
       id: 'safety',
       title: 'Safety & Emergency SOS',
       icon: Shield,
-      action: () => alert('V RIDE Safety: 24/7 Police SOS (112), Verified Drivers, Live GPS route sharing.')
+      action: () => setActiveInfoModal('safety')
     },
     {
       id: 'refer',
@@ -57,7 +60,7 @@ export const ProfileScreen = ({ onNavigate }) => {
       id: 'rewards',
       title: 'My Rewards',
       icon: Award,
-      action: () => alert('My Rewards: You have 250 V RIDE Coins and 3 active discount coupons!')
+      action: () => setActiveInfoModal('rewards')
     },
     {
       id: 'pass',
@@ -69,7 +72,7 @@ export const ProfileScreen = ({ onNavigate }) => {
       id: 'settings',
       title: 'Settings',
       icon: Settings,
-      action: () => alert('V RIDE Settings: Language (English), Notifications (Enabled), Dark Mode (Auto).')
+      action: () => setActiveInfoModal('settings')
     }
   ];
 
@@ -228,7 +231,7 @@ export const ProfileScreen = ({ onNavigate }) => {
 
       {/* PASS MODAL */}
       {showPassModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[1100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-sm w-full p-5 space-y-3 text-center">
             <div className="w-14 h-14 rounded-full bg-yellow-100 text-3xl mx-auto flex items-center justify-center">
               ⚡
@@ -240,14 +243,109 @@ export const ProfileScreen = ({ onNavigate }) => {
             <div className="p-3 bg-yellow-50 border border-yellow-300 rounded-2xl text-xs font-bold text-gray-800">
               ₹99 / month · 10 Discount Coupons · Zero Surge Fare
             </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowPassModal(false)}
+                className="flex-1 py-3 rounded-2xl bg-gray-100 text-gray-800 font-bold text-xs"
+              >
+                Close
+              </button>
+              <button
+                onClick={() => setShowPassModal(false)}
+                className="glass-btn-yellow flex-1 py-3 rounded-2xl text-black font-black text-xs"
+              >
+                Activate Pass
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* IN-APP SAFETY / REWARDS / SETTINGS MODALS (REPLACES BROWSER ALERTS) */}
+      {activeInfoModal && (
+        <div className="fixed inset-0 z-[1100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-sm w-full p-5 space-y-3.5">
+            <div className="flex items-center justify-between pb-2 border-b border-gray-100">
+              <h3 className="font-black text-sm text-gray-900 uppercase">
+                {activeInfoModal === 'safety'
+                  ? 'Safety & Emergency SOS'
+                  : activeInfoModal === 'rewards'
+                  ? 'My Rewards & Coupons'
+                  : 'App Settings'}
+              </h3>
+              <button
+                onClick={() => setActiveInfoModal(null)}
+                className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-xs font-bold"
+              >
+                ✕
+              </button>
+            </div>
+
+            {activeInfoModal === 'safety' && (
+              <div className="space-y-2.5 text-xs">
+                <div className="p-3 rounded-2xl bg-red-50 border border-red-200 text-red-900 font-bold">
+                  🚨 24/7 Police Emergency SOS: Call 112
+                </div>
+                <p className="text-gray-600">
+                  All V RIDE partners are police-verified with live GPS route sharing and OTP-protected trip starts.
+                </p>
+                <a
+                  href="tel:112"
+                  className="block w-full text-center py-3 rounded-2xl bg-red-600 text-white font-black"
+                >
+                  Call Emergency 112
+                </a>
+              </div>
+            )}
+
+            {activeInfoModal === 'rewards' && (
+              <div className="space-y-2.5 text-xs">
+                <div className="p-3 rounded-2xl bg-yellow-50 border border-yellow-300 flex justify-between items-center">
+                  <span className="font-black">V RIDE Coins</span>
+                  <span className="text-base font-black text-black">250 Coins</span>
+                </div>
+                <div className="p-3 rounded-2xl bg-gray-50 border border-gray-200">
+                  <span className="font-black block">VRIDE20</span>
+                  <span className="text-[11px] text-gray-500">20% OFF on Food Orders</span>
+                </div>
+                <div className="p-3 rounded-2xl bg-gray-50 border border-gray-200">
+                  <span className="font-black block">FIRST50</span>
+                  <span className="text-[11px] text-gray-500">Flat ₹50 OFF on Bike & Auto Rides</span>
+                </div>
+              </div>
+            )}
+
+            {activeInfoModal === 'settings' && (
+              <div className="space-y-3 text-xs">
+                <div>
+                  <label className="font-bold text-gray-500 block mb-1">App Language</label>
+                  <select
+                    value={language}
+                    onChange={(e) => setLanguage(e.target.value)}
+                    className="w-full p-2.5 rounded-xl border border-gray-200 font-bold"
+                  >
+                    <option>English</option>
+                    <option>Telugu (తెలుగు)</option>
+                    <option>Hindi (हिन्दी)</option>
+                  </select>
+                </div>
+                <label className="flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-gray-200 font-bold">
+                  <span>Push Notifications</span>
+                  <input
+                    type="checkbox"
+                    checked={notifEnabled}
+                    onChange={(e) => setNotifEnabled(e.target.checked)}
+                    className="w-4 h-4 accent-black"
+                  />
+                </label>
+              </div>
+            )}
+
             <button
-              onClick={() => {
-                alert('Power Pass activated successfully on your account!');
-                setShowPassModal(false);
-              }}
-              className="glass-btn-yellow w-full py-3 rounded-2xl text-black font-black text-xs"
+              onClick={() => setActiveInfoModal(null)}
+              className="glass-btn-yellow w-full py-2.5 rounded-2xl text-black font-black text-xs"
             >
-              Activate Power Pass
+              Done
             </button>
           </div>
         </div>

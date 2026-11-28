@@ -4,6 +4,7 @@ import {
   Plus, Minus, ArrowRight, Tag, X, CheckCircle2
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import { openRazorpayCheckout } from '../../services/api';
 
 export const RestaurantDetail = ({ onBack, onNavigateToTrack }) => {
   const {
@@ -75,35 +76,52 @@ export const RestaurantDetail = ({ onBack, onNavigateToTrack }) => {
   const total = Math.max(0, cartSubtotal + deliveryFee + tax - discount);
 
   const handlePlaceOrder = () => {
-    const newOrder = {
-      id: 'ord_' + Math.floor(10000 + Math.random() * 90000),
-      restaurantName: 'Paradise Biryani',
-      items: cartItems,
-      subtotal: cartSubtotal,
-      deliveryFee,
-      tax,
-      discount,
-      total,
-      deliveryAddress: `Flat 402, Lotus Residency, ${selectedLocation}`,
-      partnerName: 'Ramesh K',
-      partnerPhone: '+91 98480 12345',
-      partnerRating: 4.8,
-      partnerTrips: '2,341 trips',
-      partnerAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-      status: 'arriving',
-      currentStep: 4,
-      etaText: 'Arriving in 8 min',
-      otp: '4829',
-      paymentMethod: paymentMethod.toUpperCase(),
-      createdAt: new Date().toISOString()
+    const finalizeOrder = () => {
+      const newOrder = {
+        id: 'ord_' + Math.floor(10000 + Math.random() * 90000),
+        restaurantName: 'Paradise Biryani',
+        items: cartItems,
+        subtotal: cartSubtotal,
+        deliveryFee,
+        tax,
+        discount,
+        total,
+        deliveryAddress: `Flat 402, Lotus Residency, ${selectedLocation}`,
+        partnerName: 'Ramesh K',
+        partnerPhone: '+91 98480 12345',
+        partnerRating: 4.8,
+        partnerTrips: '2,341 trips',
+        partnerAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+        status: 'arriving',
+        currentStep: 4,
+        etaText: 'Arriving in 8 min',
+        otp: '4829',
+        paymentMethod: paymentMethod.toUpperCase(),
+        createdAt: new Date().toISOString()
+      };
+      setActiveFoodOrder(newOrder);
+      setShowCartModal(false);
+      onNavigateToTrack();
     };
-    setActiveFoodOrder(newOrder);
-    setShowCartModal(false);
-    onNavigateToTrack();
+
+    if (paymentMethod === 'upi') {
+      openRazorpayCheckout({
+        amount: total,
+        name: 'V RIDE Food',
+        description: 'Paradise Biryani Order',
+        purpose: 'food_order',
+        user: currentUser,
+        onSuccess: () => finalizeOrder(),
+        onFailure: () => {}
+      });
+      return;
+    }
+
+    finalizeOrder();
   };
 
   return (
-    <div className="flex flex-col min-h-full bg-white pb-24 select-none">
+    <div className={`flex flex-col bg-white select-none ${cartCount > 0 ? 'main-content-with-cart' : 'pb-3'}`}>
       {/* Banner & Header matching Screen 7 in image.png */}
       <div className="relative h-48 bg-gray-900">
         <img
@@ -251,7 +269,7 @@ export const RestaurantDetail = ({ onBack, onNavigateToTrack }) => {
 
       {/* Grand & Bright Floating Cart Bar (Above Bottom Navigation Bar) */}
       {cartCount > 0 && (
-        <div className="fixed bottom-[78px] inset-x-0 max-w-md mx-auto px-4 z-40 pointer-events-auto">
+        <div className="floating-cart max-w-md mx-auto pointer-events-auto animate-slideUp">
           <div
             onClick={() => setShowCartModal(true)}
             className="bg-[#080808] border-2 border-[#FFD600] text-white p-3.5 rounded-2xl shadow-[0_12px_35px_rgba(0,0,0,0.35)] flex items-center justify-between cursor-pointer hover:bg-neutral-900 transition active:scale-98"
@@ -281,8 +299,8 @@ export const RestaurantDetail = ({ onBack, onNavigateToTrack }) => {
 
       {/* CART & CHECKOUT MODAL */}
       {showCartModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div className="bg-white w-full max-w-sm rounded-t-3xl sm:rounded-2xl p-5 shadow-2xl max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-[1100] bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+          <div className="bg-white w-full max-w-sm rounded-t-3xl sm:rounded-2xl p-5 pb-6 shadow-2xl max-h-[86dvh] overflow-y-auto">
             <div className="flex items-center justify-between pb-3 border-b border-gray-100">
               <h3 className="font-extrabold text-base text-gray-900">Your Cart</h3>
               <button
