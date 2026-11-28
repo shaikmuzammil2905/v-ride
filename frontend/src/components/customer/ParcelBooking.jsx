@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import {
   ArrowLeft, Check, Package, ChevronDown, CheckCircle2,
-  ShieldCheck, Phone, MapPin, ArrowRight
+  ShieldCheck, Phone, MapPin, ArrowRight, Menu, Bell
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import DrawerMenu from '../common/DrawerMenu';
 
 export const ParcelBooking = ({ onNavigate, onBack }) => {
   const { setActiveParcel } = useApp();
+  const [showDrawer, setShowDrawer] = useState(false);
 
   const [pickup, setPickup] = useState('Miyapur, Hyderabad');
   const [delivery, setDelivery] = useState('Gachibowli, Hyderabad');
@@ -50,17 +52,86 @@ export const ParcelBooking = ({ onNavigate, onBack }) => {
 
   return (
     <div className="flex flex-col bg-white pb-2 select-none">
-      {/* Header matching mobile design */}
-      <div className="flex items-center px-4 py-3.5 border-b border-gray-100 bg-white sticky top-0 z-20">
-        <button
-          onClick={onBack}
-          className="p-1 rounded-full hover:bg-gray-100 text-gray-800 transition mr-3 active:scale-95"
-          aria-label="Go back"
-        >
-          <ArrowLeft className="w-5 h-5 stroke-[2.2]" />
-        </button>
-        <h1 className="text-base font-bold text-gray-900">Send Parcels</h1>
-      </div>
+      {/* 1. TOP NAVIGATION BAR (#11151C) - EXACT MATCH TO image copy 42.png */}
+      <header className="sticky top-0 z-30 bg-[#11151C] px-4 py-3 md:px-6">
+        <div className="mx-auto flex max-w-6xl items-center justify-between">
+          <button
+            type="button"
+            onClick={() => setShowDrawer(true)}
+            aria-label="Open Menu"
+            className="rounded-lg p-1.5 text-white transition hover:bg-white/10 active:scale-95"
+          >
+            <Menu className="h-6 w-6" />
+          </button>
+
+          <div className="flex items-center gap-2.5 cursor-pointer" onClick={onBack}>
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#FFD400] shadow-md">
+              <span className="text-xl font-black tracking-tighter text-[#11151C]">V</span>
+            </div>
+            <span className="text-lg font-black tracking-wide text-[#FFD400]">V RIDE</span>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => onNavigate && onNavigate('support')}
+            aria-label="Notifications"
+            className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-white/5 text-white transition hover:bg-white/10"
+          >
+            <Bell className="h-5 w-5" />
+            <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-[#FFD400] ring-2 ring-[#11151C]" />
+          </button>
+        </div>
+      </header>
+
+      {/* 2. PARCEL HERO BANNER SECTION - EXACT MATCH TO image copy 42.png */}
+      <section className="relative overflow-hidden bg-gradient-to-r from-[#11151C] via-[#171C24] to-[#1F2631] pt-5 pb-11">
+        <div className="pointer-events-none absolute -left-16 top-0 h-40 w-40 rounded-full bg-gradient-to-br from-[#FFD400]/25 to-transparent blur-xl" aria-hidden="true" />
+        <div className="pointer-events-none absolute right-6 top-2 h-44 w-56 rounded-t-full border-t-4 border-[#FFD400]/30 bg-gradient-to-b from-[#FFD400]/15 to-transparent" aria-hidden="true" />
+
+        <div className="relative z-10 mx-auto grid max-w-6xl grid-cols-12 items-center px-4">
+          <div className="col-span-7 pr-2">
+            <h1 className="text-2xl font-extrabold tracking-tight text-white">
+              Send <span className="text-[#FFD400]">Parcels</span>
+            </h1>
+            <p className="mt-1 text-xs font-medium tracking-wide text-gray-300">
+              Fast • Safe • Reliable Delivery
+            </p>
+          </div>
+
+          <div className="relative col-span-5 flex items-center justify-end">
+            <div className="relative flex items-center">
+              <div className="mr-1 hidden flex-col gap-1 sm:flex">
+                <span className="h-0.5 w-5 rounded-full bg-[#FFD400]/80" />
+                <span className="ml-1.5 h-0.5 w-4 rounded-full bg-[#FFD400]/50" />
+              </div>
+
+              <img
+                src="/images/hero-rider.jpg"
+                alt="V Ride Parcel Delivery Rider"
+                className="relative z-10 h-24 w-auto object-contain mix-blend-lighten drop-shadow-[0_10px_14px_rgba(0,0,0,0.65)]"
+              />
+
+              <div className="relative -ml-2 flex flex-col items-center">
+                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#FFD400]/15 text-[#FFD400]">
+                  <MapPin className="h-4 w-4 fill-[#FFD400] text-[#11151C]" />
+                </div>
+                <svg viewBox="0 0 80 30" className="mt-0.5 h-5 w-12 text-white/60" fill="none">
+                  <path d="M2 25 Q 35 28, 75 5" stroke="currentColor" strokeWidth="2" strokeDasharray="4 4" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="pointer-events-none absolute bottom-0 left-0 right-0 w-full overflow-hidden leading-none">
+          <svg viewBox="0 0 1440 110" preserveAspectRatio="none" className="h-8 w-full">
+            <path d="M0,85 C480,105 960,15 1440,75 L1440,110 L0,110 Z" fill="#FFD400" />
+            <path d="M0,100 C480,115 960,35 1440,95 L1440,110 L0,110 Z" fill="#FFFFFF" />
+          </svg>
+        </div>
+      </section>
+
+      <DrawerMenu isOpen={showDrawer} onClose={() => setShowDrawer(false)} onNavigate={onNavigate} />
 
       {!isBooked ? (
         <div className="px-5 pt-4 space-y-4">

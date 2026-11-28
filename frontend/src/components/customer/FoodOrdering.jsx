@@ -1,52 +1,99 @@
 import React, { useState } from 'react';
 import {
-  ArrowLeft, Search, ChevronDown, Star, Clock, Tag,
-  ChevronRight, Heart, Filter, Mic, Zap, ShoppingBag,
-  Plus, Check, RotateCcw, Sparkles
+  Menu, Bell, Utensils, MapPin, ChevronDown, Search,
+  Star, ChevronRight, Mic, ShoppingBag
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
+import DrawerMenu from '../common/DrawerMenu';
 
-export const FoodOrdering = ({ onNavigate, onBack, onSelectRestaurant }) => {
-  const { selectedLocation, cartCount, cartSubtotal, addToCart } = useApp();
+const DELIVERY_LOCATIONS = [
+  'Miyapur, Hyderabad',
+  'Kukatpally, Hyderabad',
+  'Madhapur, Hyderabad',
+  'Gachibowli, Hyderabad'
+];
 
-  // Food sub-tabs: 'food' | 'bolt' | '99store' | 'eatright' | 'reorder'
-  const [currentFoodTab, setCurrentFoodTab] = useState('food');
+// Real Food Photography matching image copy 44.png (Zero emojis)
+const FOOD_CATEGORIES = [
+  {
+    id: 'dosa',
+    label: 'Dosa',
+    image: 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?w=240&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'idli',
+    label: 'Idli',
+    image: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=240&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'poori',
+    label: 'Poori',
+    image: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=240&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'cakes',
+    label: 'Cakes',
+    image: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=240&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'khichdi',
+    label: 'Khichdi',
+    image: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=240&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'biryani',
+    label: 'Biryani',
+    image: '/images/food-biryani.jpg'
+  }
+];
 
-  // Search & Filters
+const NINETY_NINE_MEALS = [
+  {
+    id: 'item_idli_99',
+    categoryId: 'idli',
+    name: 'Idli (3 pcs)',
+    price: 35,
+    originalPrice: 50,
+    isVeg: true,
+    image: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=300&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'item_dosa_plain',
+    categoryId: 'dosa',
+    name: 'Plain Dosa',
+    price: 39,
+    originalPrice: 59,
+    isVeg: true,
+    image: 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?w=300&auto=format&fit=crop&q=80'
+  },
+  {
+    id: 'item_puli_dosa',
+    categoryId: 'khichdi',
+    name: 'Pulibongaram ...',
+    price: 29,
+    originalPrice: 50,
+    isVeg: true,
+    image: 'https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=300&auto=format&fit=crop&q=80'
+  }
+];
+
+export const FoodOrdering = ({ onNavigate, onSelectRestaurant }) => {
+  const { selectedLocation, setSelectedLocation, cartCount, cartSubtotal, addToCart } = useApp();
+  const [locationOpen, setLocationOpen] = useState(false);
+  const [showDrawer, setShowDrawer] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [vegOnly, setVegOnly] = useState(false);
   const [activeSubFilter, setActiveSubFilter] = useState(':: ALL');
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [cartCounts, setCartCounts] = useState({});
 
-  // What's on your mind categories
-  const whatsOnYourMind = [
-    { name: 'Biryani', icon: '🍛' },
-    { name: 'Dosa', icon: '🥞' },
-    { name: 'Idli', icon: '🥟' },
-    { name: 'Poori', icon: '🫓' },
-    { name: 'Cakes', icon: '🍰' },
-    { name: 'Khichdi', icon: '🍲' },
-    { name: 'Burgers', icon: '🍔' },
-    { name: 'Pizza', icon: '🍕' }
-  ];
-
-  // 99 Store Items matching image copy 30.png
-  const store99Items = [
-    { id: 'item_idli_99', name: 'Idli (3 pcs)', price: 35, originalPrice: 50, badge: 'ITEMS AT ₹29', rating: 4.2, reviews: 80, time: '20–25 mins', restaurant: 'Sri Parameswari Tasty Foods', isVeg: true },
-    { id: 'item_dosa_plain', name: 'Plain Dosa', price: 39, originalPrice: 59, badge: 'ITEMS AT ₹10', rating: 3.3, reviews: 5, time: '25–30 mins', restaurant: 'Jai Sri Tea and Tiffins', isVeg: true },
-    { id: 'item_puli_dosa', name: 'Pulibongaram', price: 29, originalPrice: 50, badge: 'ITEMS AT ₹29', rating: 4.3, reviews: 33, time: '25–30 mins', restaurant: 'Sri Parameswari Tasty Foods', isVeg: true }
-  ];
-
-  // Regular Restaurants
   const restaurants = [
     {
       id: 'rest_paradise',
       name: 'Paradise Biryani',
       rating: 4.5,
-      reviewsCount: '12.5k+',
       cuisines: ['Biryani', 'Indian', 'Hyderabadi'],
       deliveryTime: '30–40 min',
-      deliveryFee: '₹40 Delivery Fee',
-      minOrder: '₹200 Min Order',
       tag: '50% OFF',
       image: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=500&auto=format&fit=crop&q=80'
     },
@@ -54,11 +101,8 @@ export const FoodOrdering = ({ onNavigate, onBack, onSelectRestaurant }) => {
       id: 'rest_cakezone',
       name: 'Cheesecakes By CakeZone',
       rating: 4.1,
-      reviewsCount: '167',
       cuisines: ['Desserts', 'Bakery'],
       deliveryTime: '45–55 MINS',
-      deliveryFee: '₹35 Delivery Fee',
-      minOrder: '₹150 Min Order',
       tag: '50% off upto ₹100',
       image: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=500&auto=format&fit=crop&q=80'
     },
@@ -66,71 +110,161 @@ export const FoodOrdering = ({ onNavigate, onBack, onSelectRestaurant }) => {
       id: 'rest_dominos',
       name: "Domino's Pizza",
       rating: 4.3,
-      reviewsCount: '18.2k+',
       cuisines: ['Pizzas', 'Italian', 'Pastas'],
       deliveryTime: '20–30 min',
-      deliveryFee: 'FREE Delivery',
-      minOrder: '₹99 Min Order',
       tag: 'Flat ₹100 OFF',
       image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=500&auto=format&fit=crop&q=80'
     }
   ];
 
-  return (
-    <div className="flex flex-col min-h-full bg-[#f8f9fa] pb-28 select-none">
-      {/* ============================================================ */}
-      {/* 1. DARK HERO SECTION WITH BIRYANI ILLUSTRATION & YELLOW WAVE */}
-      {/* EXACT MATCH TO image copy 30.png                             */}
-      {/* ============================================================ */}
-      <div className="relative bg-[#0b0e14] text-white pt-3 pb-5 px-4 overflow-hidden">
-        {/* Glow */}
-        <div className="absolute -top-12 -right-12 w-48 h-48 bg-[#FFD600]/15 rounded-full blur-3xl pointer-events-none"></div>
+  const handleAddMeal = (meal) => {
+    setCartCounts((prev) => ({ ...prev, [meal.id]: (prev[meal.id] || 0) + 1 }));
+    addToCart({ id: meal.id, name: meal.name, price: meal.price }, 'rest_99');
+  };
 
-        {/* Top Header Row with Back and Location */}
-        <div className="flex items-center justify-between relative z-10">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={onBack}
-              className="p-1.5 rounded-full glass-btn-dark hover:bg-white/10 text-white transition active:scale-95"
-              aria-label="Go back"
-            >
-              <ArrowLeft className="w-5 h-5 stroke-[2.2]" />
-            </button>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="text-[#FFD600] font-black text-xs truncate max-w-[150px]">{selectedLocation}</span>
-                <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
-              </div>
-              <p className="text-[10px] text-gray-400 font-semibold truncate max-w-[200px]">
-                Miyapur, Hyderabad · Live Kitchens
-              </p>
+  const visibleMeals = selectedCategory
+    ? NINETY_NINE_MEALS.filter((item) => item.categoryId === selectedCategory)
+    : NINETY_NINE_MEALS;
+
+  return (
+    <div className="flex flex-col bg-white pb-2 select-none">
+      <style>{`
+        @keyframes floatBowl {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-6px); }
+        }
+        @keyframes riseSteam {
+          0% { transform: translateY(6px) scale(0.92); opacity: 0; }
+          50% { opacity: 0.55; }
+          100% { transform: translateY(-18px) scale(1.12); opacity: 0; }
+        }
+        .animate-bowl-float { animation: floatBowl 4s ease-in-out infinite; }
+        .animate-steam-1 { animation: riseSteam 3.2s ease-out infinite; }
+        .animate-steam-2 { animation: riseSteam 3.8s ease-out 1.1s infinite; }
+        .animate-steam-3 { animation: riseSteam 3.5s ease-out 2s infinite; }
+      `}</style>
+
+      {/* 1. TOP NAVIGATION BAR (#11151C) - EXACT MATCH TO image copy 43.png */}
+      <header className="sticky top-0 z-40 bg-[#11151C] px-4 py-3 md:px-6">
+        <div className="mx-auto flex max-w-6xl items-center justify-between">
+          <button
+            type="button"
+            onClick={() => setShowDrawer(true)}
+            aria-label="Open Menu"
+            className="rounded-lg p-1.5 text-white transition hover:bg-white/10"
+          >
+            <Menu className="h-6 w-6" />
+          </button>
+
+          <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => onNavigate('home')}>
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#FFD400] shadow-md">
+              <span className="text-xl font-black tracking-tighter text-[#11151C]">V</span>
+            </div>
+            <span className="text-lg font-black tracking-wide text-[#FFD400]">V RIDE</span>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => onNavigate('support')}
+            aria-label="Notifications"
+            className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-white/5 text-white transition hover:bg-white/10"
+          >
+            <Bell className="h-5 w-5" />
+            <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-[#FFD400] ring-2 ring-[#11151C]" />
+          </button>
+        </div>
+      </header>
+
+      {/* 2. DARK HERO BANNER WITH ANIMATED BIRYANI BOWL - EXACT MATCH TO image copy 43.png */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#11151C] via-[#151A22] to-[#1D242E] pt-4 pb-11">
+        <div className="pointer-events-none absolute bottom-0 right-0 h-28 w-3/5 overflow-hidden">
+          <svg viewBox="0 0 600 180" preserveAspectRatio="none" className="h-full w-full">
+            <path d="M40,180 Q280,105 600,45 L600,180 Z" fill="#FFD400" />
+          </svg>
+        </div>
+
+        <div className="relative z-10 mx-auto grid max-w-6xl grid-cols-12 items-center px-4">
+          <div className="col-span-7 pr-2">
+            <h1 className="text-2xl font-extrabold tracking-tight text-white">
+              Food <span className="text-[#FFD400]">Delivery</span>
+            </h1>
+            <div className="mt-1.5 flex items-center gap-1.5 text-xs font-medium text-gray-200">
+              <Utensils className="h-3.5 w-3.5 shrink-0 text-[#FFD400]" />
+              <span>From Your Favorite Restaurants</span>
             </div>
           </div>
 
-          <span className="text-[10px] font-black uppercase text-black bg-[#FFD600] px-2.5 py-0.5 rounded-full">
-            V RIDE FOOD
-          </span>
-        </div>
+          <div className="relative col-span-5 flex items-center justify-end">
+            <div className="relative flex items-center justify-center">
+              <div className="pointer-events-none absolute -top-4 left-1/4 h-10 w-10 rounded-full bg-white/25 blur-md animate-steam-1" aria-hidden="true" />
+              <div className="pointer-events-none absolute -top-6 left-1/2 h-12 w-12 rounded-full bg-white/20 blur-md animate-steam-2" aria-hidden="true" />
+              <div className="pointer-events-none absolute -top-3 right-1/4 h-9 w-9 rounded-full bg-white/25 blur-md animate-steam-3" aria-hidden="true" />
 
-        {/* Hero Title & Biryani Illustration */}
-        <div className="mt-4 flex items-center justify-between relative z-10">
-          <div>
-            <h1 className="text-lg font-black text-white leading-tight">Food Delivery</h1>
-            <p className="text-xs text-gray-300 font-medium mt-0.5">
-              From Your Favorite Restaurants in Hyderabad
-            </p>
-          </div>
-          <div className="w-16 h-14 shrink-0 flex items-center justify-center">
-            <img
-              src="/images/food-biryani.jpg"
-              alt="Hyderabadi Biryani"
-              className="w-full h-full object-contain rounded-xl mix-blend-lighten"
-            />
+              <span className="pointer-events-none absolute right-2 top-5 h-1.5 w-1.5 rounded-full bg-[#FFD400] opacity-75 animate-pulse" aria-hidden="true" />
+              <span className="pointer-events-none absolute left-1 bottom-6 h-1 w-1 rounded-full bg-emerald-400 opacity-80 animate-ping" aria-hidden="true" />
+
+              <img
+                src="/images/food-biryani.jpg"
+                alt="Hot Chicken Biryani Bowl"
+                className="animate-bowl-float relative z-10 h-24 w-auto object-contain mix-blend-lighten drop-shadow-[0_14px_18px_rgba(0,0,0,0.75)]"
+              />
+            </div>
           </div>
         </div>
+      </section>
 
-        {/* Search Bar with Mic & VEG Toggle Switch inside Dark Header */}
-        <div className="mt-3 flex items-center gap-2 relative z-10">
+      {/* 3. OVERLAPPING BOTTOM DELIVERY LOCATION BAR - EXACT MATCH TO image copy 43.png */}
+      <div className="relative z-20 mx-auto w-full -mt-6 max-w-6xl px-2.5">
+        <div className="relative rounded-3xl border border-white/20 bg-[#181E27] px-3.5 py-2.5 shadow-xl">
+          <div className="flex items-center justify-between gap-2">
+            <div className="relative flex items-center gap-2 min-w-0">
+              <MapPin className="h-5 w-5 shrink-0 text-[#FFD400]" />
+              <div className="min-w-0">
+                <button
+                  type="button"
+                  onClick={() => setLocationOpen(!locationOpen)}
+                  className="flex flex-wrap items-center gap-1 text-left text-xs font-bold text-white"
+                >
+                  <span>Deliver to</span>
+                  <span className="text-[#FFD400] truncate max-w-[130px]">{selectedLocation}</span>
+                  <ChevronDown className="h-3.5 w-3.5 text-[#FFD400] shrink-0" />
+                </button>
+                <p className="mt-0.5 text-[10px] font-medium text-gray-300 truncate">
+                  {selectedLocation} • <span className="font-semibold text-white">Live Kitchens</span>
+                </p>
+              </div>
+
+              {locationOpen && (
+                <div className="absolute left-0 top-12 z-50 w-52 rounded-xl border border-gray-700 bg-[#181E27] py-1.5 shadow-2xl">
+                  {DELIVERY_LOCATIONS.map((loc) => (
+                    <button
+                      key={loc}
+                      type="button"
+                      onClick={() => {
+                        setSelectedLocation(loc);
+                        setLocationOpen(false);
+                      }}
+                      className={`block w-full px-4 py-2 text-left text-xs transition hover:bg-white/10 ${
+                        selectedLocation === loc ? 'font-bold text-[#FFD400]' : 'text-gray-200'
+                      }`}
+                    >
+                      {loc}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <span className="shrink-0 rounded-full bg-[#FFD400] px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-[#11151C] shadow-sm">
+              V RIDE FOOD
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* 4. SEARCH BAR & FILTER PILLS */}
+      <div className="px-3 pt-4 space-y-2.5">
+        <div className="flex items-center gap-2">
           <div className="relative flex-1">
             <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
@@ -138,154 +272,198 @@ export const FoodOrdering = ({ onNavigate, onBack, onSelectRestaurant }) => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search for 'Biryani', 'Pizza', 'Dosa'..."
-              className="w-full pl-9 pr-9 py-2 rounded-2xl glass-pill-dark text-xs font-bold text-white placeholder:text-gray-400 focus:outline-none"
+              className="w-full pl-9 pr-9 py-2 rounded-2xl border border-gray-200 bg-gray-50 text-xs font-bold text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#FFD400]"
             />
-            <Mic className="w-4 h-4 text-[#FFD600] absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer" />
+            <Mic className="w-4 h-4 text-[#D97706] absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer" />
           </div>
 
-          {/* VEG Switch Toggle Button */}
           <button
+            type="button"
             onClick={() => setVegOnly(!vegOnly)}
-            className={`px-3 py-2 rounded-2xl text-[10px] font-black flex items-center gap-1.5 transition active:scale-95 ${
-              vegOnly ? 'bg-emerald-600 text-white shadow-sm' : 'glass-pill-dark text-gray-200'
+            className={`px-3 py-2 rounded-2xl text-[10px] font-black flex items-center gap-1.5 border transition ${
+              vegOnly ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-gray-800 border-gray-200'
             }`}
           >
-            <span className={`w-2 h-2 rounded-full ${vegOnly ? 'bg-white' : 'bg-emerald-400'}`}></span>
+            <span className={`w-2 h-2 rounded-full ${vegOnly ? 'bg-white' : 'bg-emerald-500'}`} />
             <span>VEG</span>
           </button>
         </div>
 
-        {/* Bottom Curved Yellow Accent Wave */}
-        <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-[#FFD600]"></div>
-      </div>
-
-      {/* ============================================================ */}
-      {/* 2. SUB FILTER TABS (image copy 30.png)                       */}
-      {/* ============================================================ */}
-      <div className="px-4 pt-3 flex items-center gap-2 overflow-x-auto no-scrollbar text-xs">
-        {[':: ALL', '99 STORE', '🏷️ OFFERS', '⚡ BOLT', '❤️ FOR YOU'].map((tab) => {
-          const isActive = activeSubFilter === tab;
-          return (
-            <button
-              key={tab}
-              onClick={() => setActiveSubFilter(tab)}
-              className={`px-3.5 py-1.5 rounded-full whitespace-nowrap text-[11px] font-extrabold transition active:scale-95 ${
-                isActive
-                  ? 'glass-btn-yellow text-black'
-                  : 'glass-btn text-gray-800 hover:bg-gray-200/60'
-              }`}
-            >
-              {tab}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* ============================================================ */}
-      {/* 3. "WHAT'S ON YOUR MIND?" DISH CIRCLES                       */}
-      {/* ============================================================ */}
-      <div className="px-4 pt-3.5">
-        <h3 className="font-black text-sm text-gray-900 mb-2">What's on your mind?</h3>
-        <div className="flex gap-3 overflow-x-auto no-scrollbar pb-1">
-          {whatsOnYourMind.map((item, idx) => (
-            <div
-              key={idx}
-              onClick={() => setSearchQuery(item.name)}
-              className="flex flex-col items-center min-w-[56px] cursor-pointer group"
-            >
-              <div className="w-14 h-14 rounded-full bg-white border border-gray-200 flex items-center justify-center text-2xl group-hover:scale-105 group-hover:border-yellow-400 transition shadow-2xs">
-                {item.icon}
-              </div>
-              <span className="text-[11px] font-bold text-gray-800 mt-1 truncate">{item.name}</span>
-            </div>
-          ))}
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar text-xs">
+          {[':: ALL', '99 STORE', '🏷️ OFFERS', '⚡ BOLT', '❤️ FOR YOU'].map((tab) => {
+            const isActive = activeSubFilter === tab;
+            return (
+              <button
+                key={tab}
+                type="button"
+                onClick={() => setActiveSubFilter(tab)}
+                className={`px-3.5 py-1.5 rounded-full whitespace-nowrap text-[11px] font-extrabold transition ${
+                  isActive ? 'bg-[#FFD400] text-[#11151C] shadow-xs' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                {tab}
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      {/* ============================================================ */}
-      {/* 4. "99 STORE" SECTION WITH REAL GLASSY ADD BUTTONS           */}
-      {/* EXACT MATCH TO image copy 30.png                             */}
-      {/* ============================================================ */}
-      <div className="px-4 pt-3.5">
-        <div className="bg-[#FFFBF0] p-3.5 rounded-3xl border border-yellow-200/90 space-y-3 shadow-2xs">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5">
-              <span className="px-2 py-0.5 rounded-lg bg-black text-[#FFD600] font-black text-xs">99 store</span>
-              <span className="text-xs font-bold text-gray-900">Meals under ₹99</span>
+      {/* 5. "WHAT'S ON YOUR MIND?" & "99 STORE" (REAL FOOD PHOTOS) - EXACT MATCH TO image copy 44.png */}
+      <div className="mx-auto w-full max-w-6xl space-y-5 bg-white px-3 py-4">
+        <section>
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="text-base font-extrabold tracking-tight text-[#11151C]">
+              What&apos;s on your mind?
+            </h2>
+            <button
+              type="button"
+              onClick={() => setSelectedCategory(null)}
+              className="text-xs font-bold text-[#D97706] hover:text-[#B45309]"
+            >
+              View All &rarr;
+            </button>
+          </div>
+
+          <div className="grid grid-cols-6 gap-1.5 sm:gap-3">
+            {FOOD_CATEGORIES.map((cat) => {
+              const isActive = selectedCategory === cat.id;
+              return (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => setSelectedCategory(isActive ? null : cat.id)}
+                  className="group flex flex-col items-center text-center focus:outline-none"
+                >
+                  <div
+                    className={`flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl bg-[#FFF9DC] p-1 transition sm:h-16 sm:w-16 ${
+                      isActive ? 'ring-2 ring-[#FFD400] scale-105' : 'group-hover:scale-105'
+                    }`}
+                  >
+                    <img
+                      src={cat.image}
+                      alt={cat.label}
+                      className="h-full w-full rounded-xl object-cover"
+                    />
+                  </div>
+                  <span className="mt-1 text-[10px] font-semibold text-[#11151C] sm:text-xs">
+                    {cat.label}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+
+        <section className="rounded-2xl border border-[#FDE68A]/60 bg-[#FFFBE6] p-3">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="rounded-lg bg-[#11151C] px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-white">
+                99 STORE
+              </span>
+              <h3 className="text-xs font-extrabold text-[#11151C] sm:text-sm">
+                Meals at ₹99 + Free Delivery
+              </h3>
             </div>
-            <button className="text-xs font-extrabold text-blue-600 hover:underline">
-              View All →
+            <button
+              type="button"
+              onClick={() => setSelectedCategory(null)}
+              className="text-xs font-bold text-[#D97706] hover:text-[#B45309]"
+            >
+              View All &rarr;
             </button>
           </div>
 
           <div className="grid grid-cols-3 gap-2">
-            {store99Items.map((item) => (
-              <div key={item.id} className="bg-white p-2.5 rounded-2xl border border-gray-200 shadow-2xs flex flex-col justify-between">
-                <div>
-                  <span className="w-2 h-2 rounded-full bg-emerald-600 block mb-1"></span>
-                  <h4 className="font-extrabold text-[11px] text-gray-900 leading-tight truncate">{item.name}</h4>
-                  <div className="flex items-center gap-1 mt-1">
-                    <span className="font-black text-xs text-gray-900">₹{item.price}</span>
-                    <span className="text-[9px] text-gray-400 line-through">₹{item.originalPrice}</span>
-                  </div>
-                </div>
-                <button
-                  onClick={() => addToCart({ id: item.id, name: item.name, price: item.price }, 'rest_99')}
-                  className="glass-btn-yellow mt-2 w-full py-1 rounded-xl text-black font-black text-xs transition active:scale-95 flex items-center justify-center gap-0.5"
+            {visibleMeals.map((meal) => {
+              const count = cartCounts[meal.id] || 0;
+              return (
+                <div
+                  key={meal.id}
+                  className="flex flex-col justify-between rounded-2xl border border-gray-100 bg-white p-2 shadow-sm transition hover:shadow-md"
                 >
-                  <Plus className="w-3 h-3 stroke-[3]" />
-                  <span>ADD</span>
-                </button>
-              </div>
-            ))}
+                  <div>
+                    <div className="relative overflow-hidden rounded-xl bg-gray-50">
+                      <img src={meal.image} alt={meal.name} className="h-20 w-full object-cover" />
+                      {meal.isVeg && (
+                        <span
+                          aria-label="Pure Veg"
+                          className="absolute left-1.5 top-1.5 flex h-4 w-4 items-center justify-center rounded-sm border border-green-700 bg-white"
+                        >
+                          <span className="h-2 w-2 rounded-full bg-green-700" />
+                        </span>
+                      )}
+                    </div>
+
+                    <h4 className="mt-2 truncate text-[11px] font-bold text-[#11151C]">
+                      {meal.name}
+                    </h4>
+
+                    <div className="mt-0.5 flex items-baseline gap-1.5">
+                      <span className="text-xs font-extrabold text-[#11151C]">₹{meal.price}</span>
+                      <span className="text-[10px] font-medium text-gray-400 line-through">
+                        ₹{meal.originalPrice}
+                      </span>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => handleAddMeal(meal)}
+                    className="mt-2 w-full rounded-full bg-[#FFD400] py-1.5 text-[10px] font-black uppercase tracking-wide text-[#11151C] shadow-xs transition hover:bg-[#F5C400] active:scale-[0.98]"
+                  >
+                    {count > 0 ? `+ ADD (${count})` : '+ ADD'}
+                  </button>
+                </div>
+              );
+            })}
           </div>
-        </div>
+        </section>
       </div>
 
-      {/* ============================================================ */}
-      {/* 5. TOP RESTAURANTS TO EXPLORE (image copy 30.png)            */}
-      {/* ============================================================ */}
-      <div className="px-4 pt-4 space-y-3">
+      {/* 6. TOP RESTAURANTS TO EXPLORE */}
+      <div className="px-3 space-y-3 pb-3">
         <div className="flex items-center justify-between">
           <h3 className="font-black text-sm text-gray-900">Top Restaurants to Explore</h3>
           <span className="text-xs font-bold text-gray-500">137 Available</span>
         </div>
 
-        {restaurants.map((rest) => (
-          <div
-            key={rest.id}
-            onClick={() => onSelectRestaurant(rest.id)}
-            className="bg-white rounded-3xl border border-gray-200/80 shadow-xs overflow-hidden cursor-pointer hover:border-yellow-300 transition active:scale-99"
-          >
-            <div className="relative h-36 bg-gray-100">
-              <img src={rest.image} alt={rest.name} className="w-full h-full object-cover" />
-              <span className="absolute bottom-2.5 left-2.5 glass-btn-dark px-2.5 py-0.5 rounded-lg text-white font-black text-xs">
-                {rest.tag}
-              </span>
-            </div>
-
-            <div className="p-3.5 flex items-center justify-between">
-              <div>
-                <h4 className="font-black text-sm text-gray-900">{rest.name}</h4>
-                <div className="flex items-center gap-2 text-xs text-gray-500 mt-0.5">
-                  <span className="flex items-center gap-0.5 font-bold text-gray-900">
-                    <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
-                    {rest.rating}
-                  </span>
-                  <span>·</span>
-                  <span>{rest.deliveryTime}</span>
-                  <span>·</span>
-                  <span>{rest.cuisines.join(', ')}</span>
-                </div>
+        {restaurants
+          .filter((r) => !searchQuery || r.name.toLowerCase().includes(searchQuery.toLowerCase()))
+          .map((rest) => (
+            <div
+              key={rest.id}
+              onClick={() => onSelectRestaurant(rest.id)}
+              className="bg-white rounded-3xl border border-gray-200/80 shadow-xs overflow-hidden cursor-pointer hover:border-yellow-300 transition"
+            >
+              <div className="relative h-36 bg-gray-100">
+                <img src={rest.image} alt={rest.name} className="w-full h-full object-cover" />
+                <span className="absolute bottom-2.5 left-2.5 glass-btn-dark px-2.5 py-0.5 rounded-lg text-white font-black text-xs">
+                  {rest.tag}
+                </span>
               </div>
 
-              <button className="glass-btn-yellow px-3 py-1.5 rounded-xl text-black font-extrabold text-xs flex items-center gap-1 active:scale-95">
-                <span>View Menu</span>
-                <ChevronRight className="w-3.5 h-3.5 stroke-[2.5]" />
-              </button>
+              <div className="p-3.5 flex items-center justify-between">
+                <div>
+                  <h4 className="font-black text-sm text-gray-900">{rest.name}</h4>
+                  <div className="flex items-center gap-2 text-xs text-gray-500 mt-0.5">
+                    <span className="flex items-center gap-0.5 font-bold text-gray-900">
+                      <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
+                      {rest.rating}
+                    </span>
+                    <span>·</span>
+                    <span>{rest.deliveryTime}</span>
+                    <span>·</span>
+                    <span>{rest.cuisines.join(', ')}</span>
+                  </div>
+                </div>
+
+                <button className="rounded-xl bg-[#FFD400] px-3 py-1.5 text-black font-extrabold text-xs flex items-center gap-1 active:scale-95">
+                  <span>View Menu</span>
+                  <ChevronRight className="w-3.5 h-3.5 stroke-[2.5]" />
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
       </div>
 
       {/* FLOATING CART PILL IF ITEMS ADDED */}
@@ -293,20 +471,22 @@ export const FoodOrdering = ({ onNavigate, onBack, onSelectRestaurant }) => {
         <div className="fixed bottom-20 left-4 right-4 max-w-md mx-auto z-30 animate-slideUp">
           <div
             onClick={() => onNavigate('track')}
-            className="glass-btn-dark p-3.5 rounded-2xl flex items-center justify-between cursor-pointer border border-[#FFD600]/40 shadow-xl"
+            className="glass-btn-dark p-3.5 rounded-2xl flex items-center justify-between cursor-pointer border border-[#FFD400]/40 shadow-xl"
           >
             <div className="flex items-center gap-2 text-white text-xs">
-              <ShoppingBag className="w-4 h-4 text-[#FFD600]" />
+              <ShoppingBag className="w-4 h-4 text-[#FFD400]" />
               <span className="font-bold">{cartCount} items added</span>
               <span>·</span>
-              <span className="font-black text-[#FFD600]">₹{cartSubtotal}</span>
+              <span className="font-black text-[#FFD400]">₹{cartSubtotal}</span>
             </div>
-            <button className="glass-btn-yellow px-3.5 py-1 rounded-xl text-black font-black text-xs">
+            <button className="rounded-xl bg-[#FFD400] px-3.5 py-1 text-black font-black text-xs">
               View Cart →
             </button>
           </div>
         </div>
       )}
+
+      <DrawerMenu isOpen={showDrawer} onClose={() => setShowDrawer(false)} onNavigate={onNavigate} />
     </div>
   );
 };
