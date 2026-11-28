@@ -150,7 +150,7 @@ export const DEFAULT_HYDERABAD_DATA = {
 };
 
 export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-export const RAZORPAY_PUBLIC_TEST_KEY = 'rzp_test_U3xoeEyAqeaQ9Y';
+export const RAZORPAY_PUBLIC_TEST_KEY = import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_U3xoeEyAqeaQ9Y';
 
 // Helper to make API calls with graceful fallback
 export async function apiRequest(endpoint, options = {}) {

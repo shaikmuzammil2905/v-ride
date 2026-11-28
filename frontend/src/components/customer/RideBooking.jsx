@@ -480,7 +480,7 @@ export const RideBooking = ({ onNavigate, onBack }) => {
 
       {/* MAP PICKER MODAL */}
       {showMapModal && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex flex-col justify-end animate-fadeIn">
+        <div className="fixed inset-0 z-[1100] bg-black/70 backdrop-blur-sm flex flex-col justify-end animate-fadeIn">
           <div className="bg-white rounded-t-3xl max-w-md w-full mx-auto p-4 space-y-3 h-[75vh] flex flex-col">
             <div className="flex items-center justify-between pb-2 border-b border-gray-100">
               <h3 className="font-black text-sm text-gray-900">Pick Location on Hyderabad Map</h3>
@@ -513,7 +513,7 @@ export const RideBooking = ({ onNavigate, onBack }) => {
 
       {/* ALL SERVICES MODAL */}
       {showAllServicesModal && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex flex-col justify-end animate-fadeIn">
+        <div className="fixed inset-0 z-[1100] bg-black/70 backdrop-blur-sm flex flex-col justify-end animate-fadeIn">
           <div className="bg-white rounded-t-3xl max-w-md w-full mx-auto p-5 space-y-3">
             <div className="flex items-center justify-between pb-2 border-b border-gray-100">
               <h3 className="font-black text-sm text-gray-900">All V RIDE Mobility Services</h3>

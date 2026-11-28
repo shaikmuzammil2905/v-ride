@@ -203,7 +203,7 @@ export const ProfileScreen = ({ onNavigate }) => {
 
       {/* REFER MODAL */}
       {showReferModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[1100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-sm w-full p-5 space-y-3 text-center">
             <div className="w-14 h-14 rounded-full bg-yellow-100 text-3xl mx-auto flex items-center justify-center">
               🎁

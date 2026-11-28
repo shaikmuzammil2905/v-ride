@@ -383,7 +383,7 @@ export const CustomerHome = ({ onNavigate }) => {
 
       {/* LOCATION PICKER MODAL */}
       {showLocationModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 animate-fadeIn">
+        <div className="fixed inset-0 z-[1100] bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 animate-fadeIn">
           <div className="bg-white w-full max-w-sm rounded-t-3xl sm:rounded-2xl p-5 shadow-2xl animate-slideUp">
             <div className="flex items-center justify-between pb-3 border-b border-gray-100">
               <h3 className="font-bold text-base text-gray-900">Select Location</h3>
@@ -409,7 +409,7 @@ export const CustomerHome = ({ onNavigate }) => {
 
       {/* NOTIFICATIONS MODAL */}
       {showNotifications && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div className="fixed inset-0 z-[1100] bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
           <div className="bg-white w-full max-w-sm rounded-t-3xl sm:rounded-2xl p-5 shadow-2xl">
             <div className="flex items-center justify-between pb-3 border-b border-gray-100">
               <h3 className="font-bold text-base text-gray-900 flex items-center gap-2"><Bell className="w-4 h-4 text-[#FFD400]" />Notifications</h3>

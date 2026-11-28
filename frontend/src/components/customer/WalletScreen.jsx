@@ -145,8 +145,8 @@ export const WalletScreen = () => {
 
       {/* Add Money Razorpay Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div className="bg-white w-full max-w-sm rounded-t-3xl sm:rounded-2xl p-5 shadow-2xl space-y-4">
+        <div className="fixed inset-0 z-[1100] bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+          <div className="bg-white w-full max-w-sm rounded-t-3xl sm:rounded-2xl p-5 pb-6 shadow-2xl space-y-4 max-h-[85dvh] overflow-y-auto">
             <div className="flex justify-between items-center pb-2 border-b border-gray-100">
               <h3 className="font-extrabold text-sm text-gray-900 flex items-center gap-2">
                 <CreditCard className="w-4 h-4 text-[#FFD600]" />
@@ -186,7 +186,7 @@ export const WalletScreen = () => {
               disabled={isPaying}
               className="glass-btn-yellow w-full py-3 rounded-2xl text-black font-black text-xs disabled:opacity-60"
             >
-              {isPaying ? 'Opening Razorpay...' : `Pay ₹${topupAmount} with Razorpay`}
+              {isPaying ? 'Opening Razorpay...' : `Pay Now ₹${topupAmount} with Razorpay`}
             </button>
           </div>
         </div>
