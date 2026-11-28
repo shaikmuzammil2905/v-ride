@@ -780,5 +780,201 @@
     "emergencySosNumber": "112",
     "appVersion": "2.4.0",
     "maintenanceMode": false
-  }
+  },
+  "authAccounts": [
+    {
+      "id": "auth_customer_srilatha",
+      "profileId": "usr_srilatha",
+      "name": "Sri Latha",
+      "username": "srilatha",
+      "email": "srilatha@example.com",
+      "phone": "+91 98765 43210",
+      "role": "customer",
+      "passwordHash": "$2a$10$TMsCzYIYeLATPSFS./pfb.Vi6d/1X/qDYmLT6RbFXm3jU0WYxn2g6",
+      "active": true,
+      "createdAt": "2026-01-10T10:00:00.000Z",
+      "updatedAt": "2026-11-28T12:24:33.352Z"
+    },
+    {
+      "id": "auth_admin_super",
+      "profileId": "adm_super",
+      "name": "Operations Lead",
+      "username": "admin",
+      "email": "admin@vride.in",
+      "phone": "+91 90000 00001",
+      "role": "admin",
+      "city": "All Cities",
+      "passwordHash": "$2a$10$IaS.Qt6iFjhQmQ4.Vj9wFOsinHZ53W7csCBgI01MfrRJjWW9mDTdK",
+      "active": true,
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "auth_rider_raju",
+      "profileId": "ptn_ramesh",
+      "name": "Raju Kumar",
+      "username": "rider",
+      "email": "rider@vride.in",
+      "altEmails": [
+        "partner@vride.in",
+        "ramesh.k@vride.in"
+      ],
+      "phone": "+91 97034 56789",
+      "altPhones": [
+        "+91 98480 12345"
+      ],
+      "role": "rider",
+      "vehicleType": "bike",
+      "passwordHash": "$2a$10$XY9QmVyE8pJzhxhiaCLTyuqFhdWPyysMNWofT9ewr9b.rP9VvIqQW",
+      "active": true,
+      "createdAt": "2025-11-15T09:30:00.000Z"
+    },
+    {
+      "id": "auth_vendor_paradise",
+      "profileId": "rest_paradise",
+      "restaurantId": "rest_paradise",
+      "name": "Paradise Biryani",
+      "username": "paradise",
+      "email": "vendor@vride.in",
+      "altEmails": [
+        "paradise@vride.in"
+      ],
+      "phone": "+91 90001 11222",
+      "role": "vendor",
+      "passwordHash": "$2a$10$ZarK1al0dr0h1VJeuVZ7g.2AZ9RcpUy89E2gL.gJaY8JB9PKsaAVq",
+      "active": true,
+      "createdAt": "2025-10-01T10:00:00.000Z"
+    }
+  ],
+  "auditLogs": [
+    {
+      "id": "aud_2ada3ba1",
+      "adminName": "Sri Latha",
+      "action": "Password Reset",
+      "module": "Authentication",
+      "relatedRecord": "srilatha@example.com",
+      "createdAt": "2026-11-28T12:24:33.354Z"
+    },
+    {
+      "id": "aud_4571876b",
+      "adminName": "Sri Latha",
+      "action": "User Login",
+      "module": "Authentication",
+      "relatedRecord": "customer via customer",
+      "createdAt": "2026-11-28T12:24:33.271Z"
+    },
+    {
+      "id": "aud_cddec6dc",
+      "adminName": "Sri Latha",
+      "action": "Password Reset",
+      "module": "Authentication",
+      "relatedRecord": "srilatha@example.com",
+      "createdAt": "2026-11-28T12:24:33.192Z"
+    },
+    {
+      "id": "aud_eea15247",
+      "adminName": "Sri Latha",
+      "action": "OTP Login",
+      "module": "Authentication",
+      "relatedRecord": "customer via customer",
+      "createdAt": "2026-11-28T12:24:33.104Z"
+    },
+    {
+      "id": "aud_61ac7de9",
+      "adminName": "Paradise Biryani",
+      "action": "User Login",
+      "module": "Authentication",
+      "relatedRecord": "vendor via partner",
+      "createdAt": "2026-11-28T12:24:32.939Z"
+    },
+    {
+      "id": "aud_e284b656",
+      "adminName": "Raju Kumar",
+      "action": "User Login",
+      "module": "Authentication",
+      "relatedRecord": "rider via partner",
+      "createdAt": "2026-11-28T12:24:32.853Z"
+    },
+    {
+      "id": "aud_d379c301",
+      "adminName": "Operations Lead",
+      "action": "User Login",
+      "module": "Authentication",
+      "relatedRecord": "admin via admin",
+      "createdAt": "2026-11-28T12:24:32.772Z"
+    },
+    {
+      "id": "aud_3f1f7ff0",
+      "adminName": "Sri Latha",
+      "action": "User Login",
+      "module": "Authentication",
+      "relatedRecord": "customer via customer",
+      "createdAt": "2026-11-28T12:24:32.687Z"
+    },
+    {
+      "id": "aud_5e751071",
+      "adminName": "Sri Latha",
+      "action": "Password Reset",
+      "module": "Authentication",
+      "relatedRecord": "srilatha@example.com",
+      "createdAt": "2026-11-28T11:20:49.214Z"
+    },
+    {
+      "id": "aud_abc21a27",
+      "adminName": "Sri Latha",
+      "action": "User Login",
+      "module": "Authentication",
+      "relatedRecord": "customer via customer",
+      "createdAt": "2026-11-28T11:20:49.156Z"
+    },
+    {
+      "id": "aud_ba004a0d",
+      "adminName": "Sri Latha",
+      "action": "Password Reset",
+      "module": "Authentication",
+      "relatedRecord": "srilatha@example.com",
+      "createdAt": "2026-11-28T11:20:49.100Z"
+    },
+    {
+      "id": "aud_28164db8",
+      "adminName": "Sri Latha",
+      "action": "OTP Login",
+      "module": "Authentication",
+      "relatedRecord": "customer via customer",
+      "createdAt": "2026-11-28T11:20:49.043Z"
+    },
+    {
+      "id": "aud_edda4cbe",
+      "adminName": "Paradise Biryani",
+      "action": "User Login",
+      "module": "Authentication",
+      "relatedRecord": "vendor via partner",
+      "createdAt": "2026-11-28T11:20:48.923Z"
+    },
+    {
+      "id": "aud_4a695d28",
+      "adminName": "Raju Kumar",
+      "action": "User Login",
+      "module": "Authentication",
+      "relatedRecord": "rider via partner",
+      "createdAt": "2026-11-28T11:20:48.864Z"
+    },
+    {
+      "id": "aud_c938b3cd",
+      "adminName": "Operations Lead",
+      "action": "User Login",
+      "module": "Authentication",
+      "relatedRecord": "admin via admin",
+      "createdAt": "2026-11-28T11:20:48.803Z"
+    },
+    {
+      "id": "aud_0c391df4",
+      "adminName": "Sri Latha",
+      "action": "User Login",
+      "module": "Authentication",
+      "relatedRecord": "customer via customer",
+      "createdAt": "2026-11-28T11:20:48.741Z"
+    }
+  ],
+  "otpRecords": [],
+  "passwordResets": []
 }

@@ -1,3 +1,4 @@
+import bcrypt from 'bcryptjs';
 import { db } from '../config/db.js';
 
 export const initialSeed = {
@@ -525,6 +526,72 @@ export const initialSeed = {
   }
 };
 
+export function seedAuthAccounts() {
+  const existing = db.get('authAccounts');
+  if (existing && existing.length > 0) return;
+
+  const defaultAccounts = [
+    {
+      id: 'auth_customer_srilatha',
+      profileId: 'usr_srilatha',
+      name: 'Sri Latha',
+      username: 'srilatha',
+      email: 'srilatha@example.com',
+      phone: '+91 98765 43210',
+      role: 'customer',
+      passwordHash: bcrypt.hashSync('Customer@2026', 10),
+      active: true,
+      createdAt: '2026-01-10T10:00:00.000Z'
+    },
+    {
+      id: 'auth_admin_super',
+      profileId: 'adm_super',
+      name: 'Operations Lead',
+      username: 'admin',
+      email: 'admin@vride.in',
+      phone: '+91 90000 00001',
+      role: 'admin',
+      city: 'All Cities',
+      passwordHash: bcrypt.hashSync('VRideAdmin@2026', 10),
+      active: true,
+      createdAt: '2026-01-01T00:00:00.000Z'
+    },
+    {
+      id: 'auth_rider_raju',
+      profileId: 'ptn_ramesh',
+      name: 'Raju Kumar',
+      username: 'rider',
+      email: 'rider@vride.in',
+      altEmails: ['partner@vride.in', 'ramesh.k@vride.in'],
+      phone: '+91 97034 56789',
+      altPhones: ['+91 98480 12345'],
+      role: 'rider',
+      vehicleType: 'bike',
+      passwordHash: bcrypt.hashSync('Partner@2026', 10),
+      active: true,
+      createdAt: '2025-11-15T09:30:00.000Z'
+    },
+    {
+      id: 'auth_vendor_paradise',
+      profileId: 'rest_paradise',
+      restaurantId: 'rest_paradise',
+      name: 'Paradise Biryani',
+      username: 'paradise',
+      email: 'vendor@vride.in',
+      altEmails: ['paradise@vride.in'],
+      phone: '+91 90001 11222',
+      role: 'vendor',
+      passwordHash: bcrypt.hashSync('Vendor@2026', 10),
+      active: true,
+      createdAt: '2025-10-01T10:00:00.000Z'
+    }
+  ];
+
+  db.data.authAccounts = defaultAccounts;
+  db.save();
+  console.log('Seeded default authAccounts (customer, admin, rider, vendor).');
+}
+
 export function seedDatabase() {
   const currentUsers = db.get('users');
   if (!currentUsers || currentUsers.length === 0) {
@@ -534,6 +601,7 @@ export function seedDatabase() {
   } else {
     console.log('Database already contains records. Preserving data.');
   }
+  seedAuthAccounts();
 }
 
 // Run immediately when called directly

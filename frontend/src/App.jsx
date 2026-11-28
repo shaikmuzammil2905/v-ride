@@ -1,144 +1,210 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
+import { ShieldAlert, LogOut, ArrowRight } from 'lucide-react';
 import { useApp } from './context/AppContext';
 import CustomerApp from './components/customer/CustomerApp';
 import RiderPanel from './components/rider/RiderPanel';
 import VendorPanel from './components/vendor/VendorPanel';
 import AdminDashboard from './components/admin/AdminDashboard';
-import WebsiteHome from './components/website/WebsiteHome';
-import SupportPortal from './components/support/SupportPortal';
-import UnifiedPartnerLogin from './components/common/UnifiedPartnerLogin';
-import { ArrowLeft } from 'lucide-react';
+import LoginSelectionScreen from './components/auth/LoginSelectionScreen';
+import CustomerLoginPage from './components/auth/CustomerLoginPage';
+import AdminLoginPage from './components/auth/AdminLoginPage';
+import PartnerLoginPage from './components/auth/PartnerLoginPage';
+import { AuthLayoutShell, getDashboardPathForRole } from './components/auth/AuthShared';
+
+const AuthLoadingScreen = () => (
+  <div className="min-h-screen bg-[#10151F] flex flex-col items-center justify-center p-4 text-white">
+    <div className="w-12 h-12 rounded-2xl bg-[#FFD000] text-black font-black text-2xl flex items-center justify-center animate-pulse shadow-lg">
+      V
+    </div>
+    <p className="mt-3 text-xs font-bold text-gray-300 tracking-wider uppercase">
+      Verifying V RIDE Session...
+    </p>
+  </div>
+);
+
+const ProtectedRoute = ({ allowedRoles, loginPath, children }) => {
+  const { authToken, authUser, authLoading } = useApp();
+
+  if (authLoading) return <AuthLoadingScreen />;
+
+  if (!authToken || !authUser) {
+    return <Navigate to={loginPath} replace />;
+  }
+
+  if (!allowedRoles.includes(authUser.role)) {
+    return <Navigate to="/unauthorized" replace />;
+  }
+
+  return children;
+};
+
+const UnauthorizedScreen = () => {
+  const navigate = useNavigate();
+  const { authUser, logoutSession } = useApp();
+
+  const handleSwitchAccount = async () => {
+    await logoutSession();
+    navigate('/login', { replace: true });
+  };
+
+  return (
+    <AuthLayoutShell
+      title="ACCESS RESTRICTED"
+      subtitle="Role-Based Protection Active"
+      badge="403"
+      showBack={false}
+    >
+      <div className="text-center space-y-4 py-2">
+        <div className="w-12 h-12 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center mx-auto">
+          <ShieldAlert className="w-6 h-6" />
+        </div>
+        <div className="space-y-1">
+          <h2 className="font-black text-base text-gray-900">Unauthorized Dashboard Access</h2>
+          <p className="text-xs text-gray-600">
+            {authUser
+              ? `You are currently signed in as "${authUser.role}". You do not have permission to view that dashboard.`
+              : 'Please sign in with an authorized account to access this dashboard.'}
+          </p>
+        </div>
+
+        <div className="space-y-2 pt-1">
+          {authUser && (
+            <button
+              type="button"
+              onClick={() => navigate(getDashboardPathForRole(authUser.role), { replace: true })}
+              className="w-full py-3 rounded-2xl bg-[#FFD000] hover:bg-yellow-400 text-black font-black text-xs flex items-center justify-center gap-2 shadow-sm transition"
+            >
+              <span>Go to My Dashboard</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={handleSwitchAccount}
+            className="w-full py-2.5 rounded-2xl bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold text-xs flex items-center justify-center gap-2 transition"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span>Sign Out & Switch Account</span>
+          </button>
+        </div>
+      </div>
+    </AuthLayoutShell>
+  );
+};
+
+const RootRedirect = () => {
+  const location = useLocation();
+  const { authToken, authUser, authLoading } = useApp();
+
+  if (authLoading) return <AuthLoadingScreen />;
+
+  const params = new URLSearchParams(location.search);
+  const portal = params.get('portal');
+  if (portal === 'partner') return <Navigate to="/login/partner" replace />;
+  if (portal === 'rider') return <Navigate to="/rider" replace />;
+  if (portal === 'vendor') return <Navigate to="/vendor" replace />;
+  if (portal === 'admin') return <Navigate to="/admin" replace />;
+  if (portal === 'customer') return <Navigate to="/customer" replace />;
+
+  if (authToken && authUser) {
+    return <Navigate to={getDashboardPathForRole(authUser.role)} replace />;
+  }
+  return <Navigate to="/login" replace />;
+};
+
+const GuestOrRedirect = ({ expectedRoles, children }) => {
+  const { authToken, authUser, authLoading } = useApp();
+  if (authLoading) return <AuthLoadingScreen />;
+  if (authToken && authUser && expectedRoles.includes(authUser.role)) {
+    return <Navigate to={getDashboardPathForRole(authUser.role)} replace />;
+  }
+  return children;
+};
 
 export const App = () => {
-  const { currentPortal, setCurrentPortal } = useApp();
-  const [partnerSession, setPartnerSession] = useState(() => {
-    try {
-      const saved = localStorage.getItem('vride_partner_session');
-      return saved ? JSON.parse(saved) : null;
-    } catch {
-      return null;
-    }
-  });
+  const navigate = useNavigate();
+  const { logoutSession } = useApp();
 
-  // Sync URL query param (?portal=...) or path (/partner/rider, /partner/vendor, /admin)
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const portal = params.get('portal');
-    const path = window.location.pathname.toLowerCase();
-
-    if (portal && ['customer', 'partner', 'rider', 'vendor', 'admin', 'support', 'website'].includes(portal)) {
-      setCurrentPortal(portal);
-    } else if (path.startsWith('/partner/rider')) {
-      setCurrentPortal('rider');
-    } else if (path.startsWith('/partner/vendor')) {
-      setCurrentPortal('vendor');
-    } else if (path.startsWith('/partner')) {
-      setCurrentPortal('partner');
-    } else if (path.startsWith('/admin')) {
-      setCurrentPortal('admin');
-    }
-  }, [setCurrentPortal]);
-
-  const handleLogout = (roleKey) => {
-    localStorage.removeItem(`vride_auth_${roleKey}`);
-    localStorage.removeItem('vride_partner_session');
-    setPartnerSession(null);
-  };
-
-  const handleAuthenticated = (role, user) => {
-    setPartnerSession({ role, user });
-    setCurrentPortal(role);
-  };
-
-  const isRoleAuthorized = (expectedRole) => {
-    if (localStorage.getItem(`vride_auth_${expectedRole}`) === 'true') return true;
-    return partnerSession?.role === expectedRole;
+  const handleLogout = async (redirectPath = '/login') => {
+    await logoutSession();
+    navigate(redirectPath, { replace: true });
   };
 
   return (
     <div className="min-h-screen bg-[#f8f9fa] flex flex-col font-sans select-none overflow-x-hidden">
-      {/* Return bar when viewing Partner/Vendor/Rider/Admin/Support */}
-      {currentPortal !== 'customer' && (
-        <div className="bg-black text-white px-4 py-2 flex items-center justify-between text-xs border-b border-neutral-800 z-50">
-          <button
-            onClick={() => {
-              window.history.replaceState({}, '', '/');
-              setCurrentPortal('customer');
-            }}
-            className="flex items-center gap-1.5 font-bold text-vride-yellow hover:underline"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Return to Customer Mobile App</span>
-          </button>
-          <span className="text-gray-400 font-semibold uppercase text-[10px]">
-            {currentPortal === 'vendor'
-              ? '🍽️ Vendor Panel'
-              : currentPortal === 'rider' || currentPortal === 'partner'
-              ? '🛵 Rider Partner Panel'
-              : currentPortal === 'admin'
-              ? '💼 Admin Panel'
-              : currentPortal === 'support'
-              ? '💬 Support Panel'
-              : '🌐 Website'}
-          </span>
-        </div>
-      )}
+      <Routes>
+        <Route path="/" element={<RootRedirect />} />
+        <Route path="/login" element={<LoginSelectionScreen />} />
 
-      {/* Main App Container */}
-      <div className="flex-1 flex flex-col justify-start">
-        {currentPortal === 'customer' && <CustomerApp />}
+        <Route
+          path="/login/customer"
+          element={
+            <GuestOrRedirect expectedRoles={['customer']}>
+              <CustomerLoginPage />
+            </GuestOrRedirect>
+          }
+        />
+        <Route
+          path="/login/admin"
+          element={
+            <GuestOrRedirect expectedRoles={['admin', 'super_admin']}>
+              <AdminLoginPage />
+            </GuestOrRedirect>
+          }
+        />
+        <Route
+          path="/login/partner"
+          element={
+            <GuestOrRedirect expectedRoles={['rider', 'vendor']}>
+              <PartnerLoginPage />
+            </GuestOrRedirect>
+          }
+        />
 
-        {/* Unified Partner Login (?portal=partner or /partner/login) */}
-        {currentPortal === 'partner' && (
-          isRoleAuthorized('rider') ? (
-            <RiderPanel onLogout={() => handleLogout('rider')} />
-          ) : isRoleAuthorized('vendor') ? (
-            <VendorPanel onLogout={() => handleLogout('vendor')} />
-          ) : isRoleAuthorized('admin') ? (
-            <AdminDashboard onLogout={() => handleLogout('admin')} />
-          ) : (
-            <UnifiedPartnerLogin initialRole="rider" onAuthenticated={handleAuthenticated} />
-          )
-        )}
+        {/* Legacy partner path aliases */}
+        <Route path="/partner" element={<Navigate to="/login/partner" replace />} />
+        <Route path="/partner/login" element={<Navigate to="/login/partner" replace />} />
+        <Route path="/partner/rider" element={<Navigate to="/rider" replace />} />
+        <Route path="/partner/vendor" element={<Navigate to="/vendor" replace />} />
 
-        {/* Rider Panel (?portal=rider or /partner/rider) */}
-        {currentPortal === 'rider' && (
-          isRoleAuthorized('rider') ? (
-            <RiderPanel onLogout={() => handleLogout('rider')} />
-          ) : (
-            <UnifiedPartnerLogin initialRole="rider" onAuthenticated={handleAuthenticated} />
-          )
-        )}
+        {/* Role-Protected Dashboards */}
+        <Route
+          path="/customer/*"
+          element={
+            <ProtectedRoute allowedRoles={['customer']} loginPath="/login/customer">
+              <CustomerApp />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/rider/*"
+          element={
+            <ProtectedRoute allowedRoles={['rider']} loginPath="/login/partner">
+              <RiderPanel onLogout={() => handleLogout('/login/partner')} />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/vendor/*"
+          element={
+            <ProtectedRoute allowedRoles={['vendor']} loginPath="/login/partner">
+              <VendorPanel onLogout={() => handleLogout('/login/partner')} />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/*"
+          element={
+            <ProtectedRoute allowedRoles={['admin', 'super_admin']} loginPath="/login/admin">
+              <AdminDashboard onLogout={() => handleLogout('/login/admin')} />
+            </ProtectedRoute>
+          }
+        />
 
-        {/* Restaurant Vendor Panel (?portal=vendor or /partner/vendor) */}
-        {currentPortal === 'vendor' && (
-          isRoleAuthorized('vendor') ? (
-            <VendorPanel onLogout={() => handleLogout('vendor')} />
-          ) : (
-            <UnifiedPartnerLogin initialRole="vendor" onAuthenticated={handleAuthenticated} />
-          )
-        )}
-
-        {/* Admin Panel (?portal=admin or /admin) */}
-        {currentPortal === 'admin' && (
-          isRoleAuthorized('admin') ? (
-            <AdminDashboard onLogout={() => handleLogout('admin')} />
-          ) : (
-            <UnifiedPartnerLogin initialRole="admin" onAuthenticated={handleAuthenticated} />
-          )
-        )}
-
-        {/* Support Panel (?portal=support) */}
-        {currentPortal === 'support' && (
-          isRoleAuthorized('support') ? (
-            <SupportPortal />
-          ) : (
-            <UnifiedPartnerLogin initialRole="support" onAuthenticated={handleAuthenticated} />
-          )
-        )}
-
-        {currentPortal === 'website' && <WebsiteHome />}
-      </div>
+        <Route path="/unauthorized" element={<UnauthorizedScreen />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
     </div>
   );
 };

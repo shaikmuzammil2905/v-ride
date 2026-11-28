@@ -30,6 +30,11 @@ import {
   vendorPanelController,
   adminGovernanceController
 } from '../controllers/unifiedPartnerController.js';
+import {
+  authSystemController,
+  requireAuth,
+  requireRole
+} from '../controllers/authSystemController.js';
 
 const router = express.Router();
 const upload = multer({
@@ -38,10 +43,15 @@ const upload = multer({
 });
 
 // --- Auth Routes ---
-router.post('/auth/send-otp', authController.sendOtp);
-router.post('/auth/verify-otp', authController.verifyOtp);
-router.get('/auth/me', authController.getCurrentUser);
-router.put('/auth/profile', authController.updateProfile);
+router.post('/auth/login', authSystemController.login);
+router.post('/auth/register', authSystemController.register);
+router.post('/auth/send-otp', authSystemController.sendOtp);
+router.post('/auth/verify-otp', authSystemController.verifyOtp);
+router.post('/auth/forgot-password', authSystemController.forgotPassword);
+router.post('/auth/reset-password', authSystemController.resetPassword);
+router.get('/auth/me', requireAuth, authSystemController.me);
+router.post('/auth/logout', authSystemController.logout);
+router.put('/auth/profile', requireAuth, authController.updateProfile);
 
 // --- AWS S3 Media Management Routes ---
 router.post('/media/upload', upload.single('file'), mediaController.upload);
@@ -153,7 +163,12 @@ router.post('/auth/portal-login', unifiedAuthController.portalLogin);
 // --- Rider Panel Routes ---
 router.get('/rider/:id/dashboard', riderPanelController.getDashboard);
 router.put('/rider/:id/duty', riderPanelController.toggleDuty);
+router.put('/rider/:id/profile', riderPanelController.updateProfile);
+router.post('/rider/:id/withdraw', riderPanelController.withdrawWallet);
+router.post('/rider/:id/settle-cash', riderPanelController.settleCash);
 router.post('/rider/jobs/:jobId/accept', riderPanelController.acceptJob);
+router.post('/rider/jobs/:jobId/reject', riderPanelController.rejectJob);
+router.put('/rider/jobs/:jobId/stage', riderPanelController.updateJobStage);
 router.post('/rider/jobs/:jobId/verify-otp', riderPanelController.verifyJobOtp);
 router.post('/rider/jobs/:jobId/complete', riderPanelController.completeJob);
 router.post('/rider/sos', riderPanelController.recordSos);
@@ -161,20 +176,31 @@ router.post('/rider/sos', riderPanelController.recordSos);
 // --- Restaurant Vendor Panel Routes ---
 router.get('/vendor/:id/dashboard', vendorPanelController.getDashboard);
 router.put('/vendor/:id/settings', vendorPanelController.updateSettings);
+router.put('/vendor/:id/profile', vendorPanelController.updateProfile);
 router.put('/vendor/orders/:orderId/transition', vendorPanelController.transitionOrder);
 router.post('/vendor/:id/withdraw', vendorPanelController.withdrawWallet);
+router.get('/vendor/:id/categories', vendorPanelController.categoriesCrud.list);
+router.post('/vendor/:id/categories', vendorPanelController.categoriesCrud.create);
+router.put('/vendor/:id/categories/:catId', vendorPanelController.categoriesCrud.update);
+router.delete('/vendor/:id/categories/:catId', vendorPanelController.categoriesCrud.remove);
+router.get('/vendor/:id/offers', vendorPanelController.offersCrud.list);
+router.post('/vendor/:id/offers', vendorPanelController.offersCrud.create);
+router.put('/vendor/:id/offers/:offerId', vendorPanelController.offersCrud.update);
+router.get('/vendor/:id/reviews', vendorPanelController.reviewsCrud.list);
+router.post('/vendor/:id/reviews/:reviewId/reply', vendorPanelController.reviewsCrud.reply);
+router.post('/vendor/:id/reviews/:reviewId/report', vendorPanelController.reviewsCrud.report);
 router.get('/vendor/:id/staff', vendorPanelController.staffCrud.list);
 router.post('/vendor/:id/staff', vendorPanelController.staffCrud.create);
 router.put('/vendor/:id/staff/:staffId', vendorPanelController.staffCrud.update);
 router.delete('/vendor/:id/staff/:staffId', vendorPanelController.staffCrud.remove);
 
 // --- Admin Governance, Roles, Settings & Audit Logs ---
-router.get('/admin/accounts', adminGovernanceController.listAdmins);
-router.post('/admin/accounts', adminGovernanceController.createAdmin);
-router.delete('/admin/accounts/:id', adminGovernanceController.deleteAdmin);
-router.get('/admin/audit-logs', adminGovernanceController.listAuditLogs);
-router.get('/admin/settings', adminGovernanceController.getSettings);
-router.put('/admin/settings', adminGovernanceController.updateSettings);
+router.get('/admin/accounts', requireAuth, requireRole('admin', 'super_admin'), adminGovernanceController.listAdmins);
+router.post('/admin/accounts', requireAuth, requireRole('admin', 'super_admin'), adminGovernanceController.createAdmin);
+router.delete('/admin/accounts/:id', requireAuth, requireRole('admin', 'super_admin'), adminGovernanceController.deleteAdmin);
+router.get('/admin/audit-logs', requireAuth, requireRole('admin', 'super_admin'), adminGovernanceController.listAuditLogs);
+router.get('/admin/settings', requireAuth, requireRole('admin', 'super_admin'), adminGovernanceController.getSettings);
+router.put('/admin/settings', requireAuth, requireRole('admin', 'super_admin'), adminGovernanceController.updateSettings);
 
 // --- CMS & Support Panel Routes ---
 router.get('/cms/banners', cmsController.getBanners);

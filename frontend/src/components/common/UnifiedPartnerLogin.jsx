@@ -4,9 +4,7 @@ import { apiRequest } from '../../services/api';
 
 const ROLE_OPTIONS = [
   { id: 'vendor', label: 'Restaurant Owner', icon: Store, hint: 'vendor@vride.in' },
-  { id: 'rider', label: 'Rider Partner', icon: Bike, hint: 'rider@vride.in or +91 97034 56789' },
-  { id: 'admin', label: 'Admin', icon: ShieldCheck, hint: 'admin@vride.in' },
-  { id: 'support', label: 'Support', icon: MessageSquare, hint: 'support@vride.in' }
+  { id: 'rider', label: 'Rider Partner', icon: Bike, hint: 'rider@vride.in or +91 97034 56789' }
 ];
 
 const LOCAL_FALLBACK_CREDENTIALS = {
@@ -69,7 +67,7 @@ export const UnifiedPartnerLogin = ({ initialRole = 'rider', onAuthenticated }) 
             </div>
             <div>
               <h1 className="font-black text-lg tracking-wider text-white">V RIDE PARTNER PLATFORM</h1>
-              <p className="text-xs text-gray-300">Unified Login · Vendor · Rider · Admin</p>
+              <p className="text-xs text-gray-300">Unified Login · Restaurant Owner · Rider Partner</p>
             </div>
           </div>
         </div>
@@ -80,7 +78,7 @@ export const UnifiedPartnerLogin = ({ initialRole = 'rider', onAuthenticated }) 
             <label className="text-[10px] font-black uppercase text-gray-400 tracking-wider block mb-2">
               Select Your Role
             </label>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <div className="grid grid-cols-2 gap-2.5">
               {ROLE_OPTIONS.map((role) => {
                 const Icon = role.icon;
                 const active = selectedRole === role.id;

@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { DEFAULT_HYDERABAD_DATA, apiRequest } from '../services/api';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { DEFAULT_HYDERABAD_DATA, authApiRequest } from '../services/api';
 
 const AppContext = createContext();
 
@@ -8,6 +8,89 @@ export const AppProvider = ({ children }) => {
   const [currentPortal, setCurrentPortal] = useState('customer');
   // Mobile frame simulator mode for Customer App: true (phone mockup) | false (full responsive)
   const [isPhoneFrame, setIsPhoneFrame] = useState(true);
+
+  // Unified Auth Session State
+  const [authToken, setAuthToken] = useState(() => localStorage.getItem('vride_auth_token') || null);
+  const [authUser, setAuthUser] = useState(() => {
+    try {
+      const saved = localStorage.getItem('vride_auth_user');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+  const [authLoading, setAuthLoading] = useState(() => Boolean(localStorage.getItem('vride_auth_token')));
+
+  const clearLegacyRoleKeys = () => {
+    ['customer', 'admin', 'rider', 'vendor', 'partner', 'support'].forEach((r) => {
+      localStorage.removeItem(`vride_auth_${r}`);
+    });
+    localStorage.removeItem('vride_partner_session');
+  };
+
+  const loginWithSession = useCallback((token, user) => {
+    clearLegacyRoleKeys();
+    localStorage.setItem('vride_auth_token', token);
+    localStorage.setItem('vride_auth_user', JSON.stringify(user));
+    localStorage.setItem(`vride_auth_${user.role}`, 'true');
+    if (user.role === 'rider' || user.role === 'vendor') {
+      localStorage.setItem('vride_partner_session', JSON.stringify({ role: user.role, token, user }));
+    }
+    setAuthToken(token);
+    setAuthUser(user);
+
+    if (user.role === 'customer') {
+      setCurrentUser((prev) => ({
+        ...prev,
+        ...user,
+        savedAddresses: user.savedAddresses?.length ? user.savedAddresses : prev.savedAddresses
+      }));
+    } else if (user.role === 'rider') {
+      setCurrentPartner((prev) => ({ ...prev, ...user }));
+    }
+  }, []);
+
+  const logoutSession = useCallback(async () => {
+    try {
+      await authApiRequest('/auth/logout', { method: 'POST' });
+    } catch {
+      // ignore network errors on logout
+    }
+    clearLegacyRoleKeys();
+    localStorage.removeItem('vride_auth_token');
+    localStorage.removeItem('vride_auth_user');
+    setAuthToken(null);
+    setAuthUser(null);
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    const verifyExistingSession = async () => {
+      const token = localStorage.getItem('vride_auth_token');
+      if (!token) {
+        if (active) setAuthLoading(false);
+        return;
+      }
+      const res = await authApiRequest('/auth/me', { method: 'GET' });
+      if (!active) return;
+      if (res?.success && res.user) {
+        setAuthUser(res.user);
+        localStorage.setItem('vride_auth_user', JSON.stringify(res.user));
+        if (res.user.role === 'customer') {
+          setCurrentUser((prev) => ({ ...prev, ...res.user }));
+        }
+      } else if (res?.status === 401) {
+        clearLegacyRoleKeys();
+        localStorage.removeItem('vride_auth_token');
+        localStorage.removeItem('vride_auth_user');
+        setAuthToken(null);
+        setAuthUser(null);
+      }
+      setAuthLoading(false);
+    };
+    verifyExistingSession();
+    return () => { active = false; };
+  }, []);
 
   // User state
   const [currentUser, setCurrentUser] = useState(() => {
@@ -111,6 +194,11 @@ export const AppProvider = ({ children }) => {
         setCurrentPortal,
         isPhoneFrame,
         setIsPhoneFrame,
+        authToken,
+        authUser,
+        authLoading,
+        loginWithSession,
+        logoutSession,
         currentUser,
         setCurrentUser,
         currentPartner,

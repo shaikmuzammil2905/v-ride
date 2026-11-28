@@ -158,18 +158,55 @@ export async function apiRequest(endpoint, options = {}) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), options.timeout || 5000);
     const isFormData = options.body instanceof FormData;
+    const token = typeof window !== 'undefined' ? localStorage.getItem('vride_auth_token') : null;
+    const authHeader = token ? { Authorization: `Bearer ${token}` } : {};
     const res = await fetch(`${API_BASE_URL}${endpoint}`, {
       ...options,
       signal: controller.signal,
       headers: isFormData
-        ? { ...options.headers }
-        : { 'Content-Type': 'application/json', ...options.headers }
+        ? { ...authHeader, ...options.headers }
+        : { 'Content-Type': 'application/json', ...authHeader, ...options.headers }
     });
     clearTimeout(timeoutId);
     if (!res.ok) throw new Error(`HTTP error ${res.status}`);
     return await res.json();
   } catch (err) {
     return null;
+  }
+}
+
+// Strict auth API helper that surfaces backend validation/auth errors
+export async function authApiRequest(endpoint, options = {}) {
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), options.timeout || 8000);
+    const token = typeof window !== 'undefined' ? localStorage.getItem('vride_auth_token') : null;
+    const authHeader = token ? { Authorization: `Bearer ${token}` } : {};
+    const res = await fetch(`${API_BASE_URL}${endpoint}`, {
+      ...options,
+      signal: controller.signal,
+      headers: {
+        'Content-Type': 'application/json',
+        ...authHeader,
+        ...options.headers
+      }
+    });
+    clearTimeout(timeoutId);
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      return {
+        success: false,
+        status: res.status,
+        message: data?.message || `Authentication request failed (${res.status})`
+      };
+    }
+    return data;
+  } catch (err) {
+    return {
+      success: false,
+      networkError: true,
+      message: 'Unable to reach authentication server. Please ensure the backend server is running.'
+    };
   }
 }
 

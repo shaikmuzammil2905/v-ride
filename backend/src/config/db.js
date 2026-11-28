@@ -30,6 +30,15 @@ class Database {
       payouts: [],
       banners: [],
       notifications: [],
+      authAccounts: [],
+      otpRecords: [],
+      passwordResets: [],
+      auditLogs: [],
+      vendorCategories: [],
+      vendorOffers: [],
+      vendorReviews: [],
+      vendorStaff: [],
+      sosEvents: [],
       settings: {}
     };
     this.init();

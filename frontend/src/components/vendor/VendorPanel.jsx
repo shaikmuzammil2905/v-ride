@@ -6,6 +6,12 @@ import {
   HelpCircle, Download, Clock, PauseCircle, CheckCircle2, X
 } from 'lucide-react';
 import PartnerHeader from '../common/PartnerHeader';
+import {
+  VendorStaffView,
+  VendorOffersView,
+  VendorReviewsView,
+  VendorSupportView
+} from './VendorSubViews';
 import { apiRequest, uploadMediaToS3 } from '../../services/api';
 
 export const VendorPanel = ({ onLogout }) => {
@@ -114,16 +120,31 @@ export const VendorPanel = ({ onLogout }) => {
     { id: 'rv1', customer: 'Kavya R.', rating: 5, comment: 'Hot dum biryani delivered quickly!', reply: 'Thank you for ordering!' }
   ]);
 
-  // Wallet Withdraw
+  // Wallet Withdraw & Rejection Modal
   const [showWithdraw, setShowWithdraw] = useState(false);
   const [withdrawAmount, setWithdrawAmount] = useState('2500');
+  const [payoutsList, setPayoutsList] = useState([
+    { id: 'PAY-881', amount: 8500, bank: 'HDFC Bank ···· 4412', date: '25 Nov 2026', status: 'settled' }
+  ]);
+  const [rejectingOrderId, setRejectingOrderId] = useState(null);
+  const [rejectReason, setRejectReason] = useState('Item unavailable');
+  const [customRejectReason, setCustomRejectReason] = useState('');
 
   useEffect(() => {
-    apiRequest(`/vendor/${restaurant.id}/dashboard`).then((res) => {
-      if (res?.success && res.data?.restaurant) {
-        setRestaurant((prev) => ({ ...prev, ...res.data.restaurant }));
-      }
-    });
+    const syncDashboard = () => {
+      apiRequest(`/vendor/${restaurant.id}/dashboard`).then((res) => {
+        if (res?.success && res.data) {
+          if (res.data.restaurant) setRestaurant((prev) => ({ ...prev, ...res.data.restaurant }));
+          if (Array.isArray(res.data.staff) && res.data.staff.length) setStaffList(res.data.staff);
+          if (Array.isArray(res.data.offers) && res.data.offers.length) setOffersList(res.data.offers);
+          if (Array.isArray(res.data.reviews) && res.data.reviews.length) setReviewsList(res.data.reviews);
+          if (Array.isArray(res.data.payouts) && res.data.payouts.length) setPayoutsList(res.data.payouts);
+        }
+      });
+    };
+    syncDashboard();
+    const timer = setInterval(syncDashboard, 15000);
+    return () => clearInterval(timer);
   }, []);
 
   const handleToggleOpen = async () => {
@@ -136,20 +157,26 @@ export const VendorPanel = ({ onLogout }) => {
     showToast(nextOpen ? 'Restaurant is now OPEN' : 'Restaurant set to OFFLINE');
   };
 
-  const handleOrderTransition = async (orderId, nextStatus) => {
-    let reason = '';
-    if (nextStatus === 'rejected') {
-      reason = window.prompt('Enter rejection reason:', 'Item out of stock') || 'Unavailable';
-    }
+  const executeOrderTransition = async (orderId, nextStatus, reason = '') => {
     await apiRequest(`/vendor/orders/${orderId}/transition`, {
       method: 'PUT',
       body: JSON.stringify({ status: nextStatus, reason })
     });
-    setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, status: nextStatus } : o)));
+    setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, status: nextStatus, rejectionReason: reason } : o)));
     if (selectedOrder?.id === orderId) {
-      setSelectedOrder((prev) => ({ ...prev, status: nextStatus }));
+      setSelectedOrder((prev) => ({ ...prev, status: nextStatus, rejectionReason: reason }));
     }
     showToast(`Order #${orderId} marked ${nextStatus.toUpperCase()}`);
+  };
+
+  const handleOrderTransition = async (orderId, nextStatus) => {
+    if (nextStatus === 'rejected') {
+      setRejectingOrderId(orderId);
+      setRejectReason('Item unavailable');
+      setCustomRejectReason('');
+      return;
+    }
+    await executeOrderTransition(orderId, nextStatus);
   };
 
   const handleSaveMenuItem = async (e) => {
@@ -526,19 +553,41 @@ export const VendorPanel = ({ onLogout }) => {
                     </div>
                     <input type="checkbox" checked={restaurant.isOpen} onChange={handleToggleOpen} className="w-5 h-5 accent-emerald-600" />
                   </div>
-                  <div className="p-4 flex items-center justify-between">
-                    <div>
+                  <div className="p-4 flex items-center justify-between gap-3">
+                    <div className="flex-1">
                       <span className="font-black text-xs block">Operating Hours</span>
-                      <span className="text-[11px] text-gray-500">{restaurant.operatingHours}</span>
+                      <input
+                        type="text"
+                        value={restaurant.operatingHours}
+                        onChange={(e) => setRestaurant((p) => ({ ...p, operatingHours: e.target.value }))}
+                        onBlur={async () => {
+                          await apiRequest(`/vendor/${restaurant.id}/settings`, { method: 'PUT', body: JSON.stringify({ operatingHours: restaurant.operatingHours }) });
+                          showToast('Operating hours saved');
+                        }}
+                        className="mt-1 w-full text-[11px] text-gray-700 font-semibold border border-gray-200 rounded-lg px-2.5 py-1.5"
+                      />
                     </div>
-                    <ChevronRight className="w-4 h-4 text-gray-400" />
                   </div>
-                  <div className="p-4 flex items-center justify-between">
-                    <div>
+                  <div className="p-4 flex items-center justify-between gap-3">
+                    <div className="flex-1">
                       <span className="font-black text-xs block">Preparation Time</span>
-                      <span className="text-[11px] text-gray-500">{restaurant.prepTime}</span>
+                      <select
+                        value={restaurant.prepTime}
+                        onChange={async (e) => {
+                          const prepTime = e.target.value;
+                          setRestaurant((p) => ({ ...p, prepTime }));
+                          await apiRequest(`/vendor/${restaurant.id}/settings`, { method: 'PUT', body: JSON.stringify({ prepTime }) });
+                          showToast(`Prep time set to ${prepTime}`);
+                        }}
+                        className="mt-1 w-full text-[11px] text-gray-700 font-semibold border border-gray-200 rounded-lg px-2.5 py-1.5 bg-white"
+                      >
+                        <option value="15 Minutes">15 Minutes</option>
+                        <option value="20 Minutes">20 Minutes</option>
+                        <option value="25 Minutes">25 Minutes</option>
+                        <option value="30 Minutes">30 Minutes</option>
+                        <option value="45 Minutes">45 Minutes</option>
+                      </select>
                     </div>
-                    <ChevronRight className="w-4 h-4 text-gray-400" />
                   </div>
                   <div className="p-4 flex items-center justify-between">
                     <div>
@@ -561,88 +610,37 @@ export const VendorPanel = ({ onLogout }) => {
               )}
 
               {subPage === 'staff' && (
-                <div className="bg-white rounded-2xl border border-gray-200 p-4 space-y-3">
-                  <div className="flex justify-between items-center">
-                    <h3 className="font-black text-sm">Staff Management</h3>
-                    <button
-                      onClick={() => {
-                        const name = window.prompt('Staff Member Name:');
-                        if (name) setStaffList((p) => [...p, { id: 'st_' + Date.now(), name, role: 'Kitchen Staff', active: true }]);
-                      }}
-                      className="px-3 py-1.5 rounded-xl bg-[#FFD000] text-black font-black text-xs"
-                    >
-                      + Add Staff
-                    </button>
-                  </div>
-                  {staffList.map((s) => (
-                    <div key={s.id} className="p-3 rounded-xl bg-gray-50 border flex justify-between items-center text-xs">
-                      <div>
-                        <span className="font-black block">{s.name}</span>
-                        <span className="text-gray-500">{s.role}</span>
-                      </div>
-                      <button onClick={() => setStaffList((p) => p.filter((x) => x.id !== s.id))} className="text-red-600 font-bold">Remove</button>
-                    </div>
-                  ))}
-                </div>
+                <VendorStaffView
+                  restaurantId={restaurant.id}
+                  staffList={staffList}
+                  setStaffList={setStaffList}
+                  showToast={showToast}
+                />
               )}
 
               {subPage === 'offers' && (
-                <div className="bg-white rounded-2xl border border-gray-200 p-4 space-y-3">
-                  <div className="flex justify-between items-center">
-                    <h3 className="font-black text-sm">Offers & Promotions</h3>
-                    <button
-                      onClick={() => {
-                        const title = window.prompt('Offer Title:');
-                        if (title) setOffersList((p) => [...p, { id: 'of_' + Date.now(), title, minOrder: 199, active: true }]);
-                      }}
-                      className="px-3 py-1.5 rounded-xl bg-[#FFD000] text-black font-black text-xs"
-                    >
-                      + Create Offer
-                    </button>
-                  </div>
-                  {offersList.map((o) => (
-                    <div key={o.id} className="p-3 rounded-xl bg-yellow-50 border border-yellow-200 flex justify-between items-center text-xs">
-                      <span className="font-black">{o.title}</span>
-                      <span className="text-emerald-700 font-bold">Active</span>
-                    </div>
-                  ))}
-                </div>
+                <VendorOffersView
+                  restaurantId={restaurant.id}
+                  offersList={offersList}
+                  setOffersList={setOffersList}
+                  showToast={showToast}
+                />
               )}
 
               {subPage === 'reviews' && (
-                <div className="bg-white rounded-2xl border border-gray-200 p-4 space-y-3">
-                  <h3 className="font-black text-sm">Customer Ratings & Reviews</h3>
-                  {reviewsList.map((r) => (
-                    <div key={r.id} className="p-3 rounded-xl bg-gray-50 border text-xs space-y-1">
-                      <div className="flex justify-between font-black">
-                        <span>{r.customer}</span><span>★ {r.rating}</span>
-                      </div>
-                      <p className="text-gray-600">{r.comment}</p>
-                      <p className="text-emerald-700 font-semibold">Reply: {r.reply}</p>
-                    </div>
-                  ))}
-                </div>
+                <VendorReviewsView
+                  restaurantId={restaurant.id}
+                  reviewsList={reviewsList}
+                  setReviewsList={setReviewsList}
+                  showToast={showToast}
+                />
               )}
 
               {subPage === 'support' && (
-                <div className="bg-white rounded-2xl border border-gray-200 p-4 space-y-3 text-xs">
-                  <h3 className="font-black text-sm">Vendor Support & Help</h3>
-                  <p className="text-gray-600">Need help with settlements, rider pickup, or FSSAI verification? Raise a ticket directly to V RIDE Admin Support.</p>
-                  <button
-                    onClick={async () => {
-                      const subject = window.prompt('Ticket Subject:');
-                      if (!subject) return;
-                      await apiRequest('/support/ticket', {
-                        method: 'POST',
-                        body: JSON.stringify({ userName: restaurant.name, category: 'Vendor Support', subject, message: 'Vendor portal inquiry' })
-                      });
-                      showToast('Vendor support ticket submitted!');
-                    }}
-                    className="w-full py-3 rounded-xl bg-[#FFD000] text-black font-black"
-                  >
-                    Raise Support Ticket
-                  </button>
-                </div>
+                <VendorSupportView
+                  restaurant={restaurant}
+                  showToast={showToast}
+                />
               )}
             </div>
           )}
@@ -959,6 +957,22 @@ export const VendorPanel = ({ onLogout }) => {
                   <span className="text-gray-500">This Month</span><span className="font-black">₹1,24,760</span>
                 </div>
               </div>
+
+              <div className="bg-white rounded-2xl border border-gray-200 p-4 space-y-2.5 text-xs">
+                <h3 className="font-black text-gray-900">Settlements & Payout History</h3>
+                {payoutsList.map((p) => (
+                  <div key={p.id} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
+                    <div>
+                      <span className="font-black text-gray-900 block">Withdrawal to {p.bank || 'HDFC Bank'}</span>
+                      <span className="text-[10px] text-gray-500">{p.date}</span>
+                    </div>
+                    <div className="text-right">
+                      <span className="font-black text-gray-900 block">₹{Number(p.amount).toLocaleString('en-IN')}</span>
+                      <span className="text-[10px] font-bold uppercase text-emerald-700">{p.status || 'pending'}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
@@ -1051,6 +1065,10 @@ export const VendorPanel = ({ onLogout }) => {
                   body: JSON.stringify({ amount: amt, method: 'HDFC Bank' })
                 });
                 setRestaurant((p) => ({ ...p, walletBalance: p.walletBalance - amt }));
+                setPayoutsList((p) => [
+                  { id: 'PAY-' + Date.now().toString().slice(-4), amount: amt, bank: 'HDFC Bank', date: 'Just now', status: 'pending' },
+                  ...p
+                ]);
                 setShowWithdraw(false);
                 showToast(`₹${amt} withdrawal requested!`);
               }}
@@ -1058,6 +1076,68 @@ export const VendorPanel = ({ onLogout }) => {
             >
               Confirm Withdrawal
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* ORDER REJECTION REASON MODAL */}
+      {rejectingOrderId && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-sm w-full p-5 space-y-3 text-xs">
+            <div className="flex justify-between items-center pb-2 border-b">
+              <h3 className="font-black text-sm text-gray-900">Reject Order #{rejectingOrderId}</h3>
+              <button onClick={() => setRejectingOrderId(null)}><X className="w-4 h-4" /></button>
+            </div>
+            <p className="text-gray-600 font-semibold">Select a reason for rejecting this order:</p>
+            <div className="space-y-1.5">
+              {['Item unavailable', 'Restaurant too busy', 'Technical issue', 'Incorrect order', 'Other'].map((r) => (
+                <label
+                  key={r}
+                  className={`flex items-center gap-2.5 p-2.5 rounded-xl border cursor-pointer ${
+                    rejectReason === r ? 'bg-red-50 border-red-300 font-black text-red-900' : 'bg-gray-50 border-gray-200 font-semibold'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="rejectReason"
+                    checked={rejectReason === r}
+                    onChange={() => setRejectReason(r)}
+                    className="accent-red-600"
+                  />
+                  <span>{r}</span>
+                </label>
+              ))}
+            </div>
+            {rejectReason === 'Other' && (
+              <input
+                type="text"
+                value={customRejectReason}
+                onChange={(e) => setCustomRejectReason(e.target.value)}
+                placeholder="Enter custom reason..."
+                className="w-full px-3 py-2 rounded-xl border border-gray-200 font-semibold"
+              />
+            )}
+            <div className="grid grid-cols-2 gap-2 pt-1">
+              <button
+                type="button"
+                onClick={() => setRejectingOrderId(null)}
+                className="py-2.5 rounded-xl bg-gray-100 font-bold text-gray-700"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  const finalReason = rejectReason === 'Other' && customRejectReason.trim() ? customRejectReason.trim() : rejectReason;
+                  const id = rejectingOrderId;
+                  setRejectingOrderId(null);
+                  await executeOrderTransition(id, 'rejected', finalReason);
+                }}
+                className="py-2.5 rounded-xl bg-red-600 text-white font-black"
+              >
+                Confirm Reject
+              </button>
+            </div>
           </div>
         </div>
       )}

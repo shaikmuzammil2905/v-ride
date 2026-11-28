@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
 import db from '../config/db.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'vride_jwt_secure_key_2026_hyderabad';
@@ -20,43 +21,32 @@ const logAudit = (adminName, action, moduleName, relatedRecord) => {
 // =====================================================================
 export const unifiedAuthController = {
   portalLogin: (req, res) => {
-    const { role, identifier, password } = req.body;
+    const { identifier, password } = req.body;
     const idClean = (identifier || '').trim().toLowerCase();
+    const phoneDigits = String(identifier || '').replace(/\D/g, '').slice(-10);
 
-    const accounts = {
-      admin: {
-        ids: ['admin@vride.in', 'admin'],
-        pass: 'VRideAdmin@2026',
-        user: { id: 'adm_super', name: 'Operations Lead', email: 'admin@vride.in', role: 'admin', city: 'All Cities' }
-      },
-      support: {
-        ids: ['support@vride.in', 'anand.admin@vride.com'],
-        pass: 'Support@2026',
-        user: { id: 'adm_support', name: 'Anand Kumar', email: 'support@vride.in', role: 'support', city: 'All Cities' }
-      },
-      rider: {
-        ids: ['partner@vride.in', 'rider@vride.in', '+91 98480 12345', '+91 97034 56789', '9703456789', '9848012345'],
-        pass: 'Partner@2026',
-        user: { id: 'ptn_ramesh', name: 'Raju Kumar', phone: '+91 97034 56789', email: 'rider@vride.in', role: 'rider', vehicleType: 'bike' }
-      },
-      vendor: {
-        ids: ['vendor@vride.in', 'paradise@vride.in', '+91 90001 11222', '9000111222'],
-        pass: 'Vendor@2026',
-        user: { id: 'rest_paradise', name: 'Paradise Biryani', email: 'vendor@vride.in', role: 'vendor', restaurantId: 'rest_paradise' }
+    const account = db.get('authAccounts').find((acc) => {
+      if (acc.email && acc.email.toLowerCase() === idClean) return true;
+      if (acc.username && acc.username.toLowerCase() === idClean) return true;
+      if (Array.isArray(acc.altEmails) && acc.altEmails.some((e) => e.toLowerCase() === idClean)) return true;
+      if (phoneDigits.length === 10) {
+        if (String(acc.phone || '').replace(/\D/g, '').slice(-10) === phoneDigits) return true;
+        if (Array.isArray(acc.altPhones) && acc.altPhones.some((p) => String(p).replace(/\D/g, '').slice(-10) === phoneDigits)) return true;
       }
-    };
+      return false;
+    });
 
-    const target = accounts[role];
-    if (!target || !target.ids.includes(idClean) || password !== target.pass) {
-      return res.status(401).json({ success: false, message: 'Invalid role credentials' });
+    if (!account || !bcrypt.compareSync(String(password || ''), account.passwordHash || '')) {
+      return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
 
-    const token = jwt.sign({ id: target.user.id, role: target.user.role }, JWT_SECRET, { expiresIn: '7d' });
-    if (role === 'admin' || role === 'support') {
-      logAudit(target.user.name, 'Portal Login', 'Auth', target.user.email);
-    }
-
-    return res.json({ success: true, token, user: target.user });
+    const token = jwt.sign(
+      { accountId: account.id, profileId: account.profileId, role: account.role },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+    const { passwordHash, ...safeUser } = account;
+    return res.json({ success: true, token, user: { ...safeUser, id: account.profileId || account.id } });
   }
 };
 
@@ -84,8 +74,11 @@ export const riderPanelController = {
     const foodOrders = db.get('foodOrders');
     const availableJobs = [
       ...rides.filter((r) => r.status === 'searching' || r.status === 'pending').map((r) => ({ ...r, jobType: 'ride' })),
-      ...foodOrders.filter((f) => f.status === 'ready_for_pickup' || f.status === 'placed').map((f) => ({ ...f, jobType: 'food' }))
+      ...foodOrders.filter((f) => f.status === 'ready_for_pickup' || f.status === 'ready' || f.status === 'placed').map((f) => ({ ...f, jobType: 'food' }))
     ];
+    const transactions = db.get('transactions').filter((t) => t.userId === riderId || t.partnerId === riderId);
+    const payouts = db.get('payouts').filter((p) => p.partnerId === riderId || p.partner === rider.name);
+    const supportTickets = db.get('supportTickets').filter((t) => t.userId === riderId || t.role === 'rider');
 
     return res.json({
       success: true,
@@ -101,7 +94,10 @@ export const riderPanelController = {
           { name: 'Kukatpally', demand: 'High' },
           { name: 'Hitech City', demand: 'Medium' }
         ],
-        availableJobs
+        availableJobs,
+        transactions,
+        payouts,
+        supportTickets
       }
     });
   },
@@ -115,6 +111,93 @@ export const riderPanelController = {
     const isOnline = Boolean(req.body.isOnline);
     if (rider) db.update('partners', riderId, { isOnline });
     return res.json({ success: true, isOnline });
+  },
+
+  updateProfile: (req, res) => {
+    const riderId = req.params.id || 'ptn_ramesh';
+    const rider = db.findById('partners', riderId);
+    if (rider) {
+      const updated = db.update('partners', riderId, req.body);
+      return res.json({ success: true, data: updated });
+    }
+    return res.json({ success: true, data: { id: riderId, ...req.body } });
+  },
+
+  withdrawWallet: (req, res) => {
+    const riderId = req.params.id || 'ptn_ramesh';
+    const amount = Number(req.body.amount || 0);
+    const destination = req.body.destination || 'SBI ···· 4821';
+    if (!amount || amount < 100) {
+      return res.status(400).json({ success: false, message: 'Minimum withdrawal amount is ₹100' });
+    }
+    const rider = db.findById('partners', riderId);
+    const currentBal = rider?.walletBalance ?? 3820;
+    if (amount > currentBal) {
+      return res.status(400).json({ success: false, message: 'Insufficient withdrawable balance' });
+    }
+    const newBalance = currentBal - amount;
+    if (rider) db.update('partners', riderId, { walletBalance: newBalance });
+
+    const payout = {
+      id: 'pay_' + uuidv4().slice(0, 8),
+      partnerId: riderId,
+      partnerName: rider?.name || 'Raju Kumar',
+      amount,
+      bankAccount: destination,
+      status: 'pending',
+      requestedAt: new Date().toISOString()
+    };
+    db.insert('payouts', payout);
+
+    const tx = {
+      id: 'tx_' + uuidv4().slice(0, 8),
+      userId: riderId,
+      type: 'debit',
+      category: 'Withdrawal',
+      title: `Withdrawal to ${destination}`,
+      amount,
+      status: 'pending',
+      date: new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }),
+      createdAt: new Date().toISOString()
+    };
+    db.insert('transactions', tx);
+
+    return res.json({ success: true, walletBalance: newBalance, payout, transaction: tx });
+  },
+
+  settleCash: (req, res) => {
+    const riderId = req.params.id || 'ptn_ramesh';
+    const amount = Number(req.body.amount || 0);
+    const rider = db.findById('partners', riderId);
+    const currentCash = rider?.cashCollected ?? 450;
+    const remaining = Math.max(0, currentCash - amount);
+    if (rider) db.update('partners', riderId, { cashCollected: remaining });
+    return res.json({ success: true, cashCollected: remaining });
+  },
+
+  rejectJob: (req, res) => {
+    const { jobId } = req.params;
+    const { jobType = 'ride', riderId = 'ptn_ramesh', reason = 'Not available', customReason = '' } = req.body;
+    const table = jobType === 'food' ? 'foodOrders' : 'rides';
+    const existing = db.findById(table, jobId);
+    if (existing) {
+      db.update(table, jobId, {
+        lastRejectedBy: riderId,
+        rejectionReason: reason === 'Other' && customReason ? customReason : reason
+      });
+    }
+    return res.json({ success: true, jobId, status: 'rejected', reason });
+  },
+
+  updateJobStage: (req, res) => {
+    const { jobId } = req.params;
+    const { jobType = 'ride', stage } = req.body;
+    const table = jobType === 'food' ? 'foodOrders' : 'rides';
+    const existing = db.findById(table, jobId);
+    if (existing) {
+      db.update(table, jobId, { status: stage });
+    }
+    return res.json({ success: true, jobId, stage });
   },
 
   acceptJob: (req, res) => {
@@ -253,6 +336,11 @@ export const vendorPanelController = {
     };
     const menuItems = db.get('menuItems').filter((m) => m.restaurantId === restId);
     const orders = db.get('foodOrders');
+    const categories = db.get('vendorCategories').filter((c) => !c.restaurantId || c.restaurantId === restId);
+    const offers = db.get('vendorOffers').filter((o) => !o.restaurantId || o.restaurantId === restId);
+    const reviews = db.get('vendorReviews').filter((r) => !r.restaurantId || r.restaurantId === restId);
+    const payouts = db.get('payouts').filter((p) => p.type === 'vendor' || p.partner === restaurant.name);
+    const staff = db.get('vendorStaff');
 
     return res.json({
       success: true,
@@ -266,7 +354,12 @@ export const vendorPanelController = {
           totalProducts: menuItems.length || 12
         },
         orders,
-        menuItems
+        menuItems,
+        categories,
+        offers,
+        reviews,
+        payouts,
+        staff
       }
     });
   },
@@ -279,6 +372,77 @@ export const vendorPanelController = {
       return res.json({ success: true, data: updated });
     }
     return res.json({ success: true, data: { id: restId, ...req.body } });
+  },
+
+  updateProfile: (req, res) => {
+    const restId = req.params.id || 'rest_paradise';
+    const existing = db.findById('restaurants', restId);
+    if (existing) {
+      const updated = db.update('restaurants', restId, req.body);
+      return res.json({ success: true, data: updated });
+    }
+    return res.json({ success: true, data: { id: restId, ...req.body } });
+  },
+
+  categoriesCrud: {
+    list: (req, res) => res.json({ success: true, data: db.get('vendorCategories') }),
+    create: (req, res) => {
+      const item = {
+        id: 'cat_' + uuidv4().slice(0, 8),
+        restaurantId: req.params.id || 'rest_paradise',
+        active: true,
+        ...req.body,
+        createdAt: new Date().toISOString()
+      };
+      db.insert('vendorCategories', item);
+      return res.json({ success: true, data: item });
+    },
+    update: (req, res) => {
+      const updated = db.update('vendorCategories', req.params.catId, req.body);
+      return res.json({ success: true, data: updated });
+    },
+    remove: (req, res) => {
+      const deleted = db.delete('vendorCategories', req.params.catId);
+      return res.json({ success: true, data: deleted });
+    }
+  },
+
+  offersCrud: {
+    list: (req, res) => res.json({ success: true, data: db.get('vendorOffers') }),
+    create: (req, res) => {
+      const item = {
+        id: 'off_' + uuidv4().slice(0, 8),
+        restaurantId: req.params.id || 'rest_paradise',
+        status: 'pending_approval', // Pending Admin Approval per Scope of Work
+        active: false,
+        ...req.body,
+        createdAt: new Date().toISOString()
+      };
+      db.insert('vendorOffers', item);
+      return res.json({ success: true, data: item });
+    },
+    update: (req, res) => {
+      const updated = db.update('vendorOffers', req.params.offerId, req.body);
+      return res.json({ success: true, data: updated });
+    }
+  },
+
+  reviewsCrud: {
+    list: (req, res) => res.json({ success: true, data: db.get('vendorReviews') }),
+    reply: (req, res) => {
+      const updated = db.update('vendorReviews', req.params.reviewId, {
+        reply: req.body.reply,
+        repliedAt: new Date().toISOString()
+      });
+      return res.json({ success: true, data: updated || { id: req.params.reviewId, reply: req.body.reply } });
+    },
+    report: (req, res) => {
+      const updated = db.update('vendorReviews', req.params.reviewId, {
+        reported: true,
+        reportReason: req.body.reason || 'Inappropriate content'
+      });
+      return res.json({ success: true, data: updated || { id: req.params.reviewId, reported: true } });
+    }
   },
 
   transitionOrder: (req, res) => {

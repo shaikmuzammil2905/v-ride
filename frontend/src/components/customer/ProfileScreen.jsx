@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   User, Star, ChevronRight, HelpCircle, Package,
   CreditCard, Clock, Shield, Gift, Award, Ticket,
@@ -8,7 +9,8 @@ import {
 import { useApp } from '../../context/AppContext';
 
 export const ProfileScreen = ({ onNavigate }) => {
-  const { currentUser, setCurrentUser, setCurrentPortal } = useApp();
+  const navigate = useNavigate();
+  const { currentUser, logoutSession } = useApp();
   const [userName] = useState(currentUser?.name || 'Sri Latha');
   const [userPhone] = useState(currentUser?.phone || '+91 98765 43210');
   const [showReferModal, setShowReferModal] = useState(false);
@@ -188,9 +190,10 @@ export const ProfileScreen = ({ onNavigate }) => {
         {/* LOGOUT BUTTON */}
         <div className="pt-2">
           <button
-            onClick={() => {
+            onClick={async () => {
               if (window.confirm('Are you sure you want to sign out?')) {
-                setCurrentPortal('website');
+                await logoutSession();
+                navigate('/login/customer', { replace: true });
               }
             }}
             className="glass-btn-dark w-full py-3.5 rounded-2xl text-white font-black text-xs flex items-center justify-center gap-2 active:scale-95"

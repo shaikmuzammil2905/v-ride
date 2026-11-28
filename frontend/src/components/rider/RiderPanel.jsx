@@ -98,13 +98,18 @@ export const RiderPanel = ({ onLogout }) => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Sync with backend on mount
+  // Sync with backend on mount + poll every 15s
   useEffect(() => {
-    apiRequest(`/rider/${rider.id}/dashboard`).then((res) => {
-      if (res?.success && res.data?.rider) {
-        setRider((prev) => ({ ...prev, ...res.data.rider }));
-      }
-    });
+    const syncRider = () => {
+      apiRequest(`/rider/${rider.id}/dashboard`).then((res) => {
+        if (res?.success && res.data?.rider) {
+          setRider((prev) => ({ ...prev, ...res.data.rider }));
+        }
+      });
+    };
+    syncRider();
+    const timer = setInterval(syncRider, 15000);
+    return () => clearInterval(timer);
   }, []);
 
   const handleToggleDuty = async () => {
@@ -244,23 +249,39 @@ export const RiderPanel = ({ onLogout }) => {
     showToast('Earnings & Wallet updated!');
   };
 
+  const [cashCollected, setCashCollected] = useState(450);
+  const [riderLanguage, setRiderLanguage] = useState('English');
+
   const handleWithdraw = async () => {
     const amt = Number(withdrawAmount);
-    if (!amt || amt <= 0) return showToast('Enter valid withdrawal amount');
+    if (!amt || amt < 100) return showToast('Minimum withdrawal amount is ₹100');
     if (amt > rider.walletBalance) return showToast('Insufficient wallet balance');
 
-    await apiRequest('/partner/withdrawal', {
+    const res = await apiRequest(`/rider/${rider.id}/withdraw`, {
       method: 'POST',
-      body: JSON.stringify({ partnerId: rider.id, amount: amt, bank: withdrawMethod })
+      body: JSON.stringify({ amount: amt, destination: withdrawMethod })
     });
+    if (res && !res.success) {
+      return showToast(res.message || 'Withdrawal failed');
+    }
 
-    setRider((prev) => ({ ...prev, walletBalance: prev.walletBalance - amt }));
+    setRider((prev) => ({ ...prev, walletBalance: res?.walletBalance ?? (prev.walletBalance - amt) }));
     setTransactions((prev) => [
       { id: 'tx_w_' + Date.now(), type: 'debit', category: 'Withdrawals', title: `Withdrawal (${withdrawMethod})`, date: 'Just now', amount: amt },
       ...prev
     ]);
     setShowWithdrawModal(false);
     showToast(`₹${amt} withdrawal request submitted (Pending)!`);
+  };
+
+  const handleSettleCash = async () => {
+    if (cashCollected <= 0) return showToast('No pending COD cash to settle');
+    await apiRequest(`/rider/${rider.id}/settle-cash`, {
+      method: 'POST',
+      body: JSON.stringify({ amount: cashCollected })
+    });
+    setCashCollected(0);
+    showToast('COD cash settled with V RIDE!');
   };
 
   const handleTriggerSos = async () => {
@@ -755,6 +776,25 @@ export const RiderPanel = ({ onLogout }) => {
                   <span className="text-lg font-black text-gray-900">₹24,860</span>
                   <span className="text-[10px] font-bold text-emerald-600 block">▲ +22%</span>
                 </div>
+              </div>
+
+              {/* Cash Collected / COD Settlement */}
+              <div className="bg-white rounded-2xl border border-gray-200 p-4 flex items-center justify-between gap-3">
+                <div>
+                  <span className="text-[11px] font-bold text-gray-500 block">Cash Collected (COD)</span>
+                  <span className="text-lg font-black text-gray-900">₹{cashCollected}</span>
+                  <span className="text-[10px] font-bold text-amber-700 block">
+                    {cashCollected > 0 ? 'Settlement Due' : 'All Settled ✓'}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleSettleCash}
+                  disabled={cashCollected <= 0}
+                  className="px-4 py-2 rounded-xl bg-[#10151F] text-[#FFD000] font-black text-xs disabled:opacity-40"
+                >
+                  Settle Cash
+                </button>
               </div>
 
               {/* Transaction History */}

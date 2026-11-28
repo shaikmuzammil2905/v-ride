@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   X, Bike, Package, Utensils, ShieldCheck,
   HelpCircle, LogOut, ChevronRight, Tag,
@@ -7,7 +8,8 @@ import {
 import { useApp } from '../../context/AppContext';
 
 export const DrawerMenu = ({ isOpen, onClose, onNavigate }) => {
-  const { currentUser, setCurrentPortal } = useApp();
+  const navigate = useNavigate();
+  const { currentUser, logoutSession } = useApp();
   const [showAddressModal, setShowAddressModal] = useState(false);
   const [showPaymentsModal, setShowPaymentsModal] = useState(false);
   const [showCouponsModal, setShowCouponsModal] = useState(false);
@@ -207,10 +209,11 @@ export const DrawerMenu = ({ isOpen, onClose, onNavigate }) => {
         {/* Footer with Sign Out */}
         <div className="p-4 border-t border-gray-100">
           <button
-            onClick={() => {
+            onClick={async () => {
               if (window.confirm('Sign out from V RIDE Customer Account?')) {
                 onClose();
-                setCurrentPortal('website');
+                await logoutSession();
+                navigate('/login/customer', { replace: true });
               }
             }}
             className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-black text-red-600 bg-red-50 hover:bg-red-100 transition active:scale-98"
