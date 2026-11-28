@@ -360,7 +360,7 @@ export const VendorPanel = ({ onLogout }) => {
                   <img src={editingItem.image || '/images/food-biryani.jpg'} alt="Item" className="w-24 h-20 rounded-xl object-cover bg-gray-100 border" />
                   <label className="px-3.5 py-2 rounded-xl border border-gray-300 bg-gray-50 text-xs font-bold cursor-pointer flex items-center gap-1.5">
                     <Camera className="w-4 h-4" />
-                    <span>{uploadingPhoto ? 'Uploading...' : 'Change Photo (S3)'}</span>
+                    <span>{uploadingPhoto ? 'Uploading...' : 'Change Photo'}</span>
                     <input
                       type="file"
                       accept="image/*"

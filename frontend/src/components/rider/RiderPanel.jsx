@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Home, Wallet, Clock, User, Bike, Utensils, ChevronRight,
+  Home, Wallet, Clock, User, Bike, Utensils, ChevronRight, ArrowLeft,
   Building2, Smartphone, Plus, ShieldCheck, FileText, CreditCard,
   Star, Settings, HelpCircle, AlertTriangle, TrendingUp, MapPin,
   Upload, CheckCircle2, X, Award
@@ -82,8 +82,21 @@ export const RiderPanel = ({ onLogout }) => {
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
   const [withdrawAmount, setWithdrawAmount] = useState('1000');
   const [withdrawMethod, setWithdrawMethod] = useState('Bank (SBI ···· 4821)');
-  const [profileModal, setProfileModal] = useState(null); // 'documents' | 'vehicle' | 'bank' | 'ratings' | 'settings' | 'support' | 'demand' | 'earnings'
+  const [profileModal, setProfileModal] = useState(null); // dedicated sub-page: 'documents' | 'vehicle' | 'bank' | 'ratings' | 'settings' | 'support' | 'demand' | 'earnings'
   const [sosConfirming, setSosConfirming] = useState(false);
+
+  const openSubPage = (page) => {
+    setProfileModal(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const switchTab = (tab) => {
+    setWorkflowMode(null);
+    setProfileModal(null);
+    setSelectedHistoryItem(null);
+    setActiveTab(tab);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   // Sync with backend on mount
   useEffect(() => {
@@ -321,7 +334,7 @@ export const RiderPanel = ({ onLogout }) => {
             return (
               <button
                 key={t.id}
-                onClick={() => { setWorkflowMode(null); setActiveTab(t.id); }}
+                onClick={() => switchTab(t.id)}
                 className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-3 transition ${
                   active ? 'bg-[#FFD000] text-black font-black' : 'text-gray-300 hover:bg-white/10'
                 }`}
@@ -396,8 +409,137 @@ export const RiderPanel = ({ onLogout }) => {
             </div>
           )}
 
+          {/* DEDICATED SUB-PAGES (Documents, Vehicle, Bank, Ratings, Settings, Support, Demand, Earnings, Job Details) */}
+          {!workflowMode && selectedHistoryItem && (
+            <div className="p-4 space-y-4">
+              <button
+                type="button"
+                onClick={() => setSelectedHistoryItem(null)}
+                className="flex items-center gap-1.5 text-xs font-black text-gray-700"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Back to History</span>
+              </button>
+              <div className="bg-white rounded-3xl border border-gray-200 p-5 space-y-3 shadow-xs">
+                <h2 className="font-black text-base text-gray-900">Job Details</h2>
+                <div className="space-y-2.5 text-xs">
+                  <div className="flex justify-between py-1.5 border-b border-gray-100"><span className="text-gray-500">Route</span><span className="font-black">{selectedHistoryItem.route}</span></div>
+                  <div className="flex justify-between py-1.5 border-b border-gray-100"><span className="text-gray-500">Date & Time</span><span className="font-bold">{selectedHistoryItem.date}</span></div>
+                  <div className="flex justify-between py-1.5 border-b border-gray-100"><span className="text-gray-500">Status</span><span className="font-black text-emerald-600">{selectedHistoryItem.status}</span></div>
+                  <div className="flex justify-between py-1.5 border-b border-gray-100"><span className="text-gray-500">Payment Mode</span><span className="font-bold">{selectedHistoryItem.payment}</span></div>
+                  <div className="flex justify-between py-1.5 border-b border-gray-100"><span className="text-gray-500">Commission</span><span className="font-bold">₹{selectedHistoryItem.commission}</span></div>
+                  <div className="flex justify-between py-2 bg-yellow-50 px-3 rounded-xl"><span className="font-black">Net Earnings</span><span className="font-black text-sm">₹{selectedHistoryItem.amount}</span></div>
+                  {selectedHistoryItem.rating && <div className="flex justify-between py-1.5"><span className="text-gray-500">Customer Rating</span><span className="font-black">★ {selectedHistoryItem.rating}</span></div>}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {!workflowMode && !selectedHistoryItem && profileModal && (
+            <div className="p-4 space-y-4">
+              <button
+                type="button"
+                onClick={() => setProfileModal(null)}
+                className="flex items-center gap-1.5 text-xs font-black text-gray-700"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Back</span>
+              </button>
+
+              <div className="bg-white rounded-3xl border border-gray-200 p-5 space-y-3 shadow-xs">
+                <h2 className="font-black text-base uppercase text-gray-900">{profileModal}</h2>
+
+                {profileModal === 'documents' && (
+                  <div className="space-y-3 text-xs">
+                    <p className="text-gray-500">Driving Licence, RC, ID Proof & Insurance (Verified)</p>
+                    <label className="flex items-center justify-center gap-2 p-3.5 rounded-xl border border-dashed border-gray-300 cursor-pointer font-bold bg-gray-50 hover:border-[#FFD000]">
+                      <Upload className="w-4 h-4" />
+                      <span>Upload / Renew Document</span>
+                      <input
+                        type="file"
+                        className="hidden"
+                        onChange={async (e) => {
+                          const f = e.target.files?.[0];
+                          if (!f) return;
+                          await uploadMediaToS3(f, 'rider-docs');
+                          showToast('Document uploaded and submitted for verification!');
+                        }}
+                      />
+                    </label>
+                  </div>
+                )}
+
+                {profileModal === 'vehicle' && (
+                  <div className="space-y-3 text-xs">
+                    <input
+                      value={rider.vehicleModel}
+                      onChange={(e) => setRider((p) => ({ ...p, vehicleModel: e.target.value }))}
+                      className="w-full p-2.5 rounded-xl border text-xs font-bold"
+                      placeholder="Vehicle Model"
+                    />
+                    <input
+                      value={rider.vehicleNumber}
+                      onChange={(e) => setRider((p) => ({ ...p, vehicleNumber: e.target.value }))}
+                      className="w-full p-2.5 rounded-xl border text-xs font-bold"
+                      placeholder="Registration Number"
+                    />
+                    <button
+                      onClick={() => { setProfileModal(null); showToast('Vehicle details saved!'); }}
+                      className="w-full py-3 rounded-xl bg-[#FFD000] text-black font-black"
+                    >
+                      Save Vehicle Info
+                    </button>
+                  </div>
+                )}
+
+                {profileModal === 'bank' && (
+                  <div className="space-y-3 text-xs">
+                    <input
+                      value={rider.bankLabel}
+                      onChange={(e) => setRider((p) => ({ ...p, bankLabel: e.target.value }))}
+                      className="w-full p-2.5 rounded-xl border text-xs font-bold"
+                      placeholder="Bank / UPI Details"
+                    />
+                    <button
+                      onClick={() => { setProfileModal(null); showToast('Bank / UPI updated!'); }}
+                      className="w-full py-3 rounded-xl bg-[#FFD000] text-black font-black"
+                    >
+                      Save Bank Details
+                    </button>
+                  </div>
+                )}
+
+                {profileModal !== 'documents' && profileModal !== 'vehicle' && profileModal !== 'bank' && (
+                  <div className="text-xs text-gray-600 space-y-3">
+                    <p>Detailed {profileModal} overview and controls for {rider.name}.</p>
+                    {profileModal === 'earnings' && (
+                      <div className="p-3 rounded-xl bg-yellow-50 border border-yellow-200 space-y-1.5">
+                        <div className="flex justify-between"><span>Base + Distance Fare</span><span className="font-black">₹{todayStats.earnings - 120}</span></div>
+                        <div className="flex justify-between"><span>Peak Surge & Tips</span><span className="font-black text-emerald-700">+ ₹120</span></div>
+                        <div className="flex justify-between pt-1 border-t border-yellow-200 font-black"><span>Total Today</span><span>₹{todayStats.earnings}</span></div>
+                      </div>
+                    )}
+                    {profileModal === 'demand' && (
+                      <div className="space-y-2">
+                        {['Miyapur (High · +₹25 Surge)', 'Kukatpally (High · +₹20 Surge)', 'Hitech City (Medium · +₹10 Surge)', 'Gachibowli (Medium)', 'Madhapur (High)'].map((z) => (
+                          <div key={z} className="p-2.5 rounded-xl bg-gray-50 border font-bold">{z}</div>
+                        ))}
+                      </div>
+                    )}
+                    <button
+                      onClick={() => setProfileModal(null)}
+                      className="w-full py-3 rounded-xl bg-[#FFD000] text-black font-black"
+                    >
+                      Done
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* PAGE 1 – HOME DASHBOARD */}
-          {!workflowMode && activeTab === 'home' && (
+          {!workflowMode && !selectedHistoryItem && !profileModal && activeTab === 'home' && (
             <div className="space-y-4">
               {/* Dark Hero matching image copy 34.png */}
               <div className="bg-[#10151F] text-white px-4 pt-4 pb-5 rounded-b-3xl md:rounded-2xl md:m-4 flex items-center justify-between">
@@ -546,7 +688,7 @@ export const RiderPanel = ({ onLogout }) => {
           )}
 
           {/* PAGE 2 – WALLET */}
-          {!workflowMode && activeTab === 'wallet' && (
+          {!workflowMode && !selectedHistoryItem && !profileModal && activeTab === 'wallet' && (
             <div className="p-4 space-y-4">
               <h1 className="text-lg font-black text-gray-900">Wallet</h1>
 
@@ -651,7 +793,7 @@ export const RiderPanel = ({ onLogout }) => {
           )}
 
           {/* PAGE 3 – HISTORY */}
-          {!workflowMode && activeTab === 'history' && (
+          {!workflowMode && !selectedHistoryItem && !profileModal && activeTab === 'history' && (
             <div className="p-4 space-y-4">
               <h1 className="text-lg font-black text-gray-900">History</h1>
 
@@ -727,7 +869,7 @@ export const RiderPanel = ({ onLogout }) => {
           )}
 
           {/* PAGE 4 – PROFILE */}
-          {!workflowMode && activeTab === 'profile' && (
+          {!workflowMode && !selectedHistoryItem && !profileModal && activeTab === 'profile' && (
             <div className="p-4 space-y-4">
               <h1 className="text-lg font-black text-gray-900">Profile</h1>
 
@@ -807,7 +949,7 @@ export const RiderPanel = ({ onLogout }) => {
             <button
               key={t.id}
               type="button"
-              onClick={() => { setWorkflowMode(null); setActiveTab(t.id); }}
+              onClick={() => switchTab(t.id)}
               className={`flex flex-col items-center px-3.5 py-1.5 rounded-2xl transition ${
                 active ? 'bg-[#FFD000] text-black font-black' : 'text-gray-400'
               }`}
@@ -841,110 +983,6 @@ export const RiderPanel = ({ onLogout }) => {
         </div>
       )}
 
-      {/* HISTORY DETAIL MODAL */}
-      {selectedHistoryItem && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-sm w-full p-5 space-y-3">
-            <div className="flex justify-between items-center pb-2 border-b">
-              <h3 className="font-black text-sm">Job Details</h3>
-              <button onClick={() => setSelectedHistoryItem(null)}><X className="w-4 h-4" /></button>
-            </div>
-            <div className="space-y-2 text-xs">
-              <p><strong>Route:</strong> {selectedHistoryItem.route}</p>
-              <p><strong>Date & Time:</strong> {selectedHistoryItem.date}</p>
-              <p><strong>Status:</strong> {selectedHistoryItem.status}</p>
-              <p><strong>Payment Mode:</strong> {selectedHistoryItem.payment}</p>
-              <p><strong>Commission:</strong> ₹{selectedHistoryItem.commission}</p>
-              <p><strong>Net Earnings:</strong> ₹{selectedHistoryItem.amount}</p>
-              {selectedHistoryItem.rating && <p><strong>Customer Rating:</strong> ★ {selectedHistoryItem.rating}</p>}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* PROFILE / DETAIL MODAL */}
-      {profileModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full p-5 space-y-3">
-            <div className="flex justify-between items-center pb-2 border-b">
-              <h3 className="font-black text-sm uppercase">{profileModal}</h3>
-              <button onClick={() => setProfileModal(null)}><X className="w-4 h-4" /></button>
-            </div>
-
-            {profileModal === 'documents' && (
-              <div className="space-y-2 text-xs">
-                <p className="text-gray-500">Driving Licence, RC, ID Proof & Insurance (S3 Protected)</p>
-                <label className="flex items-center justify-center gap-2 p-3 rounded-xl border border-dashed border-gray-300 cursor-pointer font-bold bg-gray-50">
-                  <Upload className="w-4 h-4" />
-                  <span>Upload / Renew Document to AWS S3</span>
-                  <input
-                    type="file"
-                    className="hidden"
-                    onChange={async (e) => {
-                      const f = e.target.files?.[0];
-                      if (!f) return;
-                      await uploadMediaToS3(f, 'rider-docs');
-                      showToast('Document uploaded to AWS S3!');
-                    }}
-                  />
-                </label>
-              </div>
-            )}
-
-            {profileModal === 'vehicle' && (
-              <div className="space-y-2 text-xs">
-                <input
-                  value={rider.vehicleModel}
-                  onChange={(e) => setRider((p) => ({ ...p, vehicleModel: e.target.value }))}
-                  className="w-full p-2.5 rounded-xl border text-xs font-bold"
-                  placeholder="Vehicle Model"
-                />
-                <input
-                  value={rider.vehicleNumber}
-                  onChange={(e) => setRider((p) => ({ ...p, vehicleNumber: e.target.value }))}
-                  className="w-full p-2.5 rounded-xl border text-xs font-bold"
-                  placeholder="Registration Number"
-                />
-                <button
-                  onClick={() => { setProfileModal(null); showToast('Vehicle details saved!'); }}
-                  className="w-full py-2.5 rounded-xl bg-[#FFD000] text-black font-black"
-                >
-                  Save Vehicle Info
-                </button>
-              </div>
-            )}
-
-            {profileModal === 'bank' && (
-              <div className="space-y-2 text-xs">
-                <input
-                  value={rider.bankLabel}
-                  onChange={(e) => setRider((p) => ({ ...p, bankLabel: e.target.value }))}
-                  className="w-full p-2.5 rounded-xl border text-xs font-bold"
-                  placeholder="Bank / UPI Details"
-                />
-                <button
-                  onClick={() => { setProfileModal(null); showToast('Bank / UPI updated!'); }}
-                  className="w-full py-2.5 rounded-xl bg-[#FFD000] text-black font-black"
-                >
-                  Save Bank Details
-                </button>
-              </div>
-            )}
-
-            {profileModal !== 'documents' && profileModal !== 'vehicle' && profileModal !== 'bank' && (
-              <div className="text-xs text-gray-600 space-y-2">
-                <p>All {profileModal} metrics and controls are active and synchronized with your V RIDE Rider account ({rider.name}).</p>
-                <button
-                  onClick={() => setProfileModal(null)}
-                  className="w-full py-2.5 rounded-xl bg-[#FFD000] text-black font-black"
-                >
-                  Close
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 };

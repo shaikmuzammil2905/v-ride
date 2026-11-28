@@ -30,9 +30,9 @@ export const PartnerApp = () => {
     const res = await uploadMediaToS3(file, 'partner-kyc');
     setUploadingDoc(false);
     if (res?.success && res.data?.url) {
-      setKycUploadMsg(`${docLabel} uploaded to AWS S3!`);
+      setKycUploadMsg(`${docLabel} uploaded successfully!`);
     } else {
-      setKycUploadMsg(`${docLabel} saved locally (start backend for live S3 sync).`);
+      setKycUploadMsg(`${docLabel} saved locally.`);
     }
   };
 
@@ -374,10 +374,10 @@ export const PartnerApp = () => {
 
               <div className="pt-2 border-t border-neutral-800 space-y-2">
                 <label className="block text-[11px] font-bold text-yellow-400">
-                  Upload / Update KYC Document to AWS S3 (aitacademy)
+                  Upload / Update KYC Document
                 </label>
                 <label className="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-black border border-dashed border-neutral-700 hover:border-yellow-400 cursor-pointer text-xs font-bold text-gray-200">
-                  <span>{uploadingDoc ? 'Uploading to S3...' : '📤 Upload DL / RC / Aadhaar'}</span>
+                  <span>{uploadingDoc ? 'Uploading...' : '📤 Upload DL / RC / Aadhaar'}</span>
                   <input type="file" accept="image/*,.pdf" onChange={(e) => handlePartnerDocUpload(e, 'KYC Document')} className="hidden" />
                 </label>
                 {kycUploadMsg && (

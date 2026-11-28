@@ -135,7 +135,7 @@ export const SupportPortal = () => {
 
               {t.attachmentUrl && (
                 <a href={t.attachmentUrl} target="_blank" rel="noreferrer" className="text-xs font-bold text-blue-600 underline block">
-                  View S3 Attachment ↗
+                  View Attachment ↗
                 </a>
               )}
 

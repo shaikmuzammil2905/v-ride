@@ -121,7 +121,7 @@ export const SupportScreen = ({ onBack }) => {
             )}
             <div>
               <h1 className="text-base font-black text-white">24/7 Help & Support Panel</h1>
-              <p className="text-[10px] text-gray-300">AWS S3 Evidence Upload · Live Ticket Tracking</p>
+              <p className="text-[10px] text-gray-300">Live Ticket Tracking · Fast Resolution</p>
             </div>
           </div>
           <span className="text-[10px] font-black bg-[#FFD600] text-black px-2 py-0.5 rounded-full">
@@ -190,14 +190,14 @@ export const SupportScreen = ({ onBack }) => {
               />
             </div>
 
-            {/* S3 Attachment Upload */}
+            {/* Attachment Upload */}
             <div>
               <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">
-                Attach Screenshot (AWS S3)
+                Attach Screenshot (Optional)
               </label>
               <label className="flex items-center justify-center gap-2 p-2.5 rounded-xl border border-dashed border-gray-300 bg-gray-50 text-xs font-bold text-gray-700 cursor-pointer hover:border-yellow-400">
                 <Upload className="w-3.5 h-3.5" />
-                <span>{uploading ? 'Uploading to S3...' : attachmentUrl ? 'Screenshot Attached ✓' : 'Upload Screenshot'}</span>
+                <span>{uploading ? 'Uploading...' : attachmentUrl ? 'Screenshot Attached ✓' : 'Upload Screenshot'}</span>
                 <input type="file" accept="image/*" onChange={handleFileAttach} className="hidden" />
               </label>
             </div>

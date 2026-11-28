@@ -2,17 +2,11 @@ import React, { useState, useEffect } from 'react';
 import {
   LayoutDashboard, Radio, Users, Utensils, Bike, ShoppingBag, Package, Car,
   Wallet, FileBarChart, MessageSquare, ShieldCheck, Settings, History,
-  Image as ImageIcon, Search, Bell, Menu, X, Plus, Edit3, Trash2, Upload,
-  CheckCircle2, Download, Phone, RefreshCw, Copy, ExternalLink, LogOut
+  Search, Bell, Menu, X, Plus, Edit3, Trash2,
+  CheckCircle2, Download, Phone, RefreshCw, LogOut
 } from 'lucide-react';
 import MapComponent from '../common/MapComponent';
-import {
-  apiRequest,
-  uploadMediaToS3,
-  listS3Media,
-  deleteS3Media,
-  openRazorpayCheckout
-} from '../../services/api';
+import { apiRequest } from '../../services/api';
 
 export const AdminDashboard = ({ onLogout }) => {
   const [activeNav, setActiveNav] = useState('dashboard');
@@ -103,24 +97,18 @@ export const AdminDashboard = ({ onLogout }) => {
     cities: 'Hyderabad, Vijayawada, Guntur'
   });
 
-  // S3 Media Manager
-  const [s3Media, setS3Media] = useState([]);
-  const [s3Loading, setS3Loading] = useState(false);
-
   // Generic Add/Edit Modal
   const [modal, setModal] = useState({ open: false, type: '', data: {} });
 
   const syncAll = async () => {
-    const [ticketsRes, adminsRes, auditRes, s3Res] = await Promise.all([
+    const [ticketsRes, adminsRes, auditRes] = await Promise.all([
       apiRequest('/support/tickets'),
       apiRequest('/admin/accounts'),
-      apiRequest('/admin/audit-logs'),
-      listS3Media()
+      apiRequest('/admin/audit-logs')
     ]);
     if (ticketsRes?.success && ticketsRes.data?.length) setTickets(ticketsRes.data);
     if (adminsRes?.success && adminsRes.data?.length) setAdminAccounts(adminsRes.data);
     if (auditRes?.success && auditRes.data?.length) setAuditLogs(auditRes.data);
-    if (s3Res?.success && s3Res.data?.items) setS3Media(s3Res.data.items);
   };
 
   useEffect(() => {
@@ -159,8 +147,7 @@ export const AdminDashboard = ({ onLogout }) => {
     { id: 'support', label: 'Support', icon: MessageSquare },
     { id: 'admin_roles', label: 'Admin & Roles', icon: ShieldCheck },
     { id: 'settings', label: 'Settings', icon: Settings },
-    { id: 'audit', label: 'Audit Logs', icon: History },
-    { id: 'media', label: 'AWS S3 Media', icon: ImageIcon }
+    { id: 'audit', label: 'Audit Logs', icon: History }
   ];
 
   const currentNavLabel = sidebarMenu.find((m) => m.id === activeNav)?.label || 'Dashboard';
@@ -206,7 +193,11 @@ export const AdminDashboard = ({ onLogout }) => {
             return (
               <button
                 key={item.id}
-                onClick={() => { setActiveNav(item.id); setMobileMenuOpen(false); }}
+                onClick={() => {
+                  setActiveNav(item.id);
+                  setMobileMenuOpen(false);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
                 className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-3 transition ${
                   active ? 'bg-[#FFD000] text-black font-black shadow-xs' : 'text-gray-300 hover:bg-white/10'
                 }`}
@@ -803,12 +794,12 @@ export const AdminDashboard = ({ onLogout }) => {
                 ))}
               </div>
 
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 {['overview', 'settlements', 'withdrawals', 'refunds'].map((t) => (
                   <button
                     key={t}
                     onClick={() => setFinanceTab(t)}
-                    className={`px-3.5 py-2 rounded-xl text-xs font-black capitalize ${financeTab === t ? 'bg-[#FFD000] text-black' : 'bg-white border border-gray-200'}`}
+                    className={`px-3.5 py-2 rounded-xl text-xs font-black capitalize transition ${financeTab === t ? 'bg-[#FFD000] text-black shadow-xs' : 'bg-white border border-gray-200 text-gray-700'}`}
                   >
                     {t}
                   </button>
@@ -839,21 +830,12 @@ export const AdminDashboard = ({ onLogout }) => {
               )}
 
               {(financeTab === 'overview' || financeTab === 'withdrawals') && (
-                <div className="bg-white rounded-2xl border border-gray-200 p-4 space-y-2">
-                  <div className="flex justify-between items-center">
+                <div className="bg-white rounded-2xl border border-gray-200 p-4 space-y-2.5">
+                  <div className="flex flex-wrap justify-between items-center gap-2">
                     <h3 className="font-black text-sm">Rider Withdrawals</h3>
-                    <button
-                      onClick={() => openRazorpayCheckout({
-                        amount: 500,
-                        name: 'V RIDE Settlement Test',
-                        description: 'Razorpay Payout Test',
-                        onSuccess: (r) => showToast(`Razorpay Verified: ${r.paymentId}`),
-                        onFailure: (err) => showToast(err)
-                      })}
-                      className="px-3 py-1.5 rounded-xl bg-[#FFD000] text-black font-black text-xs"
-                    >
-                      Test Razorpay Checkout
-                    </button>
+                    <span className="text-[11px] font-bold text-gray-500">
+                      {payouts.filter((w) => w.status === 'Pending').length} Pending
+                    </span>
                   </div>
                   {payouts.map((w) => (
                     <div key={w.id} className="p-3 rounded-xl bg-gray-50 border flex justify-between items-center text-xs">
@@ -1051,48 +1033,6 @@ export const AdminDashboard = ({ onLogout }) => {
             </div>
           )}
 
-          {/* 15. AWS S3 MEDIA MANAGER */}
-          {activeNav === 'media' && (
-            <div className="space-y-4">
-              <div className="bg-white p-4 rounded-2xl border border-gray-200 flex justify-between items-center">
-                <div>
-                  <h2 className="font-black text-sm">AWS S3 Media Manager (`aitacademy`)</h2>
-                  <p className="text-xs text-gray-500">Upload, copy public URLs, or delete media objects.</p>
-                </div>
-                <label className="px-4 py-2 rounded-xl bg-[#FFD000] text-black font-black text-xs cursor-pointer flex items-center gap-1.5">
-                  <Upload className="w-3.5 h-3.5" />
-                  <span>{s3Loading ? 'Uploading...' : 'Upload to S3'}</span>
-                  <input
-                    type="file"
-                    className="hidden"
-                    onChange={async (e) => {
-                      const f = e.target.files?.[0];
-                      if (!f) return;
-                      setS3Loading(true);
-                      const res = await uploadMediaToS3(f, 'vride-media');
-                      setS3Loading(false);
-                      if (res?.success && res.data) {
-                        setS3Media((p) => [res.data, ...p]);
-                        showToast(`Uploaded ${f.name} to S3!`);
-                      } else showToast('Start backend (port 5000) for live S3 upload.');
-                    }}
-                  />
-                </label>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {s3Media.map((m) => (
-                  <div key={m.key} className="bg-white rounded-2xl border p-3 space-y-2 text-xs">
-                    <img src={m.url} alt={m.key} className="w-full h-32 object-cover rounded-xl bg-gray-100" />
-                    <p className="font-bold truncate">{m.key}</p>
-                    <div className="flex gap-2">
-                      <button onClick={() => { navigator.clipboard?.writeText(m.url); showToast('Copied URL'); }} className="flex-1 py-1.5 rounded bg-gray-100 font-bold">Copy URL</button>
-                      <button onClick={async () => { await deleteS3Media(m.key); setS3Media((p) => p.filter((x) => x.key !== m.key)); showToast('Deleted from S3'); }} className="p-1.5 rounded bg-red-50 text-red-600"><Trash2 className="w-3.5 h-3.5" /></button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </main>
       </div>
 

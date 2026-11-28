@@ -69,7 +69,7 @@ export const WalletScreen = () => {
           <p className="text-[10px] text-gray-300">Powered by Razorpay Secure Checkout</p>
         </div>
         <span className="text-[10px] font-black bg-[#FFD600] text-black px-2.5 py-0.5 rounded-full">
-          RAZORPAY TEST
+          SECURE PAY
         </span>
       </div>
 
@@ -178,7 +178,7 @@ export const WalletScreen = () => {
 
             <div className="p-2.5 rounded-xl bg-yellow-50 border border-yellow-200 text-[10px] text-gray-700 flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-              <span>UPI, Cards, NetBanking & Wallets supported via Razorpay Test Mode.</span>
+              <span>UPI, Cards, NetBanking & Wallets supported via Razorpay.</span>
             </div>
 
             <button
