@@ -35,6 +35,7 @@ import {
   requireAuth,
   requireRole
 } from '../controllers/authSystemController.js';
+import { onboardingController } from '../controllers/onboardingController.js';
 
 const router = express.Router();
 const upload = multer({
@@ -201,6 +202,13 @@ router.delete('/admin/accounts/:id', requireAuth, requireRole('admin', 'super_ad
 router.get('/admin/audit-logs', requireAuth, requireRole('admin', 'super_admin'), adminGovernanceController.listAuditLogs);
 router.get('/admin/settings', requireAuth, requireRole('admin', 'super_admin'), adminGovernanceController.getSettings);
 router.put('/admin/settings', requireAuth, requireRole('admin', 'super_admin'), adminGovernanceController.updateSettings);
+
+// --- Partner Onboarding & Admin Approval Routes ---
+router.post('/onboarding/restaurant', onboardingController.submitRestaurant);
+router.post('/onboarding/rider', onboardingController.submitRider);
+router.get('/onboarding/status', onboardingController.trackStatus);
+router.get('/admin/onboarding', requireAuth, requireRole('admin', 'super_admin'), onboardingController.listAllForAdmin);
+router.put('/admin/onboarding/:type/:id/decision', requireAuth, requireRole('admin', 'super_admin'), onboardingController.decideApplication);
 
 // --- CMS & Support Panel Routes ---
 router.get('/cms/banners', cmsController.getBanners);

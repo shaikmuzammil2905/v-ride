@@ -39,6 +39,7 @@ class Database {
       vendorReviews: [],
       vendorStaff: [],
       sosEvents: [],
+      onboardingApplications: [],
       settings: {}
     };
     this.init();

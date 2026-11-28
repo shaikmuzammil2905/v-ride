@@ -42,6 +42,56 @@
   ],
   "partners": [
     {
+      "id": "RDR_A2DE46",
+      "applicationId": "APP_RDR_A4C717",
+      "name": "Test Rider",
+      "phone": "9988776644",
+      "email": "testrider@vride.in",
+      "dob": "",
+      "address": "",
+      "emergencyContact": "",
+      "city": "Hyderabad",
+      "vehicle": "Bike",
+      "vehicleType": "bike",
+      "vehicleModel": "",
+      "vehicleNo": "TS09AB1111",
+      "vehicleNumber": "TS09AB1111",
+      "services": [
+        "Food Delivery",
+        "Parcel Delivery",
+        "Customer Pick & Drop"
+      ],
+      "preferredLocation": "Miyapur, Hyderabad",
+      "availability": "Full-time",
+      "gps": {
+        "lat": 17.4948,
+        "lng": 78.3578
+      },
+      "documents": {
+        "idProof": "Submitted",
+        "pan": "Submitted",
+        "drivingLicense": "Submitted",
+        "vehicleRC": "TS09AB1111",
+        "insurance": "Submitted",
+        "bankProof": "Uploaded"
+      },
+      "bankDetails": {
+        "accountHolder": "Test Rider",
+        "bankName": "",
+        "accountNumberMasked": "",
+        "ifscCode": ""
+      },
+      "isOnline": false,
+      "online": false,
+      "rating": 5,
+      "totalTrips": 0,
+      "walletBalance": 0,
+      "appliedOn": "28 Nov 2026",
+      "status": "pending",
+      "remarks": "",
+      "createdAt": "2026-11-28T13:48:28.769Z"
+    },
+    {
       "id": "ptn_ramesh",
       "name": "Ramesh K",
       "phone": "+91 98480 12345",
@@ -239,6 +289,55 @@
     }
   ],
   "restaurants": [
+    {
+      "id": "RST_0E7544",
+      "applicationId": "APP_RST_BD37F6",
+      "name": "Test Kitchen",
+      "owner": "Test Owner",
+      "phone": "9988776655",
+      "email": "testrest@vride.in",
+      "ownerPhoto": "",
+      "logo": "",
+      "restaurantType": "Both",
+      "cuisine": "Multi Cuisine",
+      "cuisines": [
+        "Multi Cuisine"
+      ],
+      "address": "Miyapur, Hyderabad",
+      "area": "Miyapur",
+      "city": "Hyderabad",
+      "gps": {
+        "lat": 17.4948,
+        "lng": 78.3578
+      },
+      "operatingHours": "10:00 AM - 11:00 PM",
+      "prepTime": "20 Minutes",
+      "documents": {
+        "fssai": "FSSAI123",
+        "pan": "ABCDE1234F",
+        "gst": "N/A",
+        "ownerIdProof": "Submitted",
+        "bankProof": "Cancelled Cheque Uploaded"
+      },
+      "docs": [
+        "FSSAI: FSSAI123",
+        "PAN: ABCDE1234F",
+        "GST: N/A",
+        "Bank: HDFC (HDFC0001)"
+      ],
+      "bankDetails": {
+        "accountHolder": "Test Owner",
+        "bankName": "HDFC",
+        "accountNumberMasked": "••••7890",
+        "ifscCode": "HDFC0001"
+      },
+      "isOpen": false,
+      "rating": 4.5,
+      "appliedOn": "28 Nov 2026",
+      "status": "pending",
+      "remarks": "",
+      "createdAt": "2026-11-28T13:48:28.678Z"
+    },
     {
       "id": "rest_paradise",
       "name": "Paradise Biryani",
@@ -783,6 +882,34 @@
   },
   "authAccounts": [
     {
+      "id": "auth_5d597a94",
+      "profileId": "RDR_A2DE46",
+      "name": "Test Rider",
+      "username": "testrider",
+      "email": "testrider@vride.in",
+      "phone": "9988776644",
+      "role": "rider",
+      "vehicleType": "bike",
+      "passwordHash": "$2a$10$Xf1d/P6HK0O4RYk1FPE2w.qwJQYtiNvyuHw8WUeV4V5InJy23Z1ZW",
+      "active": false,
+      "status": "pending",
+      "createdAt": "2026-11-28T13:48:28.873Z"
+    },
+    {
+      "id": "auth_35651c50",
+      "profileId": "RST_0E7544",
+      "restaurantId": "RST_0E7544",
+      "name": "Test Kitchen",
+      "username": "testrest",
+      "email": "testrest@vride.in",
+      "phone": "9988776655",
+      "role": "vendor",
+      "passwordHash": "$2a$10$oj.TiYjdoF895firWc35ce1ycvxJN/Lq1vQPH1RxNqI5KpWspv6Ce",
+      "active": false,
+      "status": "pending",
+      "createdAt": "2026-11-28T13:48:28.768Z"
+    },
+    {
       "id": "auth_customer_srilatha",
       "profileId": "usr_srilatha",
       "name": "Sri Latha",
@@ -976,5 +1103,110 @@
     }
   ],
   "otpRecords": [],
-  "passwordResets": []
+  "passwordResets": [],
+  "onboardingApplications": [
+    {
+      "id": "RDR_A2DE46",
+      "targetId": "RDR_A2DE46",
+      "type": "rider",
+      "applicationId": "APP_RDR_A4C717",
+      "name": "Test Rider",
+      "phone": "9988776644",
+      "email": "testrider@vride.in",
+      "dob": "",
+      "address": "",
+      "emergencyContact": "",
+      "city": "Hyderabad",
+      "vehicle": "Bike",
+      "vehicleType": "bike",
+      "vehicleModel": "",
+      "vehicleNo": "TS09AB1111",
+      "vehicleNumber": "TS09AB1111",
+      "services": [
+        "Food Delivery",
+        "Parcel Delivery",
+        "Customer Pick & Drop"
+      ],
+      "preferredLocation": "Miyapur, Hyderabad",
+      "availability": "Full-time",
+      "gps": {
+        "lat": 17.4948,
+        "lng": 78.3578
+      },
+      "documents": {
+        "idProof": "Submitted",
+        "pan": "Submitted",
+        "drivingLicense": "Submitted",
+        "vehicleRC": "TS09AB1111",
+        "insurance": "Submitted",
+        "bankProof": "Uploaded"
+      },
+      "bankDetails": {
+        "accountHolder": "Test Rider",
+        "bankName": "",
+        "accountNumberMasked": "",
+        "ifscCode": ""
+      },
+      "isOnline": false,
+      "online": false,
+      "rating": 5,
+      "totalTrips": 0,
+      "walletBalance": 0,
+      "appliedOn": "28 Nov 2026",
+      "status": "pending",
+      "remarks": "",
+      "createdAt": "2026-11-28T13:48:28.769Z"
+    },
+    {
+      "id": "RST_0E7544",
+      "targetId": "RST_0E7544",
+      "type": "restaurant",
+      "applicationId": "APP_RST_BD37F6",
+      "name": "Test Kitchen",
+      "owner": "Test Owner",
+      "phone": "9988776655",
+      "email": "testrest@vride.in",
+      "ownerPhoto": "",
+      "logo": "",
+      "restaurantType": "Both",
+      "cuisine": "Multi Cuisine",
+      "cuisines": [
+        "Multi Cuisine"
+      ],
+      "address": "Miyapur, Hyderabad",
+      "area": "Miyapur",
+      "city": "Hyderabad",
+      "gps": {
+        "lat": 17.4948,
+        "lng": 78.3578
+      },
+      "operatingHours": "10:00 AM - 11:00 PM",
+      "prepTime": "20 Minutes",
+      "documents": {
+        "fssai": "FSSAI123",
+        "pan": "ABCDE1234F",
+        "gst": "N/A",
+        "ownerIdProof": "Submitted",
+        "bankProof": "Cancelled Cheque Uploaded"
+      },
+      "docs": [
+        "FSSAI: FSSAI123",
+        "PAN: ABCDE1234F",
+        "GST: N/A",
+        "Bank: HDFC (HDFC0001)"
+      ],
+      "bankDetails": {
+        "accountHolder": "Test Owner",
+        "bankName": "HDFC",
+        "accountNumberMasked": "••••7890",
+        "ifscCode": "HDFC0001"
+      },
+      "isOpen": false,
+      "rating": 4.5,
+      "appliedOn": "28 Nov 2026",
+      "status": "pending",
+      "remarks": "",
+      "createdAt": "2026-11-28T13:48:28.678Z"
+    }
+  ]
 }

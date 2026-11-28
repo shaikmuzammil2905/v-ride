@@ -101,14 +101,90 @@ export const AdminDashboard = ({ onLogout }) => {
   const [modal, setModal] = useState({ open: false, type: '', data: {} });
 
   const syncAll = async () => {
-    const [ticketsRes, adminsRes, auditRes] = await Promise.all([
+    const [ticketsRes, adminsRes, auditRes, onboardRes] = await Promise.all([
       apiRequest('/support/tickets'),
       apiRequest('/admin/accounts'),
-      apiRequest('/admin/audit-logs')
+      apiRequest('/admin/audit-logs'),
+      apiRequest('/admin/onboarding')
     ]);
     if (ticketsRes?.success && ticketsRes.data?.length) setTickets(ticketsRes.data);
     if (adminsRes?.success && adminsRes.data?.length) setAdminAccounts(adminsRes.data);
     if (auditRes?.success && auditRes.data?.length) setAuditLogs(auditRes.data);
+
+    try {
+      const localRest = JSON.parse(localStorage.getItem('vride_onboarding_restaurants') || '[]');
+      const apiRest = onboardRes?.success ? (onboardRes.data?.restaurants || []) : [];
+      const mergedRest = [...apiRest, ...localRest];
+      if (mergedRest.length > 0) {
+        setRestaurants((prev) => {
+          const seen = new Set(prev.map((x) => x.id));
+          const additions = mergedRest.filter((x) => !seen.has(x.id));
+          return [...additions, ...prev];
+        });
+      }
+
+      const localRiders = JSON.parse(localStorage.getItem('vride_onboarding_riders') || '[]');
+      const apiRiders = onboardRes?.success ? (onboardRes.data?.riders || []) : [];
+      const mergedRiders = [...apiRiders, ...localRiders];
+      if (mergedRiders.length > 0) {
+        setRiders((prev) => {
+          const seen = new Set(prev.map((x) => x.id));
+          const additions = mergedRiders.filter((x) => !seen.has(x.id));
+          return [...additions, ...prev];
+        });
+      }
+    } catch {
+      // ignore localStorage parse errors
+    }
+  };
+
+  const handleOnboardingDecision = async (type, item, decision) => {
+    const targetId = item.targetId || item.id;
+    await apiRequest(`/admin/onboarding/${type}/${targetId}/decision`, {
+      method: 'PUT',
+      body: JSON.stringify({ decision })
+    });
+
+    try {
+      const key = type === 'restaurant' ? 'vride_onboarding_restaurants' : 'vride_onboarding_riders';
+      const list = JSON.parse(localStorage.getItem(key) || '[]');
+      const updatedList = list.map((x) => (x.id === item.id || x.targetId === targetId ? { ...x, status: decision } : x));
+      localStorage.setItem(key, JSON.stringify(updatedList));
+
+      if (decision === 'approved' && item.rawApplication) {
+        const raw = item.rawApplication;
+        const customAccs = JSON.parse(localStorage.getItem('vride_local_accounts') || '[]');
+        const emailLower = String(raw.email || '').trim().toLowerCase();
+        if (emailLower && !customAccs.some((a) => a.email?.toLowerCase() === emailLower)) {
+          customAccs.unshift({
+            id: targetId,
+            accountId: 'auth_' + targetId,
+            restaurantId: type === 'restaurant' ? targetId : undefined,
+            name: type === 'restaurant' ? raw.restaurantName : raw.fullName,
+            username: emailLower.split('@')[0],
+            email: emailLower,
+            phone: raw.mobile,
+            role: type === 'restaurant' ? 'vendor' : 'rider',
+            vehicleType: raw.vehicleType ? String(raw.vehicleType).toLowerCase() : undefined,
+            pass: raw.password || (type === 'restaurant' ? 'Vendor@2026' : 'Partner@2026')
+          });
+          localStorage.setItem('vride_local_accounts', JSON.stringify(customAccs));
+        }
+      }
+    } catch {
+      // ignore localStorage errors
+    }
+
+    if (type === 'restaurant') {
+      setRestaurants((p) => p.map((x) => (x.id === item.id ? { ...x, status: decision } : x)));
+      setSelectedRest((p) => (p ? { ...p, status: decision } : p));
+      addAudit(`${decision === 'approved' ? 'Approved' : 'Rejected'} Restaurant`, 'Restaurants', item.id);
+    } else {
+      setRiders((p) => p.map((x) => (x.id === item.id ? { ...x, status: decision } : x)));
+      setSelectedRider((p) => (p ? { ...p, status: decision } : p));
+      addAudit(`${decision === 'approved' ? 'Approved' : 'Rejected'} Rider`, 'Riders', item.id);
+    }
+    showToast(`${item.name} ${decision}!`);
   };
 
   useEffect(() => {
@@ -513,33 +589,28 @@ export const AdminDashboard = ({ onLogout }) => {
                   <div className="space-y-3 text-xs">
                     <p><strong>Name:</strong> {selectedRest.name} ({selectedRest.id})</p>
                     <p><strong>Owner:</strong> {selectedRest.owner}</p>
+                    {selectedRest.phone && <p><strong>Phone:</strong> {selectedRest.phone}</p>}
+                    {selectedRest.email && <p><strong>Email:</strong> {selectedRest.email}</p>}
+                    {selectedRest.bankDetails?.bankName && (
+                      <p><strong>Bank:</strong> {selectedRest.bankDetails.bankName} ({selectedRest.bankDetails.ifscCode})</p>
+                    )}
                     <div className="space-y-1">
                       <span className="font-bold block">Documents:</span>
                       {(selectedRest.docs || ['FSSAI', 'GST', 'Bank']).map((d) => (
                         <div key={d} className="flex justify-between p-2 rounded-lg bg-gray-50">
-                          <span>{d}</span><span className="text-emerald-600 font-bold">✓ Verified</span>
+                          <span>{d}</span><span className="text-emerald-600 font-bold">✓ Submitted</span>
                         </div>
                       ))}
                     </div>
                     <div className="grid grid-cols-2 gap-2">
                       <button
-                        onClick={() => {
-                          setRestaurants((p) => p.map((x) => (x.id === selectedRest.id ? { ...x, status: 'approved' } : x)));
-                          setSelectedRest((p) => ({ ...p, status: 'approved' }));
-                          addAudit('Approved Restaurant', 'Restaurants', selectedRest.id);
-                          showToast(`${selectedRest.name} approved!`);
-                        }}
+                        onClick={() => handleOnboardingDecision('restaurant', selectedRest, 'approved')}
                         className="py-2 rounded-xl bg-emerald-600 text-white font-black"
                       >
                         Approve
                       </button>
                       <button
-                        onClick={() => {
-                          setRestaurants((p) => p.map((x) => (x.id === selectedRest.id ? { ...x, status: 'rejected' } : x)));
-                          setSelectedRest((p) => ({ ...p, status: 'rejected' }));
-                          addAudit('Rejected Restaurant', 'Restaurants', selectedRest.id);
-                          showToast(`${selectedRest.name} rejected`);
-                        }}
+                        onClick={() => handleOnboardingDecision('restaurant', selectedRest, 'rejected')}
                         className="py-2 rounded-xl bg-red-600 text-white font-black"
                       >
                         Reject
@@ -613,8 +684,10 @@ export const AdminDashboard = ({ onLogout }) => {
                     </div>
 
                     <div className="space-y-1.5">
-                      <span className="font-bold block">Documents</span>
-                      {['Driving Licence', 'Vehicle RC', 'Insurance', 'ID Proof'].map((doc) => (
+                      <span className="font-bold block">Documents & Details</span>
+                      {selectedRider.phone && <p><strong>Phone:</strong> {selectedRider.phone}</p>}
+                      {selectedRider.email && <p><strong>Email:</strong> {selectedRider.email}</p>}
+                      {(selectedRider.docs || ['Driving Licence', 'Vehicle RC', 'Insurance', 'ID Proof']).map((doc) => (
                         <div key={doc} className="flex justify-between p-2 rounded-lg bg-gray-50">
                           <span>{doc}</span><span className="text-emerald-600 font-bold">✓</span>
                         </div>
@@ -623,23 +696,13 @@ export const AdminDashboard = ({ onLogout }) => {
 
                     <div className="grid grid-cols-2 gap-2">
                       <button
-                        onClick={() => {
-                          setRiders((p) => p.map((x) => (x.id === selectedRider.id ? { ...x, status: 'approved' } : x)));
-                          setSelectedRider((p) => ({ ...p, status: 'approved' }));
-                          addAudit('Approved Rider', 'Riders', selectedRider.id);
-                          showToast(`${selectedRider.name} approved!`);
-                        }}
+                        onClick={() => handleOnboardingDecision('rider', selectedRider, 'approved')}
                         className="py-2 rounded-xl bg-emerald-600 text-white font-black"
                       >
                         Approve
                       </button>
                       <button
-                        onClick={() => {
-                          setRiders((p) => p.map((x) => (x.id === selectedRider.id ? { ...x, status: 'rejected' } : x)));
-                          setSelectedRider((p) => ({ ...p, status: 'rejected' }));
-                          addAudit('Rejected Rider', 'Riders', selectedRider.id);
-                          showToast(`${selectedRider.name} rejected`);
-                        }}
+                        onClick={() => handleOnboardingDecision('rider', selectedRider, 'rejected')}
                         className="py-2 rounded-xl bg-red-600 text-white font-black"
                       >
                         Reject
